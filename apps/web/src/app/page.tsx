@@ -105,9 +105,7 @@ const homepageSchema = [
       { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
       { "@type": "Offer", "name": "Starter", "price": "49", "priceCurrency": "USD" },
       { "@type": "Offer", "name": "Growth", "price": "99", "priceCurrency": "USD" },
-      { "@type": "Offer", "name": "Professional", "price": "349", "priceCurrency": "USD" },
       { "@type": "Offer", "name": "Scale", "price": "399", "priceCurrency": "USD" },
-      { "@type": "Offer", "name": "Enterprise", "priceCurrency": "USD", "description": "Custom pricing — contact sales", "priceSpecification": { "@type": "PriceSpecification", "priceCurrency": "USD", "price": "1500", "unitText": "starting at" } },
     ],
   },
 ];
@@ -155,7 +153,6 @@ export default function Home() {
         <HeroSection />
         <FeaturesSection />
         <AboutSection />
-        <PricingSection />
         <TestimonialsSection />
         <CtaSection />
         <FaqSection />

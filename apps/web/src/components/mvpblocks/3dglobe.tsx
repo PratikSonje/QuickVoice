@@ -26,7 +26,7 @@ export default function Globe3D() {
 
       <div className="relative z-10 container mx-auto max-w-2xl px-4 text-center md:max-w-4xl md:px-6 lg:max-w-7xl">
         <motion.div
-          initial={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}>
           <span
@@ -53,9 +53,9 @@ export default function Globe3D() {
             </Link>
 
             <a
-              href="#how-it-works"
+              href="#pricing"
               className="flex w-full items-center justify-center gap-2 dark:text-white/70 text-gray-600 transition-colors dark:hover:text-white hover:text-black sm:w-auto">
-              <span>Learn how it works</span>
+              <span>See pricing</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"

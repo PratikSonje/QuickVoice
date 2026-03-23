@@ -6,24 +6,9 @@ import {
   Menu,
   X,
   ChevronDown,
-  ChevronsUpDown,
-  Sparkles,
-  BadgeCheck,
-  CreditCard,
-  Bell,
-  LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 import Logo1 from "../logo1";
 
 interface NavItem {
@@ -121,8 +106,6 @@ const navItems: NavItem[] = [
   },
 ];
 export default function Header1() {
-  const router = useRouter();
-  
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -231,8 +214,16 @@ export default function Header1() {
             </ul>
           </nav>
 
-          {/* Right Side (Auth + Theme) */}
+          {/* Right Side (Auth + CTA) */}
           <div className="flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Get Started</Link>
+              </Button>
+            </div>
             {/* Mobile Menu Button */}
             <button
               className="lg:hidden rounded-lg p-2 hover:bg-muted transition"
@@ -263,7 +254,7 @@ export default function Header1() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <ul className="space-y-2 h-[300px] overflow-auto">
+            <ul className="space-y-2 max-h-[60vh] overflow-auto">
               {navItems.map((item) => (
                 <li key={item.name}>
                   <Link
@@ -302,7 +293,14 @@ export default function Header1() {
                 </li>
               ))}
             </ul>
-            
+            <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
+              <Button variant="outline" asChild className="w-full">
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
+              </Button>
+              <Button asChild className="w-full">
+                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
+              </Button>
+            </div>
           </motion.nav>
         )}
       </AnimatePresence>

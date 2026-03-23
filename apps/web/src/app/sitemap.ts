@@ -156,7 +156,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const caseStudyUrls: MetadataRoute.Sitemap = caseStudies.map((study: ) => ({
+  const caseStudyUrls: MetadataRoute.Sitemap = caseStudies.map((study: { slug: string }) => ({
     url: `${baseUrl}/case-studies/${study.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CTA2() {
   return (
-    <div className="relative w-full max-w-4xl overflow-hidden rounded-[40px] bg-[#2563eb] dark:bg-[#8b5cf6] p-6 sm:p-10 md:p-20">
+    <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-[40px] bg-[#2563eb] dark:bg-[#8b5cf6] p-6 sm:p-10 md:p-20">
       <div className="absolute inset-0 hidden h-full w-full overflow-hidden md:block">
         <div className="absolute top-1/2 right-[-45%] aspect-square h-[800px] w-[800px] -translate-y-1/2">
           {/* Light mode circles */}
@@ -42,10 +42,10 @@ export default function CTA2() {
             <span className="h-5 w-5 flex-shrink-0 rounded-full bg-white"></span>
           </Link>
           <Link
-            href="/#demo"
+            href="#contact-us"
             className="flex w-full items-center justify-between rounded-full bg-black px-5 py-3 text-white sm:w-[240px]"
           >
-            <span className="font-medium">Watch Demo</span>
+            <span className="font-medium">Contact Us</span>
             <span className="h-5 w-5 flex-shrink-0 rounded-full bg-white"></span>
           </Link>
         </div>

@@ -41,42 +41,27 @@ export default function ContactUs1() {
         return;
       }
 
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          message,
-          lookingFor: 'General Inquiry',
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Unable to process your request at this time');
-      }
+      // Open mailto with pre-filled data
+      const subject = encodeURIComponent(`Contact from ${name}`);
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+      );
+      window.open(`mailto:info@quickvoice.co?subject=${subject}&body=${body}`, '_self');
 
       // Clear form data
       setName('');
       setEmail('');
       setMessage('');
       setIsSubmitted(true);
-      
+
       // Reset success message after 10 seconds
       setTimeout(() => {
         setIsSubmitted(false);
       }, 10000);
     } catch (error: unknown) {
       console.error('Error submitting form:', error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'We encountered an issue processing your request. Please try again or contact us directly at info@quickvoice.co';
-      setSubmitError(errorMessage);
-      
+      setSubmitError('We encountered an issue. Please contact us directly at info@quickvoice.co');
+
       // Clear error message after 10 seconds
       setTimeout(() => {
         setSubmitError('');
@@ -139,7 +124,7 @@ export default function ContactUs1() {
                   maxSize={1.4}
                   particleDensity={500}
                   className="absolute inset-0 top-0 h-24 w-full"
-                  particleColor="#2563eb"
+                  particleColor="currentColor"
                 />
               </motion.div>
 

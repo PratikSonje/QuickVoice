@@ -1,234 +1,639 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+export const metadata: Metadata = {
+  title: "Pricing — AI Voice Agent Plans",
+  description:
+    "QuickVoice pricing starts free. Choose from 6 plans — Free, PAYG, Starter ($49/mo), Growth ($99/mo), Scale ($399/mo), and Enterprise. No hidden fees.",
+  alternates: {
+    canonical: "https://quickvoice.co/pricing",
+  },
+  openGraph: {
+    title: "Pricing — AI Voice Agent Plans",
+    description:
+      "QuickVoice pricing starts free. Choose from 6 plans. No hidden fees.",
+    type: "website",
+    url: "https://quickvoice.co/pricing",
+  },
+};
 
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { toast } from "sonner";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
-import { plans } from "@/data/plans";
+/* ------------------------------------------------------------------ */
+/*  Static plan data (mirrors data/plans.ts without importing icons)  */
+/* ------------------------------------------------------------------ */
 
+const PLANS = [
+  {
+    name: "Free",
+    price: "$0",
+    period: "",
+    agents: "1",
+    minutes: "15 mins/mo",
+    effectiveRate: "—",
+    overageRate: "—",
+    keyFeatures: [
+      "Browser playground only",
+      "Non-commercial use",
+      "15 test minutes per month",
+    ],
+    cta: "Get Started",
+    ctaHref: "/register",
+    popular: false,
+  },
+  {
+    name: "PAYG",
+    price: "$0",
+    period: "+ $0.25/min",
+    agents: "1",
+    minutes: "Pay as you go",
+    effectiveRate: "$0.25/min",
+    overageRate: "$0.25/min",
+    keyFeatures: [
+      "API + webhooks + telephony",
+      "Per-second billing",
+      "1 workspace",
+    ],
+    cta: "Get Started",
+    ctaHref: "/register",
+    popular: false,
+  },
+  {
+    name: "Starter",
+    price: "$49",
+    period: "/mo",
+    agents: "3",
+    minutes: "245 mins/mo",
+    effectiveRate: "$0.20/min",
+    overageRate: "$0.25/min",
+    keyFeatures: [
+      "Basic analytics",
+      "Email support",
+      "Telephony enabled",
+    ],
+    cta: "Subscribe",
+    ctaHref: "/register",
+    popular: false,
+  },
+  {
+    name: "Growth",
+    price: "$99",
+    period: "/mo",
+    agents: "5",
+    minutes: "600 mins/mo",
+    effectiveRate: "$0.165/min",
+    overageRate: "$0.22/min",
+    keyFeatures: [
+      "Call transcripts & redaction",
+      "SSO (add-on)",
+      "Telephony enabled",
+    ],
+    cta: "Subscribe",
+    ctaHref: "/register",
+    popular: false,
+  },
+  {
+    name: "Scale",
+    price: "$399",
+    period: "/mo",
+    agents: "10",
+    minutes: "2,660 mins/mo",
+    effectiveRate: "$0.15/min",
+    overageRate: "$0.20/min",
+    keyFeatures: [
+      "HIPAA-ready logging",
+      "Priority support",
+      "Reserved concurrency",
+    ],
+    cta: "Subscribe",
+    ctaHref: "/register",
+    popular: true,
+  },
+  {
+    name: "Enterprise",
+    price: "$1,500",
+    period: "/mo",
+    agents: "Custom",
+    minutes: "10,000+ mins/mo",
+    effectiveRate: "$0.15/min",
+    overageRate: "Custom",
+    keyFeatures: [
+      "Custom SLA & BAA",
+      "Dedicated support",
+      "Private networking & SSO/SCIM",
+    ],
+    cta: "Contact Sales",
+    ctaHref: "/company/contact",
+    popular: false,
+  },
+] as const;
 
-export default function SimplePricing() {
-  const router = useRouter();
-  // const { data: session } = authClient.useSession();
-  // const user = session?.user;
-  // const getCheckoutUrl = async (plan: string) => {
-  //   const response = await axios.post("/api/stripe/checkout", {
-  //     plan: plan,
-  //     email: user?.email as string,
-  //   });
-  //   if (response.data.url) {
-  //     console.log("response.data.url", response.data.url);
-  //     localStorage.setItem("checkoutToken", response.data.token);
-  //     router.push(response.data.url);
-  //   } else {
-  //     toast.error("Failed to get checkout URL");
-  //   }
-  // };
+/* ------------------------------------------------------------------ */
+/*  Feature matrix                                                     */
+/* ------------------------------------------------------------------ */
 
+const FEATURE_ROWS: { label: string; plans: boolean[] }[] = [
+  { label: "Browser playground",        plans: [true,  true,  true,  true,  true,  true] },
+  { label: "API & webhooks",            plans: [false, true,  true,  true,  true,  true] },
+  { label: "Telephony (inbound/outbound)", plans: [false, true, true, true, true, true] },
+  { label: "Call transcripts",          plans: [false, false, false, true,  true,  true] },
+  { label: "PII redaction",             plans: [false, false, false, true,  true,  true] },
+  { label: "Analytics dashboard",       plans: [false, false, true,  true,  true,  true] },
+  { label: "Email support",             plans: [false, false, true,  true,  true,  true] },
+  { label: "Priority support",          plans: [false, false, false, false, true,  true] },
+  { label: "HIPAA-ready logging",       plans: [false, false, false, false, true,  true] },
+  { label: "Reserved concurrency",      plans: [false, false, false, false, true,  true] },
+  { label: "SSO / SCIM",                plans: [false, false, false, false, false, true] },
+  { label: "Custom SLA",                plans: [false, false, false, false, false, true] },
+  { label: "BAA available",             plans: [false, false, false, false, false, true] },
+  { label: "Private networking",        plans: [false, false, false, false, false, true] },
+  { label: "Dedicated account manager", plans: [false, false, false, false, false, true] },
+];
+
+/* ------------------------------------------------------------------ */
+/*  FAQs                                                               */
+/* ------------------------------------------------------------------ */
+
+const FAQS = [
+  {
+    q: "Is there really a free plan?",
+    a: "Yes. The Free plan gives you 1 agent and 15 browser-only minutes every month at no cost. No credit card is required to sign up.",
+  },
+  {
+    q: "How does the PAYG plan work?",
+    a: "PAYG (Pay As You Go) has no monthly fee. You are billed per second at an effective rate of $0.25 per minute for every call your agent handles. Telephony, API, and webhooks are all enabled.",
+  },
+  {
+    q: "What happens if I exceed my included minutes?",
+    a: "If you go over the minutes included in your plan, additional usage is billed at the overage rate listed for your tier. For example, Starter overages are $0.25/min while Scale overages are $0.20/min.",
+  },
+  {
+    q: "Can I upgrade or downgrade at any time?",
+    a: "Absolutely. You can change plans at any point from your account dashboard. Upgrades take effect immediately, and downgrades apply at the start of your next billing cycle.",
+  },
+  {
+    q: "Do you offer annual billing discounts?",
+    a: "Yes. Annual plans receive a discount compared to month-to-month pricing. Contact our sales team for a custom annual quote.",
+  },
+  {
+    q: "Is QuickVoice HIPAA-compliant?",
+    a: "Our Scale and Enterprise plans include HIPAA-ready logging and we can sign a Business Associate Agreement (BAA) on the Enterprise tier. Contact us to discuss compliance requirements.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "We accept all major credit and debit cards (Visa, Mastercard, American Express) processed securely through Stripe. Enterprise customers can also pay by invoice.",
+  },
+  {
+    q: "How do I get started with Enterprise?",
+    a: "Reach out to our sales team through the Contact Sales button. We will work with you to tailor agents, minutes, concurrency, and SLAs to your exact needs.",
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  JSON-LD schemas                                                    */
+/* ------------------------------------------------------------------ */
+
+const pricingSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "QuickVoice",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  browserRequirements: "Requires JavaScript. Requires HTML5.",
+  url: "https://quickvoice.co/pricing",
+  offers: [
+    { "@type": "Offer", name: "Free",       price: "0",    priceCurrency: "USD", description: "1 agent, 15 mins/mo, browser only" },
+    { "@type": "Offer", name: "PAYG",       price: "0",    priceCurrency: "USD", description: "Pay $0.25/min, 1 agent, telephony enabled" },
+    { "@type": "Offer", name: "Starter",    price: "49",   priceCurrency: "USD", description: "3 agents, 245 mins/mo included" },
+    { "@type": "Offer", name: "Growth",     price: "99",   priceCurrency: "USD", description: "5 agents, 600 mins/mo included" },
+    { "@type": "Offer", name: "Scale",      price: "399",  priceCurrency: "USD", description: "10 agents, 2,660 mins/mo included" },
+    { "@type": "Offer", name: "Enterprise", price: "1500", priceCurrency: "USD", description: "Custom agents and minutes, dedicated support" },
+  ],
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.a,
+    },
+  })),
+};
+
+/* ================================================================== */
+/*  Page component                                                     */
+/* ================================================================== */
+
+export default function PricingPage() {
   return (
-    <div
-      id="pricing"
-      className="not-prose relative flex w-full flex-col gap-16 overflow-hidden px-4 py-2 mb-10 text-center sm:px-8 "
-    >
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="bg-primary/10 absolute -top-[10%] left-[50%] h-[40%] w-[60%] -translate-x-1/2 rounded-full blur-3xl" />
-        <div className="bg-primary/5 absolute -right-[10%] -bottom-[10%] h-[40%] w-[40%] rounded-full blur-3xl" />
-        <div className="bg-primary/5 absolute -bottom-[10%] -left-[10%] h-[40%] w-[40%] rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* ── JSON-LD ─────────────────────────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
-      <div className="flex flex-col items-center justify-center gap-8">
-        <div className="flex flex-col items-center space-y-2">
-          <Badge
-            variant="outline"
-            className="border-primary/20 bg-primary/5 mb-4 rounded-full px-4 py-1 text-sm font-medium"
-          >
-            <Sparkles className="text-primary mr-1 h-3.5 w-3.5 animate-pulse" />
-            Simple, Transparent Pricing
-          </Badge>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="pb-4 from-foreground to-foreground/30 bg-gradient-to-b bg-clip-text text-4xl font-bold text-transparent sm:text-5xl"
-          >
-            Start with our free trial and scale as you grow. No hidden fees, no
-            surprises.
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-muted-foreground max-w-md pt-2 text-lg"
-          >
-            Simple, transparent pricing that scales with your business. No
-            hidden fees, no surprises.
-          </motion.p>
+      {/* ── Hero ────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden pt-24 pb-16 text-center">
+        {/* Decorative blurs */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-[10%] left-1/2 h-[40%] w-[60%] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -bottom-[10%] -right-[10%] h-[40%] w-[40%] rounded-full bg-primary/5 blur-3xl" />
         </div>
 
-        {/* <div className="mt-8 grid w-full max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
-          {Object.values(plans).map(
-            (plan, index) =>
-              plan.id !== "admin" && (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="flex"
-                >
-                  <Card
-                    className={cn(
-                      "bg-secondary/20 relative h-full w-full text-left transition-all duration-300 hover:shadow-lg",
+        <div className="container mx-auto max-w-4xl px-4">
+          <p className="mb-4 inline-block rounded-full border border-primary/20 bg-primary/5 px-4 py-1 text-sm font-medium text-primary">
+            Pricing
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Simple, Transparent Pricing
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+            Start free, upgrade when you are ready. Every plan includes
+            per-second billing, so you only pay for what you use.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Plan Cards (mobile) & Table (desktop) ───────────────── */}
+      <section className="container mx-auto max-w-7xl px-4 pb-20">
+        {/* ---- Mobile: stacked cards ---- */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:hidden">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative rounded-2xl border p-6 ${
+                plan.popular
+                  ? "border-primary ring-2 ring-primary/50 shadow-lg"
+                  : "border-border"
+              } bg-background`}
+            >
+              {plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                  POPULAR
+                </span>
+              )}
+              <h3 className="text-lg font-semibold">{plan.name}</h3>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-3xl font-bold">{plan.price}</span>
+                {plan.period && (
+                  <span className="text-muted-foreground">{plan.period}</span>
+                )}
+              </div>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <span className="font-medium text-foreground">Agents:</span>{" "}
+                  {plan.agents}
+                </li>
+                <li>
+                  <span className="font-medium text-foreground">Minutes:</span>{" "}
+                  {plan.minutes}
+                </li>
+                {plan.effectiveRate !== "—" && (
+                  <li>
+                    <span className="font-medium text-foreground">
+                      Effective rate:
+                    </span>{" "}
+                    {plan.effectiveRate}
+                  </li>
+                )}
+                {plan.overageRate !== "—" && (
+                  <li>
+                    <span className="font-medium text-foreground">
+                      Overage:
+                    </span>{" "}
+                    {plan.overageRate}
+                  </li>
+                )}
+              </ul>
+              <ul className="mt-4 space-y-1.5 text-sm">
+                {plan.keyFeatures.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <svg
+                      className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={plan.ctaHref}
+                className={`mt-6 block w-full rounded-lg px-4 py-2.5 text-center text-sm font-medium transition-colors ${
+                  plan.popular
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border border-border bg-muted hover:bg-muted/80 text-foreground"
+                }`}
+              >
+                {plan.cta}
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* ---- Desktop: comparison table ---- */}
+        <div className="hidden lg:block overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="border-b border-border p-4 text-left font-medium text-muted-foreground">
+                  &nbsp;
+                </th>
+                {PLANS.map((plan) => (
+                  <th
+                    key={plan.name}
+                    className={`relative border-b p-4 text-center font-semibold ${
                       plan.popular
-                        ? "ring-primary/50 dark:shadow-primary/10 shadow-md ring-2"
-                        : "hover:border-primary/30",
-                      plan.popular &&
-                        "from-primary/[0.03] bg-gradient-to-b to-transparent"
-                    )}
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
+                    }`}
                   >
                     {plan.popular && (
-                      <div className="absolute -top-3 right-0 left-0 mx-auto w-fit">
-                        <Badge className="bg-primary text-primary-foreground rounded-full px-4 py-1 shadow-sm">
-                          <Sparkles className="mr-1 h-3.5 w-3.5" />
-                          Popular
-                        </Badge>
-                      </div>
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                        POPULAR
+                      </span>
                     )}
-                    <CardHeader className={cn("pb-4", plan.popular && "pt-8")}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={cn(
-                            "flex h-8 w-8 items-center justify-center rounded-full",
-                            plan.popular
-                              ? "bg-primary/10 text-primary"
-                              : "bg-secondary text-foreground"
-                          )}
-                        >
-                          <plan.icon className="h-4 w-4" />
-                        </div>
-                        <CardTitle
-                          className={cn(
-                            "text-xl font-bold",
-                            plan.popular && "text-primary"
-                          )}
-                        >
-                          {plan.name}
-                        </CardTitle>
-                      </div>
-                      <CardDescription className="mt-3 space-y-2">
-                        <p className="text-sm">{plan.description}</p>
-                        <div className="pt-2">
-                          <div className="flex items-baseline">
-                            <span
-                              className={cn(
-                                "text-3xl font-bold",
-                                plan.popular
-                                  ? "text-primary"
-                                  : "text-foreground"
-                              )}
-                            >
-                              $ {plan.price}
-                            </span>
-                          </div>
-                        </div>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-3 pb-6">
-                      {plan.features.map((feature, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -5 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{
-                            duration: 0.3,
-                            delay: 0.5 + index * 0.05,
-                          }}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <div
-                            className={cn(
-                              "flex h-5 w-5 items-center justify-center rounded-full",
-                              plan.popular
-                                ? "bg-primary/10 text-primary"
-                                : "bg-secondary text-secondary-foreground"
-                            )}
+                    {plan.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {/* Price */}
+              <tr>
+                <td className="p-4 font-medium">Price</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    <span className="text-xl font-bold">{plan.price}</span>
+                    {plan.period && (
+                      <span className="text-muted-foreground">
+                        {plan.period}
+                      </span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+              {/* Agents */}
+              <tr>
+                <td className="p-4 font-medium">Agents included</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    {plan.agents}
+                  </td>
+                ))}
+              </tr>
+              {/* Minutes */}
+              <tr>
+                <td className="p-4 font-medium">Minutes per month</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    {plan.minutes}
+                  </td>
+                ))}
+              </tr>
+              {/* Effective rate */}
+              <tr>
+                <td className="p-4 font-medium">Effective rate</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    {plan.effectiveRate}
+                  </td>
+                ))}
+              </tr>
+              {/* Overage */}
+              <tr>
+                <td className="p-4 font-medium">Overage rate</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    {plan.overageRate}
+                  </td>
+                ))}
+              </tr>
+              {/* Key features */}
+              <tr>
+                <td className="p-4 align-top font-medium">Key features</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center align-top ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    <ul className="inline-block space-y-1 text-left text-xs text-muted-foreground">
+                      {plan.keyFeatures.map((f) => (
+                        <li key={f} className="flex items-start gap-1.5">
+                          <svg
+                            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
                           >
-                            <Check className="h-3.5 w-3.5" />
-                          </div>
-                          <span
-                            className={
-                              plan.popular
-                                ? "text-foreground"
-                                : "text-muted-foreground"
-                            }
-                          >
-                            {feature}
-                          </span>
-                        </motion.div>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          {f}
+                        </li>
                       ))}
-                    </CardContent>
-                    <CardFooter>
-                      {user?.plan === plan.id ? (
-                        <Button className="w-full font-medium duration-300 bg-white text-black">
-                          Current Plan
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            if (user) {
-                              console.log("plan", plan);
-                              getCheckoutUrl(plan.id);
-                              toast.success("Redirecting to checkout...");
-                            } else {
-                              toast.info(
-                                "Please sign up or log in to continue"
-                              );
-                              router.push(plan.link || "upgrade");
-                            }
-                          }}
-                          variant={plan.popular ? "default" : "outline"}
-                          className={cn(
-                            "w-full font-medium transition-all duration-300",
-                            plan.popular
-                              ? "bg-primary hover:bg-primary/90 hover:shadow-primary/20 hover:shadow-md"
-                              : "hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-                          )}
-                        >
-                          <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                          {plan.cta}
-                        </Button>
-                      )}
-                    </CardFooter>
+                    </ul>
+                  </td>
+                ))}
+              </tr>
+              {/* CTA row */}
+              <tr>
+                <td className="p-4">&nbsp;</td>
+                {PLANS.map((plan) => (
+                  <td
+                    key={plan.name}
+                    className={`p-4 text-center ${
+                      plan.popular ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    <Link
+                      href={plan.ctaHref}
+                      className={`inline-block rounded-lg px-5 py-2 text-sm font-medium transition-colors ${
+                        plan.popular
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "border border-border bg-muted hover:bg-muted/80 text-foreground"
+                      }`}
+                    >
+                      {plan.cta}
+                    </Link>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-                    {/* Subtle gradient effects */}
-                    {/* {plan.popular ? (
-                      <>
-                        <div className="from-primary/[0.05] pointer-events-none absolute right-0 bottom-0 left-0 h-1/2 rounded-b-lg bg-gradient-to-t to-transparent" />
-                        <div className="border-primary/20 pointer-events-none absolute inset-0 rounded-lg border" />
-                      </>
-                    ) : (
-                      <div className="hover:border-primary/10 pointer-events-none absolute inset-0 rounded-lg border border-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
-                    )}
-                  </Card>
-                </motion.div>
-              )
-          )} */}
-        {/* </div> */} 
-      </div>
+      {/* ── Feature Matrix ──────────────────────────────────────── */}
+      <section className="border-t border-border bg-muted/30 py-20">
+        <div className="container mx-auto max-w-7xl px-4">
+          <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">
+            Full Feature Comparison
+          </h2>
+          <p className="mx-auto mb-12 max-w-xl text-center text-muted-foreground">
+            See exactly what is included in every plan so you can pick the right
+            fit for your team.
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th className="border-b border-border p-3 text-left font-medium text-muted-foreground">
+                    Feature
+                  </th>
+                  {PLANS.map((plan) => (
+                    <th
+                      key={plan.name}
+                      className={`border-b p-3 text-center font-semibold ${
+                        plan.popular
+                          ? "border-primary bg-primary/5"
+                          : "border-border"
+                      }`}
+                    >
+                      {plan.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {FEATURE_ROWS.map((row) => (
+                  <tr key={row.label}>
+                    <td className="p-3 font-medium">{row.label}</td>
+                    {row.plans.map((available, i) => (
+                      <td
+                        key={PLANS[i].name}
+                        className={`p-3 text-center ${
+                          PLANS[i].popular ? "bg-primary/5" : ""
+                        }`}
+                      >
+                        {available ? (
+                          <svg
+                            className="mx-auto h-5 w-5 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        ) : (
+                          <span className="text-muted-foreground/40">—</span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ─────────────────────────────────────────────────── */}
+      <section className="py-20">
+        <div className="container mx-auto max-w-3xl px-4">
+          <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">
+            Pricing FAQs
+          </h2>
+          <p className="mx-auto mb-12 max-w-xl text-center text-muted-foreground">
+            Have questions? We have answers. If you need more help, feel free to{" "}
+            <Link
+              href="/company/contact"
+              className="text-primary underline underline-offset-4 hover:text-primary/80"
+            >
+              contact our team
+            </Link>
+            .
+          </p>
+
+          <dl className="divide-y divide-border">
+            {FAQS.map((faq) => (
+              <div key={faq.q} className="py-6">
+                <dt className="text-base font-semibold">{faq.q}</dt>
+                <dd className="mt-2 text-muted-foreground">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* ── CTA ─────────────────────────────────────────────────── */}
+      <section className="border-t border-border bg-muted/30 py-20">
+        <div className="container mx-auto max-w-2xl px-4 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Ready to automate your calls?
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+            Join thousands of businesses using QuickVoice to handle inbound and
+            outbound calls with AI voice agents. Start free today.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            >
+              Get Started Free
+            </Link>
+            <Link
+              href="/company/contact"
+              className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-8 py-3 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
+            >
+              Contact Sales
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

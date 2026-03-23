@@ -282,7 +282,6 @@ export default function Faq2() {
             Can&apos;t find what you&apos;re looking for?
           </p>
           <a
-          target='_blank'
             href="/company/contact"
             className="border-primary text-foreground hover:bg-primary hover:text-white inline-flex items-center justify-center rounded-lg border-2 px-6 py-3 font-medium transition-colors"
           >

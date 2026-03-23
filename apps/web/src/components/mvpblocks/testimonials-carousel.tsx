@@ -11,43 +11,43 @@ const defaultTestimonials = [
   {
     text: "We deployed our first AI voice agent in under 10 minutes. It now handles 70% of appointment scheduling calls without any human intervention.",
     imageSrc: "",
-    name: "Practice Manager",
-    username: "",
+    name: "Sarah M.",
+    username: "Practice Manager",
     role: "Multi-Location Healthcare Group",
   },
   {
     text: "HIPAA compliance was non-negotiable for us. QuickVoice gave us the security certifications we needed while dramatically reducing missed calls.",
     imageSrc: "",
-    name: "Director of Operations",
-    username: "",
+    name: "James T.",
+    username: "Director of Operations",
     role: "Regional Hospital System",
   },
   {
     text: "The CRM integration alone saved our team 15 hours per week. Every call is logged, transcribed, and synced to HubSpot automatically.",
     imageSrc: "",
-    name: "VP of Sales",
-    username: "",
+    name: "Michael R.",
+    username: "VP of Sales",
     role: "B2B SaaS Company",
   },
   {
     text: "We went from missing 40% of after-hours calls to capturing every single inquiry. Our lead conversion rate increased by 35% in the first month.",
     imageSrc: "",
-    name: "Business Development Lead",
-    username: "",
+    name: "Lisa K.",
+    username: "Business Development Lead",
     role: "Commercial Real Estate Firm",
   },
   {
     text: "Multi-language support was the deciding factor. Our AI agents now handle calls in English, Spanish, and French across all our locations.",
     imageSrc: "",
-    name: "Customer Experience Director",
-    username: "",
+    name: "David P.",
+    username: "Customer Experience Director",
     role: "National Retail Chain",
   },
   {
     text: "We replaced our legacy IVR with QuickVoice and saw customer satisfaction scores jump from 3.2 to 4.6 out of 5 within 60 days.",
     imageSrc: "",
-    name: "Contact Center Manager",
-    username: "",
+    name: "Rachel W.",
+    username: "Contact Center Manager",
     role: "Financial Services Provider",
   },
 ];
@@ -96,7 +96,7 @@ export default function TestimonialsCarousel({
 
   return (
     <section
-      className={cn('relative overflow-hidden py-16 md:py-24 mt-[-90px]', className)}
+      className={cn('relative overflow-hidden py-16 md:py-24', className)}
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.2),transparent_60%)]" />

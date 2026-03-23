@@ -27,6 +27,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "QuickVoice",
+    title: "QuickVoice — No-Code AI Voice Agents | Deploy in 2 Minutes",
+    description:
+      "Deploy human-like AI voice agents without coding. Automate support, scheduling, and sales calls. HIPAA compliant. 100+ languages. Free trial.",
+    images: [
+      {
+        url: "/logo.svg",
+        width: 512,
+        height: 512,
+        alt: "QuickVoice Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QuickVoice — No-Code AI Voice Agents",
+    description:
+      "Deploy human-like AI voice agents without coding. Automate support, scheduling, and sales calls.",
   },
 };
 

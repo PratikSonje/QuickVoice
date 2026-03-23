@@ -14,10 +14,7 @@ import {
   Twilio
 } from "@/components/ui/partners";
 
-// cn utility function (similar to clsx or classnames)
-function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
-}
+import { cn } from "@/lib/utils";
 
 const useAnimationFrame = (callback: (time: number, delta: number) => void) => {
   const requestRef = useRef<number | null>(null);
