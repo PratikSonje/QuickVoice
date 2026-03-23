@@ -1,65 +1,167 @@
-import Image from "next/image";
+import dynamic from "next/dynamic";
+
+// Above-fold: server-rendered immediately (SSR)
+import { HeroSection } from "@/components/landing/hero-section";
+import Navbar from "../components/landing/navbar";
+
+// Below-fold: lazy-loaded to reduce initial JS parse
+const FeaturesSection = dynamic(() =>
+  import("@/components/landing/features-section").then((m) => ({ default: m.FeaturesSection }))
+);
+const AboutSection = dynamic(() =>
+  import("@/components/landing/about-section").then((m) => ({ default: m.AboutSection }))
+);
+const PricingSection = dynamic(() =>
+  import("@/components/landing/pricing-section").then((m) => ({ default: m.PricingSection }))
+);
+const TestimonialsSection = dynamic(() =>
+  import("@/components/landing/testimonials-section").then((m) => ({ default: m.TestimonialsSection }))
+);
+const CtaSection = dynamic(() =>
+  import("@/components/landing/cta-section").then((m) => ({ default: m.CtaSection }))
+);
+const FaqSection = dynamic(() =>
+  import("@/components/landing/faq-section").then((m) => ({ default: m.FaqSection }))
+);
+const ContactSection = dynamic(() =>
+  import("@/components/landing/contact-section").then((m) => ({ default: m.ContactSection }))
+);
+const Footer = dynamic(() =>
+  import("@/components/landing/footer").then((m) => ({ default: m.Footer }))
+);
+
+const homepageSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://quickvoice.co/#website",
+    "name": "QuickVoice",
+    "url": "https://quickvoice.co",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://quickvoice.co/blog?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://quickvoice.co/#organization",
+    "name": "QuickVoice",
+    "alternateName": ["QuickVoice AI", "QuickVoice.co", "QuickVoice AI Voice Agent Platform"],
+    "url": "https://quickvoice.co",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://quickvoice.co/logo.svg",
+      "width": 512,
+      "height": 512,
+    },
+    "description":
+      "No-code AI voice agent platform for creating, managing, and automating business voice communications at scale.",
+    "foundingDate": "2020",
+    "founder": { "@type": "Person", "name": "Rahul Agarwal" },
+    "address": [
+      {
+        "@type": "PostalAddress",
+        "streetAddress": "4000 Innovation Drive, 3rd Floor",
+        "addressLocality": "Ottawa",
+        "addressRegion": "Ontario",
+        "postalCode": "K2K 3K1",
+        "addressCountry": "CA",
+      },
+      {
+        "@type": "PostalAddress",
+        "streetAddress": "104 West 40th Street, Suite 1800",
+        "addressLocality": "New York",
+        "addressRegion": "NY",
+        "postalCode": "10018",
+        "addressCountry": "US",
+      },
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "url": "https://quickvoice.co/company/contact",
+    },
+    "sameAs": [
+      "https://www.linkedin.com/company/quickvoice",
+      "https://twitter.com/quickvoice",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "QuickVoice",
+    "description":
+      "No-code platform to deploy AI voice agents for inbound and outbound calls in minutes.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "url": "https://quickvoice.co",
+    "offers": [
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Starter", "price": "49", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Growth", "price": "99", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Professional", "price": "349", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Scale", "price": "399", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Enterprise", "priceCurrency": "USD", "description": "Custom pricing — contact sales", "priceSpecification": { "@type": "PriceSpecification", "priceCurrency": "USD", "price": "1500", "unitText": "starting at" } },
+    ],
+  },
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is QuickVoice and how does it work?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice is an AI-powered voice automation platform that allows businesses to deploy human-like AI voice agents in minutes. Our no-code platform uses advanced natural language processing to handle customer calls, answer questions, and perform tasks without any coding required." } },
+    { "@type": "Question", "name": "How quickly can I deploy an AI voice agent?", "acceptedAnswer": { "@type": "Answer", "text": "You can deploy your first AI voice agent in under 2 minutes. Our intuitive platform uses pre-built templates and drag-and-drop functionality to get you up and running immediately. No technical expertise required." } },
+    { "@type": "Question", "name": "What languages does QuickVoice support?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice supports over 100 languages and dialects worldwide. Our AI agents can communicate naturally in multiple languages, making it easy to serve global customers without language barriers." } },
+    { "@type": "Question", "name": "Is QuickVoice HIPAA compliant?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, QuickVoice is fully HIPAA compliant. We implement enterprise-grade security measures including end-to-end encryption, secure data transmission, and strict access controls to ensure your sensitive customer data is always protected." } },
+    { "@type": "Question", "name": "How much does QuickVoice cost?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice pricing starts at just 20 cents per minute. We offer flexible pricing plans based on your call volume and requirements. Contact our sales team for a custom quote tailored to your business needs." } },
+    { "@type": "Question", "name": "Can QuickVoice integrate with my existing CRM?", "acceptedAnswer": { "@type": "Answer", "text": "Absolutely! QuickVoice seamlessly integrates with popular CRM systems like Salesforce, HubSpot, and custom solutions. Our API allows for easy data synchronization and workflow automation." } },
+    { "@type": "Question", "name": "How does the AI understand complex customer requests?", "acceptedAnswer": { "@type": "Answer", "text": "Our AI uses advanced natural language processing and machine learning to understand context, intent, and sentiment. It can handle complex conversations, follow up on previous interactions, and provide personalized responses." } },
+    { "@type": "Question", "name": "Can I customize the voice and personality of my AI agent?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, you can fully customize your AI agent's voice, personality, and conversation style. Choose from various voice options and train the AI to match your brand's tone and communication style." } },
+    { "@type": "Question", "name": "What happens if the AI can't handle a customer request?", "acceptedAnswer": { "@type": "Answer", "text": "Our AI agents are programmed to seamlessly transfer calls to human agents when they encounter complex requests or when human intervention is needed. This ensures customers always get the help they need." } },
+    { "@type": "Question", "name": "How does QuickVoice handle call analytics and reporting?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice provides comprehensive analytics including call duration, success rates, customer satisfaction scores, and conversation insights. All data is automatically synced to your CRM for better customer relationship management." } },
+    { "@type": "Question", "name": "Is there a free trial available?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, we offer a free trial that allows you to test QuickVoice with up to 100 minutes of calls. This gives you a full experience of our platform before making any commitment." } },
+    { "@type": "Question", "name": "Can QuickVoice handle outbound calls and campaigns?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, QuickVoice supports both inbound and outbound calling. You can create automated outbound campaigns for appointment reminders, follow-ups, and proactive customer engagement." } },
+    { "@type": "Question", "name": "What security measures does QuickVoice implement?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice implements enterprise-grade security including SSL/TLS encryption, secure data centers, regular security audits, and compliance with industry standards like SOC 2, GDPR, and HIPAA." } },
+    { "@type": "Question", "name": "How does QuickVoice handle different accents and dialects?", "acceptedAnswer": { "@type": "Answer", "text": "Our AI is trained on diverse speech patterns and can understand various accents, dialects, and speech variations. The system continuously learns and improves its recognition capabilities." } },
+    { "@type": "Question", "name": "Can I use QuickVoice for my healthcare practice?", "acceptedAnswer": { "@type": "Answer", "text": "Absolutely! QuickVoice is specifically designed for healthcare applications with full HIPAA compliance. It can handle appointment scheduling, patient reminders, insurance verification, and other healthcare-related tasks." } },
+    { "@type": "Question", "name": "What kind of support do you provide?", "acceptedAnswer": { "@type": "Answer", "text": "We provide 24/7 customer support including live chat, email support, and dedicated account managers for enterprise clients. Our team is always available to help you optimize your AI voice agents." } },
+    { "@type": "Question", "name": "How does QuickVoice handle peak call volumes?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice automatically scales to handle unlimited concurrent calls. Our cloud infrastructure ensures your AI agents can handle peak volumes without any performance degradation or additional costs." } },
+    { "@type": "Question", "name": "Can I use my existing phone numbers with QuickVoice?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, you can port your existing phone numbers to QuickVoice or purchase new numbers through our platform. We support both local and toll-free numbers." } },
+    { "@type": "Question", "name": "How does QuickVoice ensure data privacy?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice follows strict data privacy protocols including data encryption at rest and in transit, regular security audits, and compliance with international privacy regulations. We never share your customer data with third parties." } },
+    { "@type": "Question", "name": "What industries can benefit from QuickVoice?", "acceptedAnswer": { "@type": "Answer", "text": "QuickVoice serves industries including healthcare, real estate, finance, e-commerce, logistics, insurance, and more. Our platform is designed to be versatile and adaptable to any business that handles customer calls." } },
+  ],
+};
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <main id="main-content" className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        <Navbar />
+        <HeroSection />
+        <FeaturesSection />
+        <AboutSection />
+        <PricingSection />
+        <TestimonialsSection />
+        <CtaSection />
+        <FaqSection />
+        <ContactSection />
+        <Footer />
       </main>
-    </div>
+    </>
   );
 }

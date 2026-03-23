@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -h \"^import\\\\|^export\" /d/Coding/QuickVoice/apps/web/src/components/landing/*.tsx)",
+      "Bash(grep -rh \"from ['''']\" /d/Coding/QuickVoice/apps/web/src --include=*.tsx)"
+    ]
+  }
+}

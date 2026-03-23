@@ -1,0 +1,55 @@
+import Link from "next/link";
+
+export default function CTA2() {
+  return (
+    <div className="relative w-full max-w-4xl overflow-hidden rounded-[40px] bg-[#2563eb] dark:bg-[#8b5cf6] p-6 sm:p-10 md:p-20">
+      <div className="absolute inset-0 hidden h-full w-full overflow-hidden md:block">
+        <div className="absolute top-1/2 right-[-45%] aspect-square h-[800px] w-[800px] -translate-y-1/2">
+          {/* Light mode circles */}
+          <div className="absolute inset-0 rounded-full bg-[#3b82f6] opacity-30 dark:hidden"></div>
+          <div className="absolute inset-0 scale-[0.8] rounded-full bg-[#60a5fa] opacity-30 dark:hidden"></div>
+          <div className="absolute inset-0 scale-[0.6] rounded-full bg-[#93c5fd] opacity-30 dark:hidden"></div>
+          <div className="absolute inset-0 scale-[0.4] rounded-full bg-[#bfdbfe] opacity-30 dark:hidden"></div>
+          <div className="absolute inset-0 scale-[0.2] rounded-full bg-[#dbeafe] opacity-30 dark:hidden"></div>
+          <div className="absolute inset-0 scale-[0.1] rounded-full bg-white/50 opacity-30 dark:hidden"></div>
+
+          {/* Dark mode circles */}
+          <div className="absolute inset-0 rounded-full bg-[#a78bfa] opacity-30 hidden dark:block"></div>
+          <div className="absolute inset-0 scale-[0.8] rounded-full bg-[#c4b5fd] opacity-30 hidden dark:block"></div>
+          <div className="absolute inset-0 scale-[0.6] rounded-full bg-[#ddd6fe] opacity-30 hidden dark:block"></div>
+          <div className="absolute inset-0 scale-[0.4] rounded-full bg-[#ede9fe] opacity-30 hidden dark:block"></div>
+          <div className="absolute inset-0 scale-[0.2] rounded-full bg-[#f5f3ff] opacity-30 hidden dark:block"></div>
+          <div className="absolute inset-0 scale-[0.1] rounded-full bg-white/50 opacity-30 hidden dark:block"></div>
+        </div>
+      </div>
+
+      <div className="relative z-10">
+        <h2 className="mb-3 text-3xl font-bold text-white sm:text-4xl md:mb-4 md:text-5xl">
+          Let&apos;s Get In Touch.
+        </h2>
+        <p className="mb-6 max-w-md text-base text-white sm:text-lg md:mb-8">
+          Stop paying for missed opportunities. Start building smarter
+          connections today with industry-leading AI voice automation at just 20
+          cents per minute.
+        </p>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+          <Link
+            href="/company/contact"
+            className="flex w-full items-center justify-between rounded-full bg-black px-5 py-3 text-white sm:w-[240px]"
+          >
+            <span className="font-medium">Book a discovery call</span>
+            <span className="h-5 w-5 flex-shrink-0 rounded-full bg-white"></span>
+          </Link>
+          <Link
+            href="/#demo"
+            className="flex w-full items-center justify-between rounded-full bg-black px-5 py-3 text-white sm:w-[240px]"
+          >
+            <span className="font-medium">Watch Demo</span>
+            <span className="h-5 w-5 flex-shrink-0 rounded-full bg-white"></span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

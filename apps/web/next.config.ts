@@ -1,8 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "d35j3mps666d98.cloudfront.net",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
