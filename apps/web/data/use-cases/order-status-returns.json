@@ -7,10 +7,7 @@
     "url": "https://d35j3mps666d98.cloudfront.net/Quickvoice/use-cases/order/order-status-returns_1.jpg",
     "alt": "Enterprise Security"
   },
- 
- "orderstatusreturns":
-    "1767123912592-final-order-status-returns-demo.mp3",
-
+  "orderstatusreturns": "https://d35j3mps666d98.cloudfront.net/Quickvoice/demo-voices/1767123912592-final-order-status-returns-demo.mp3",
   "transcript": [
     {
       "time": -2,

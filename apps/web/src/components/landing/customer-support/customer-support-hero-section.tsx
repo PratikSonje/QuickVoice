@@ -9,39 +9,21 @@ import AudioPlayer from "react-h5-audio-player";
 import { Player } from "@/components/audioPlayer";
 import { TypingTranscript, type TranscriptLine } from "@/components/TranscriptPlayer";
 
-import { useEffect , useState , useRef} from "react";
-
-import { generateDownloadUrl } from "@/utils/s3Ops";
+import { useEffect, useState, useRef } from "react";
+const audioUrl = transcript.customersupport;
 
 export function CustomerSupportHeroSection() {
-  const folderName = "Voice-agents/marketing/demo-voices";
-const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<AudioPlayer | null>(null);
 
-  /** Fetch audio */
-  useEffect(() => {
-    async function fetchAudio() {
-      try {
-        const res = await generateDownloadUrl(folderName, transcript.customersupport);
-          //  console.log("Fetched audio URL:", data.url);
-               setAudioUrl(res);
-      } catch (err) {
-        console.error("Failed to load audio demo", err);
-      }
-    }
-
-    fetchAudio();
-  }, []);
-
-  
+  /** 🔒 HARD STOP AUTOPLAY + listen to play/pause */
   useEffect(() => {
     const audio = audioRef.current?.audio.current;
     
     if (!audio) return;
-     audio.pause();
-    audio.currentTime = 0
-
+    
+    audio.pause();
+    audio.currentTime = 0;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -53,7 +35,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [audioUrl]);
+  }, []); // Empty dependency array as audioUrl is now static
 
   return (
     <section className="relative pt-32 pb-20 bg-background min-h-screen">
@@ -67,7 +49,8 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               style={{
                 background:
                   "linear-gradient(152.92deg, rgba(var(--primary-rgb), 0.6) 4.54%, rgba(var(--primary-rgb), 0.35) 34.2%, rgba(var(--primary-rgb), 0.95) 77.55%)",
-              }}></div>
+              }}
+            ></div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -108,40 +91,40 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
             </motion.div>
           </div>
 
-          {/* Right Column - Image */}
+          {/* Right Column - AUDIO + TRANSCRIPT */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative group"
+            className="relative flex flex-col gap-4 group"
             whileHover={{ scale: 1.02 }}
           >
             <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
-                             <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                                      Live AI Voice Demo
-                                      </h3>
-                                           
-                   {audioUrl ? (
-                    <Player ref={audioRef} src={audioUrl} />
-                                 ) : (
-                     <div className="h-16 rounded-md bg-background/50 animate-pulse" />
-                                )}
-                             </div>
-                                           
-                     <div className="rounded-xl border border-border bg-background shadow-lg">
-                       {audioUrl ? (
-                                  <TypingTranscript
-                                      audioRef={audioRef}
-                                 transcript={transcript.transcript as TranscriptLine[]}
-                                     isPlaying={isPlaying}
-                                                      />
-                                         ) : (
-                          <div className="p-4 space-y-2">
-                     <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
-                            <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
-                                         </div>
-                                                  )}
-                                 </div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                Live AI Voice Demo
+              </h3>
+              
+              {audioUrl ? (
+                <Player ref={audioRef} src={audioUrl} />
+              ) : (
+                <div className="h-16 rounded-md bg-background/50 animate-pulse" />
+              )}
+            </div>
+            
+            <div className="rounded-xl border border-border bg-background shadow-lg">
+              {audioUrl ? (
+                <TypingTranscript
+                  audioRef={audioRef}
+                  transcript={transcript.transcript as TranscriptLine[]}
+                  isPlaying={isPlaying}
+                />
+              ) : (
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
 
@@ -159,32 +142,51 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">90%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Cost Reduction</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                90%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Cost Reduction
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">24/7</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Availability</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                24/7
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Availability
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">&lt;500ms</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Response Time</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                &lt;500ms
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Response Time
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">200+</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Integrations</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                200+
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Integrations
+              </div>
             </motion.div>
           </motion.div>
 
@@ -210,6 +212,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
                 Resolves common support tickets instantly, such as order issues, refunds, and account access
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -225,6 +228,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
                 Handles step-by-step troubleshooting, ensuring seamless issue resolution
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -240,6 +244,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
                 Routes complex issues to human agents with full conversation history
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -255,6 +260,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
                 Analyzes customer conversations to improve service quality
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -270,6 +276,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
                 Automatically updates, cancels, or modifies orders based on customer requests
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}

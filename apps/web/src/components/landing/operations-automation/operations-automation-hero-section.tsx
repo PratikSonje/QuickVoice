@@ -9,38 +9,21 @@ import AudioPlayer from "react-h5-audio-player";
 
 import { Player } from "@/components/audioPlayer";
 import { TypingTranscript, type TranscriptLine } from "@/components/TranscriptPlayer";
-import { generateDownloadUrl } from "@/utils/s3Ops";
-import { useEffect , useState , useRef} from "react";
+import { useEffect, useState, useRef } from "react";
+
+const audioUrl = transcript.operationsautomation;
 
 export function OperationsAutomationHeroSection() {
-  const folderName = "Voice-agents/marketing/demo-voices";
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<AudioPlayer | null>(null);
 
-  /** Fetch audio */
-  useEffect(() => {
-    async function fetchAudio() {
-      try {
-         const res = await generateDownloadUrl(folderName, transcript.operationsautomation);
-           //  console.log("Fetched audio URL:", data.url);
-                setAudioUrl(res);
-      } catch (err) {
-        console.error("Failed to load audio demo", err);
-      }
-    }
-
-    fetchAudio();
-  }, []);
-
-  
+  /** 🔒 HARD STOP AUTOPLAY + listen to play/pause */
   useEffect(() => {
     const audio = audioRef.current?.audio.current;
-    
-    if (!audio) return;
-     audio.pause();
-    audio.currentTime = 0
 
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -52,7 +35,7 @@ export function OperationsAutomationHeroSection() {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [audioUrl]);
+  }, []); // Empty dependency array as audioUrl is now static
 
   return (
     <section className="relative pt-32 pb-20 bg-background min-h-screen">
@@ -65,7 +48,8 @@ export function OperationsAutomationHeroSection() {
               style={{
                 background:
                   "linear-gradient(152.92deg, rgba(var(--primary-rgb), 0.6) 4.54%, rgba(var(--primary-rgb), 0.35) 34.2%, rgba(var(--primary-rgb), 0.95) 77.55%)",
-              }}></div>
+              }}
+            ></div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -126,40 +110,40 @@ export function OperationsAutomationHeroSection() {
             </motion.div>
           </div>
 
-          {/* Right Column - Image */}
+          {/* Right Column - AUDIO + TRANSCRIPT */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative group"
+            className="relative flex flex-col gap-4 group"
             whileHover={{ scale: 1.02 }}
           >
             <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                                     Live AI Voice Demo
-                                     </h3>
-                                          
-                  {audioUrl ? (
-                   <Player ref={audioRef} src={audioUrl} />
-                                ) : (
-                    <div className="h-16 rounded-md bg-background/50 animate-pulse" />
-                               )}
-                            </div>
-                                          
-                    <div className="rounded-xl border border-border bg-background shadow-lg">
-                      {audioUrl ? (
-                                 <TypingTranscript
-                                     audioRef={audioRef}
-                                transcript={transcript.transcript as TranscriptLine[]}
-                                    isPlaying={isPlaying}
-                                                     />
-                                        ) : (
-                         <div className="p-4 space-y-2">
-                    <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
-                           <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
-                                        </div>
-                                                 )}
-                                </div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                Live AI Voice Demo
+              </h3>
+
+              {audioUrl ? (
+                <Player ref={audioRef} src={audioUrl} />
+              ) : (
+                <div className="h-16 rounded-md bg-background/50 animate-pulse" />
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-background shadow-lg">
+              {audioUrl ? (
+                <TypingTranscript
+                  audioRef={audioRef}
+                  transcript={transcript.transcript as TranscriptLine[]}
+                  isPlaying={isPlaying}
+                />
+              ) : (
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
       </div>

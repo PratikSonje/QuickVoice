@@ -7,10 +7,7 @@
     "url": "https://d35j3mps666d98.cloudfront.net/Quickvoice/use-cases/customer/customer_support_2.jpg",
     "alt": "AI Customer Service Agent in action"
   }, 
- 
- "customersupport":
-    "1767123093951-customer-support.mp3",
-
+  "customersupport": "https://d35j3mps666d98.cloudfront.net/Quickvoice/demo-voices/1767123093951-customer-support.mp3",
   "transcript": [
     {
       "time": 0,

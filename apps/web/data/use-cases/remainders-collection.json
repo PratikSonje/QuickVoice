@@ -3,10 +3,7 @@
     "url": "https://d35j3mps666d98.cloudfront.net/Quickvoice/use-cases/remainder/remainder-collection_1.jpg",
     "alt": "Quickvoice AI-powered reminders and collections dashboard showing automated follow-ups and customer engagement metrics"
   } ,
-
-   "remaindercollection":
-    "1767124067332-final-reminder-collection-demo.mp3",
- 
+  "remaindercollection": "https://d35j3mps666d98.cloudfront.net/Quickvoice/demo-voices/1767124067332-final-reminder-collection-demo.mp3",
   "transcript": [
     {
       "time": -2,
@@ -64,8 +61,4 @@
       "text": "Great. Thank you for your time, and I appreciate your prompt response... Have a good day."
     }
   ]
-
-
-
-
 }

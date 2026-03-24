@@ -4,44 +4,27 @@ import React from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Shield, Zap } from "lucide-react";
 import Link from "next/link";
-// import Image from "next/image";
-import transcript from "@/data/industries/manufacturing-engineering-images.json";
+import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
+
 import { Player } from "@/components/audioPlayer";
 import { TypingTranscript, type TranscriptLine } from "@/components/TranscriptPlayer";
-import { generateDownloadUrl } from "@/utils/s3Ops";
-import { useEffect , useState , useRef} from "react";
+import transcript from "@/data/industries/manufacturing-engineering-images.json";
 
+// Assuming JSON structure aligns with the other files
+const audioUrl = transcript.manufacturing;
 
 export function ManufacturingHeroSection() {
-  const folderName = "Voice-agents/marketing/demo-voices";
-const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<AudioPlayer | null>(null);
 
-  /** Fetch audio */
-  useEffect(() => {
-    async function fetchAudio() {
-      try {
-      const res = await generateDownloadUrl(folderName, transcript.manufacturing);
-       //  console.log("Fetched audio URL:", data.url);
-            setAudioUrl(res);
-      } catch (err) {
-        console.error("Failed to load audio demo", err);
-      }
-    }
-
-    fetchAudio();
-  }, []);
-
-  
+  /** 🔒 HARD STOP AUTOPLAY + listen to play/pause */
   useEffect(() => {
     const audio = audioRef.current?.audio.current;
-    
     if (!audio) return;
-     audio.pause();
-    audio.currentTime = 0
 
+    audio.pause();
+    audio.currentTime = 0;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -53,7 +36,7 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [audioUrl]);
+  }, []); // Empty dependency array as audioUrl is static
 
   return (
     <section className="relative pt-32 pb-20 bg-background min-h-screen">
@@ -67,7 +50,8 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               style={{
                 background:
                   "linear-gradient(152.92deg, rgba(var(--primary-rgb), 0.6) 4.54%, rgba(var(--primary-rgb), 0.35) 34.2%, rgba(var(--primary-rgb), 0.95) 77.55%)",
-              }}></div>
+              }}
+            ></div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -107,40 +91,40 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
             </motion.div>
           </div>
 
-          {/* Right column - Image */}
+          {/* Right column - AUDIO + TRANSCRIPT */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative group"
+            className="relative flex flex-col gap-4 group"
             whileHover={{ scale: 1.02 }}
           >
-          <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                           Live AI Voice Demo
-                           </h3>
-                                
-        {audioUrl ? (
-         <Player ref={audioRef} src={audioUrl} />
-                      ) : (
-          <div className="h-16 rounded-md bg-background/50 animate-pulse" />
-                     )}
-                  </div>
-                                
-          <div className="rounded-xl border border-border bg-background shadow-lg">
-            {audioUrl ? (
-                       <TypingTranscript
-                           audioRef={audioRef}
-                      transcript={transcript.transcript as TranscriptLine[]}
-                          isPlaying={isPlaying}
-                                           />
-                              ) : (
-               <div className="p-4 space-y-2">
-          <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
-                 <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
-                              </div>
-                                       )}
-                      </div>
+            <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                Live AI Voice Demo
+              </h3>
+
+              {audioUrl ? (
+                <Player ref={audioRef} src={audioUrl} />
+              ) : (
+                <div className="h-16 rounded-md bg-background/50 animate-pulse" />
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-background shadow-lg">
+              {audioUrl ? (
+                <TypingTranscript
+                  audioRef={audioRef}
+                  transcript={transcript.transcript as TranscriptLine[]}
+                  isPlaying={isPlaying}
+                />
+              ) : (
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
 
@@ -157,32 +141,51 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">35%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Operational Efficiency</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                35%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Operational Efficiency
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">85%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Faster Issue Resolution</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                85%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Faster Issue Resolution
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">92%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Customer Satisfaction</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                92%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Customer Satisfaction
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">40%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Cost Reduction</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                40%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Cost Reduction
+              </div>
             </motion.div>
           </motion.div>
 
@@ -201,9 +204,14 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
                 <Shield className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">ERP/MES Integration</h3>
-              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">Seamless connectivity with existing systems</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                ERP/MES Integration
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                Seamless connectivity with existing systems
+              </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -212,9 +220,14 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
                 <Zap className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">24/7 Operations Support</h3>
-              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">Round-the-clock automated assistance</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                24/7 Operations Support
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                Round-the-clock automated assistance
+              </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -223,8 +236,12 @@ const [audioUrl, setAudioUrl] = useState<string | null>(null);
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
                 <TrendingUp className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">Real-time Analytics</h3>
-              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">Actionable insights for decision making</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                Real-time Analytics
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                Actionable insights for decision making
+              </p>
             </motion.div>
           </motion.div>
         </div>
