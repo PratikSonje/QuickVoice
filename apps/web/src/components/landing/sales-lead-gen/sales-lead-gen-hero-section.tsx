@@ -5,40 +5,23 @@ import { Target, TrendingUp, Users, DollarSign } from "lucide-react";
 import Link from "next/link";
 import transcript from "@/data/use-cases/sales-lead-gen.json";
 import AudioPlayer from "react-h5-audio-player";
-import { generateDownloadUrl } from "@/utils/s3Ops";
 import { Player } from "@/components/audioPlayer";
-import { useEffect , useState , useRef} from "react";
+import { useEffect, useState, useRef } from "react";
 import { TypingTranscript, type TranscriptLine } from "@/components/TranscriptPlayer";
+const audioUrl = transcript.saleslead;
 
 export function SalesLeadGenHeroSection() {
-  const folderName = "Voice-agents/marketing/demo-voices";
- const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<AudioPlayer | null>(null);
 
-  /** Fetch audio */
-  useEffect(() => {
-    async function fetchAudio() {
-      try {
-        const res = await generateDownloadUrl(folderName, transcript.saleslead);
-          //  console.log("Fetched audio URL:", data.url);
-               setAudioUrl(res);
-      } catch (err) {
-        console.error("Failed to load audio demo", err);
-      }
-    }
-
-    fetchAudio();
-  }, []);
-
-  
+  /** 🔒 HARD STOP AUTOPLAY + listen to play/pause */
   useEffect(() => {
     const audio = audioRef.current?.audio.current;
-    
-    if (!audio) return;
-     audio.pause();
-    audio.currentTime = 0
 
+    if (!audio) return;
+    
+    audio.pause();
+    audio.currentTime = 0;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -50,8 +33,8 @@ export function SalesLeadGenHeroSection() {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [audioUrl]);
-  
+  }, []); // Empty dependency array as audioUrl is now static
+
   return (
     <section className="relative pt-32 pb-20 bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -94,7 +77,7 @@ export function SalesLeadGenHeroSection() {
               <Link
                 href="/register"
                 className="relative w-full sm:w-auto overflow-hidden rounded-full border px-8 py-4 text-foreground shadow-lg transition-all duration-300
-                        bg-gradient-to-b from-white/80 to-white/60 hover:border-gray-300 hover:shadow-md
+                           bg-gradient-to-b from-white/80 to-white/60 hover:border-gray-300 hover:shadow-md
                         dark:bg-gradient-to-b dark:from-white/10 dark:to-white/5 dark:border-white/10 dark:hover:border-primary/30 dark:hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]"
               >
                 Book a Free Demo
@@ -102,40 +85,40 @@ export function SalesLeadGenHeroSection() {
             </motion.div>
           </div>
 
-          {/* Right column - Image */}
+          {/* Right column - AUDIO + TRANSCRIPT */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative group"
+            className="relative flex flex-col gap-4 group"
             whileHover={{ scale: 1.02 }}
           >
-             <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                                     Live AI Voice Demo
-                                     </h3>
-                                          
-                  {audioUrl ? (
-                   <Player ref={audioRef} src={audioUrl} />
-                                ) : (
-                    <div className="h-16 rounded-md bg-background/50 animate-pulse" />
-                               )}
-                            </div>
-                                          
-                    <div className="rounded-xl border border-border bg-background shadow-lg">
-                      {audioUrl ? (
-                                 <TypingTranscript
-                                     audioRef={audioRef}
-                                transcript={transcript.transcript as TranscriptLine[]}
-                                    isPlaying={isPlaying}
-                                                     />
-                                        ) : (
-                         <div className="p-4 space-y-2">
-                    <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
-                           <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
-                                        </div>
-                                                 )}
-                                </div>
+            <div className="rounded-xl border border-border bg-muted p-4 shadow-xl">
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                Live AI Voice Demo
+              </h3>
+
+              {audioUrl ? (
+                <Player ref={audioRef} src={audioUrl} />
+              ) : (
+                <div className="h-16 rounded-md bg-background/50 animate-pulse" />
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-background shadow-lg">
+              {audioUrl ? (
+                <TypingTranscript
+                  audioRef={audioRef}
+                  transcript={transcript.transcript as TranscriptLine[]}
+                  isPlaying={isPlaying}
+                />
+              ) : (
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
 
@@ -152,32 +135,51 @@ export function SalesLeadGenHeroSection() {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">40%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Lower Acquisition Costs</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                40%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Lower Acquisition Costs
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">3x</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Faster Conversions</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                3x
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Faster Conversions
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">85%</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Lead Qualification</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                85%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Lead Qualification
+              </div>
             </motion.div>
+
             <motion.div
               className="text-center group"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">24/7</div>
-              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Sales Support</div>
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                24/7
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Sales Support
+              </div>
             </motion.div>
           </motion.div>
 
@@ -203,6 +205,7 @@ export function SalesLeadGenHeroSection() {
                 Identify high-intent prospects automatically
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -218,6 +221,7 @@ export function SalesLeadGenHeroSection() {
                 Turn conversations into sales with AI guidance
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}
@@ -233,6 +237,7 @@ export function SalesLeadGenHeroSection() {
                 Tailored product suggestions for each customer
               </p>
             </motion.div>
+
             <motion.div
               className="flex flex-col items-center group"
               whileHover={{ scale: 1.05, y: -4 }}

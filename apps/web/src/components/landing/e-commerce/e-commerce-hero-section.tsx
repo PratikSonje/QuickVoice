@@ -8,10 +8,7 @@ import AudioPlayer from "react-h5-audio-player";
 
 import { Player } from "@/components/audioPlayer";
 import { TypingTranscript, TranscriptLine } from "@/components/TypingTranscript";
-import { generateDownloadUrl } from "@/utils/s3Ops";
 import ecommerceData from "@/data/industries/e-commerce-images.json";
-const folderName = "Voice-agents/marketing/demo-voices";
-const { fileName } = ecommerceData.ecommerce;
 
 function normalizeTranscript(
   transcript: { time: number; speaker: string; text: string }[]
@@ -25,30 +22,12 @@ function normalizeTranscript(
   }));
 }
 
-const transcript = normalizeTranscript(
-  ecommerceData.ecommerce.transcript
-);
-
+const transcript = normalizeTranscript(ecommerceData.ecommerce.transcript);
+const audioUrl = ecommerceData.ecommerce.fileUrl;
 
 export function EcommerceHeroSection() {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<AudioPlayer | null>(null);
-
-  /** Fetch audio */
-  useEffect(() => {
-    async function fetchAudio() {
-      try {
-        const url = await generateDownloadUrl(folderName, fileName);
-        setAudioUrl(url);
-      } catch (err) {
-        console.error("Failed to load ecommerce audio demo", err);
-      }
-    }
-
-    fetchAudio();
-  }, [fileName]);
-
 
   /** 🔒 HARD STOP AUTOPLAY + listen to play/pause */
   useEffect(() => {
@@ -68,16 +47,16 @@ export function EcommerceHeroSection() {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [audioUrl]);
+  }, []); // Empty dependency array as audioUrl is now static
 
   return (
     <section className="relative pt-32 pb-20 bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
+        
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-
-          {/* LEFT — Content (unchanged) */}
+          
+          {/* LEFT — Content */}
           <div className="text-left relative">
             <div
               className="absolute -left-8 -top-8 h-32 w-32 blur-[80px] opacity-60"
@@ -126,7 +105,7 @@ export function EcommerceHeroSection() {
             </motion.div>
           </div>
 
-          {/* RIGHT — AUDIO + TRANSCRIPT (replaces image) */}
+          {/* RIGHT — AUDIO + TRANSCRIPT */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -163,7 +142,138 @@ export function EcommerceHeroSection() {
         </div>
 
         {/* Stats Section */}
-        <div className="text-center"> <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="grid grid-cols-2 gap-8 sm:grid-cols-4 mb-16" > <motion.div className="text-center group" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">+40%</div> <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Conversion Rate</div> </motion.div> <motion.div className="text-center group" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">-60%</div> <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Support Tickets</div> </motion.div> <motion.div className="text-center group" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">24/7</div> <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Customer Support</div> </motion.div> <motion.div className="text-center group" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">+35%</div> <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Customer Satisfaction</div> </motion.div> </motion.div> {/* Key Features */} <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4" > <motion.div className="flex flex-col items-center group" whileHover={{ scale: 1.05, y: -4 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110"> <ShoppingCart className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" /> </div> <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">Smart Shopping</h3> <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">AI-guided product recommendations</p> </motion.div> <motion.div className="flex flex-col items-center group" whileHover={{ scale: 1.05, y: -4 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110"> <Headphones className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" /> </div> <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">Instant Support</h3> <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">24/7 multilingual customer service</p> </motion.div> <motion.div className="flex flex-col items-center group" whileHover={{ scale: 1.05, y: -4 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110"> <TrendingUp className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" /> </div> <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">Sales Boost</h3> <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">Proactive upselling and cross-selling</p> </motion.div> <motion.div className="flex flex-col items-center group" whileHover={{ scale: 1.05, y: -4 }} transition={{ duration: 0.2, ease: "easeOut" }} > <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110"> <CheckCircle className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" /> </div> <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">Easy Integration</h3> <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">No-code setup with existing tools</p> </motion.div> </motion.div> </div>
+        <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="grid grid-cols-2 gap-8 sm:grid-cols-4 mb-16"
+          >
+            <motion.div
+              className="text-center group"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                +40%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Conversion Rate
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="text-center group"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                -60%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Support Tickets
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="text-center group"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                24/7
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Customer Support
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="text-center group"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="text-3xl font-bold text-primary mb-2 transition-colors duration-300 group-hover:text-primary/80">
+                +35%
+              </div>
+              <div className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+                Customer Satisfaction
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Key Features */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <motion.div
+              className="flex flex-col items-center group"
+              whileHover={{ scale: 1.05, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
+                <ShoppingCart className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                Smart Shopping
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                AI-guided product recommendations
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="flex flex-col items-center group"
+              whileHover={{ scale: 1.05, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
+                <Headphones className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                Instant Support
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                24/7 multilingual customer service
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="flex flex-col items-center group"
+              whileHover={{ scale: 1.05, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
+                <TrendingUp className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                Sales Boost
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                Proactive upselling and cross-selling
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="flex flex-col items-center group"
+              whileHover={{ scale: 1.05, y: -4 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4 transition-all duration-200 ease-out group-hover:bg-primary/20 group-hover:scale-110">
+                <CheckCircle className="h-8 w-8 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2 transition-colors duration-200 ease-out group-hover:text-primary">
+                Easy Integration
+              </h3>
+              <p className="text-sm text-muted-foreground text-center transition-colors duration-200 ease-out group-hover:text-foreground/80">
+                No-code setup with existing tools
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
 
       </div>
     </section>
