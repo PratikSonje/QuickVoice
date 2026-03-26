@@ -5,13 +5,15 @@ applications:
       phases:
         preBuild:
           commands:
-            - corepack enable
-            - corepack prepare pnpm@9.0.0 --activate
-            - cd ${CODEBUILD_SRC_DIR} && pnpm install
+            - npm install -g pnpm
+            - pnpm install
         build:
           commands:
-            - cd ${CODEBUILD_SRC_DIR} && pnpm turbo run build --filter=web...
+            - pnpm turbo run build --filter=web...
       artifacts:
-        baseDirectory: .next
+        baseDirectory: apps/web/.next
         files:
           - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
