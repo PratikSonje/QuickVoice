@@ -7,10 +7,10 @@ applications:
           commands:
             - corepack enable
             - corepack prepare pnpm@9.0.0 --activate
-            - cd ../.. && pnpm install
+            - cd ${CODEBUILD_SRC_DIR} && pnpm install
         build:
           commands:
-            - cd ../.. && pnpm turbo run build --filter=web...
+            - cd ${CODEBUILD_SRC_DIR} && pnpm turbo run build --filter=web...
       artifacts:
         baseDirectory: .next
         files:
