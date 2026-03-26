@@ -1,0 +1,21 @@
+import { createAuthClient } from "better-auth/react";
+import { nextCookies } from "better-auth/next-js";
+import { inferAdditionalFields } from "better-auth/client/plugins";
+import { adminClient } from "better-auth/client/plugins"
+import { apiKeyClient } from "@better-auth/api-key/client"
+import { organizationClient } from "better-auth/client/plugins"
+import { stripeClient } from "@better-auth/stripe/client"
+
+import { auth } from "./auth";
+export const authClient = createAuthClient({
+  plugins: [inferAdditionalFields<typeof auth>(), adminClient(), apiKeyClient(), organizationClient({
+    dynamicAccessControl: {
+      enabled: true,
+    }
+  }), stripeClient({
+    subscription: true //if you want to enable subscription management
+  })],
+});
+
+export const { signIn, signUp, signOut, useSession } = authClient;
+

@@ -1,0 +1,68 @@
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prisma } from "@/src/config/prisma";
+import { plans } from "@/data/plans";
+import bcrypt from "bcryptjs";
+import { sendEmail } from "./mailer";
+import { admin } from "better-auth/plugins";
+import { apiKey } from "@better-auth/api-key";
+import { organization } from "better-auth/plugins"
+import { stripe } from "@better-auth/stripe"
+import { stripeClient } from "@/src/config/stripe";
+import { ac, roles } from "./permissions";
+// ─── Better Auth server instance ────────────────────────────────────────────
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    password: {
+      hash: async (password) => {
+        return await bcrypt.hash(password, 10);
+      },
+      verify: async ({ hash, password }) => {
+        return await bcrypt.compare(password, hash);
+      },
+    },
+    async sendResetPassword({ user, url, }) {
+      await sendEmail("resetPassword", user.email, url, user.name);
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    async sendVerificationEmail({ user, url }) {
+      await sendEmail("verifyEmail", user.email, url, user.name);
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+  plugins: [admin(), apiKey(), organization({
+    dynamicAccessControl: {
+      enabled: true,
+      ac,
+      roles: roles,
+    },
+  }), stripe({
+    stripeClient,
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+    createCustomerOnSignUp: true,
+    subscription: {
+      enabled: true,
+      defaultPlan: "free",
+      plans: plans,
+    },
+    organization: {
+      enabled: true,
+
+    }
+  })],
+});
+
+
