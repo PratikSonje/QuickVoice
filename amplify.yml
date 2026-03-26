@@ -1,17 +1,17 @@
 version: 1
 applications:
-  - appRoot: .
+  - appRoot: apps/web
     frontend:
       phases:
         preBuild:
           commands:
             - corepack enable
             - corepack prepare pnpm@9.0.0 --activate
-            - pnpm install
+            - cd ../.. && pnpm install
         build:
           commands:
-            - pnpm turbo run build --filter=web...
+            - cd ../.. && pnpm turbo run build --filter=web...
       artifacts:
-        baseDirectory: apps/web/.next
+        baseDirectory: .next
         files:
           - '**/*'
