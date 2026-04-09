@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum sourceType {
+  PDF
+  TXT
+  CSV
+  DOCX
+  URL
+}
+
+enum CallStatus {
+  NOT_ANSWERED
+  SCHEDULED
+  PROCESSED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum CampaignStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  PROCESSED
+  FAILED
+}
+
+enum kbStatus {
+  PROCESSING
+  ACTIVE
+  ERROR
+}
+
+enum OutboundCallMode {
+  quick
+  campaign
+}
+
+enum PlanId {
+  free
+  payg
+  starter
+  growth
+  scale
+  enterprise
+  admin
+}
+
+enum TelephonyProvider {
+  TWILIO @map("twilio")
+  TELNYX @map("telnyx")
+}
+
+// ─── Better Auth Core Tables ─────────────────────────────────────────────────
+
+model User {
+  id               String       @id
+  name             String
+  email            String
+  emailVerified    Boolean      @default(false)
+  image            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  role             String?
+  banned           Boolean?     @default(false)
+  banReason        String?
+  banExpires       DateTime?
+  stripeCustomerId String?
+  sessions         Session[]
+  accounts         Account[]
+  members          Member[]
+  invitations      Invitation[]
+
+  // App resource reverse relations
+  phoneNumbers     PhoneNumber[]
+  agents           Agent[]
+  knowledgeSources KnowledgeSource[]
+  callLogs         CallLog[]
+  outboundCalls    OutboundCall[]
+  campaigns        Campaign[]
+  tools            Tool[]
+  secrets          Secret[]
+
+  @@unique([email])
+}
+
+model Session {
+  id                   String   @id
+  expiresAt            DateTime
+  token                String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  ipAddress            String?
+  userAgent            String?
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy       String?
+  activeOrganizationId String?
+
+  @@unique([token])
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+// ─── Better Auth Plugin Tables ───────────────────────────────────────────────
+
+model Apikey {
+  id                  String    @id
+  configId            String    @default("default")
+  name                String?
+  start               String?
+  referenceId         String
+  prefix              String?
+  key                 String
+  refillInterval      Int?
+  refillAmount        Int?
+  lastRefillAt        DateTime?
+  enabled             Boolean?  @default(true)
+  rateLimitEnabled    Boolean?  @default(true)
+  rateLimitTimeWindow Int?      @default(86400000)
+  rateLimitMax        Int?      @default(10)
+  requestCount        Int?      @default(0)
+  remaining           Int?
+  lastRequest         DateTime?
+  expiresAt           DateTime?
+  createdAt           DateTime
+  updatedAt           DateTime
+  permissions         String?
+  metadata            String?
+
+  @@index([configId])
+  @@index([referenceId])
+  @@index([key])
+}
+
+// ─── Organization & Team ─────────────────────────────────────────────────────
+
+model Organization {
+  id                String             @id
+  name              String
+  slug              String
+  logo              String?
+  createdAt         DateTime
+  metadata          String?
+  stripeCustomerId  String?
+  members           Member[]
+  invitations       Invitation[]
+  accessKey         String?
+  plan              PlanId             @default(free)
+  agents            Agent[]
+  knowledgeSources  KnowledgeSource[]
+  phoneNumbers      PhoneNumber[]
+  tools             Tool[]
+  secrets           Secret[]
+  callLogs          CallLog[]
+  outboundCalls     OutboundCall[]
+  campaigns         Campaign[]
+  organizationroles OrganizationRole[]
+
+  @@unique([slug])
+}
+
+model OrganizationRole {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           String
+  permission     String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
+
+  @@index([organizationId])
+  @@index([role])
+}
+
+model Member {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("member")
+  createdAt      DateTime
+
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Invitation {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String       @default("pending")
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+}
+
+// ─── Billing (Better Auth Stripe Plugin) ─────────────────────────────────────
+
+model Subscription {
+  id                   String    @id
+  plan                 String
+  referenceId          String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String?   @default("incomplete")
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  cancelAt             DateTime?
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  seats                Int?
+  billingInterval      String?
+  stripeScheduleId     String?
+}
+
+// ─── App Resource Models ─────────────────────────────────────────────────────
+
+model PhoneNumber {
+  phId           String            @id @default(uuid())
+  number         String            @unique
+  organizationId String
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agentId        String?
+  agent          Agent?            @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  sid            String
+  friendlyName   String
+  provider       TelephonyProvider @default(TWILIO)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([organizationId])
+  @@index([agentId])
+}
+
+model Agent {
+  agentId               String              @id @default(uuid())
+  agentSlug             String
+  organizationId        String
+  organization          Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId                String?
+  user                  User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name                  String
+  templateId            String?
+  isActive              Boolean             @default(true)
+  // TODO : Change in backend and frontend
+  isConfigured          Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  configuration         AgentConfiguration?
+  // TODO : Change in API, removed callLog[]
+  callLogsCount         Int                 @default(0)
+  callLogs              CallLog[]
+  phoneNumbers          PhoneNumber[]
+  knowledgeSources      KnowledgeSource[]
+  outboundCalls         OutboundCall[]
+  campaigns             Campaign[]
+  // TODO : Change in API also fetch in agent config page, removed knowledgeSources[]
+  knowledgeSourcesCount Int                 @default(0)
+  // TODO:Change in API, removed phoneNumbers[]
+  phoneNumbersCount     Int                 @default(0)
+  // TODO: Fetch tools in agent config, removed tools[]
+  toolsCount            Int                 @default(0)
+
+  tools Tool[] @relation("AgentTools")
+
+  @@unique([organizationId, agentSlug])
+}
+
+model AgentConfiguration {
+  agentConfigId                     String   @id @default(uuid())
+  agentId                           String   @unique
+  agent                             Agent    @relation(fields: [agentId], references: [agentId], onDelete: Cascade)
+  systemPrompt                      String
+  firstMessage                      String
+  temperature                       Float    @default(0.7)
+  data_needed                       Json?    @default("[]")
+  data_evaluation                   Json?    @default("[]")
+  // TODO: Add voiceId to the enum
+  voiceId                           String
+  concurrent_calls_limit            Int
+  conversation_retention_days       Int      @default(30)
+  daily_calls_limit                 Int
+  enable_auth_for_agent_api         Boolean  @default(false)
+  max_conversation_duration_seconds Int
+  optimize_streaming_latency        Boolean  @default(false)
+  silence_end_call_timeout_seconds  Int
+  store_call_audio                  Boolean  @default(true)
+  tokenLimit                        Int      @default(4096)
+  tts_output_format                 String   @default("mp3")
+  turn_timeout_seconds              Int
+  update_at                         DateTime @updatedAt
+  use_flash_call                    Boolean  @default(false)
+  use_rag                           Boolean  @default(false)
+  user_input_audio_format           String
+  voice_similarity_boost            Float
+  voice_speed                       Float
+  voice_stability                   Float
+  zero_pii_retention                Boolean  @default(false)
+  llmModel                          String   @default("gpt-4o-mini")
+  agent_language                    String   @default("en")
+  initiation_webhook                Json?
+  post_call_webhook                 Json?
+  variables                         Json?
+
+  @@index([agentId])
+}
+
+model KnowledgeSource {
+  kbId             String       @id @default(uuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId          String?
+  agent            Agent?       @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  userId           String?
+  user             User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name             String
+  originalFileName String?
+  storagePath      String
+  sourceType       sourceType
+  status           kbStatus
+  metadata         Json?
+  lastIndexedAt    DateTime?
+  uploadedAt       DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([agentId])
+}
+
+// ─── Call & Conversation Models ──────────────────────────────────────────────
+
+model CallLog {
+  callId         String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId        String?
+  agent          Agent?       @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Call Data
+  startTime          DateTime?
+  endTime            DateTime?
+  durationSeconds    Int?
+  status             CallStatus
+  audioRecordingPath String?
+  callerId           String?
+  metadata           Json?
+  sessionId          String?
+  direction          String?
+  dataExtracted      Json?            @default("[]")
+  dataEvaluation     Json?            @default("[]")
+  // Future-use fields
+  callCostCents      Int?
+  // TODO Remove include transcripts from api call
+  transcripts        CallTranscript[]
+  // TODO Change in api for delete and fetch credits
+  deleted            Boolean          @default(false)
+
+  @@index([organizationId])
+  @@index([organizationId, startTime])
+  @@index([organizationId, endTime])
+  @@index([agentId])
+}
+
+model CallTranscript {
+  callTransId     String   @id @default(uuid())
+  callLogId       String
+  callLog         CallLog  @relation(fields: [callLogId], references: [callId], onDelete: Cascade)
+  speaker         String
+  messageText     String
+  timestamp       DateTime
+  confidenceScore Float?
+  isPiiRedacted   Boolean  @default(false)
+  sentimentScore  Float?
+
+  @@index([callLogId])
+}
+
+model OutboundCall {
+  outboundId     String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId        String?
+  agent          Agent?       @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  campaignId     String?
+  campaign       Campaign?    @relation(fields: [campaignId], references: [campaignId], onDelete: SetNull)
+  scheduledAt    DateTime?
+
+  // Call Data
+  phoneNumber  String
+  fromNumber   String
+  firstMessage String?
+  systemPrompt String?
+  optionalData Json?            @default("{}")
+  mode         OutboundCallMode
+  status       CallStatus
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([organizationId])
+  @@index([agentId])
+  @@index([campaignId])
+}
+
+model Campaign {
+  campaignId     String         @id @default(uuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  agentId        String?
+  agent          Agent?         @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  fromNumber     String
+  scheduledAt    DateTime?
+  status         CampaignStatus
+  userId         String?
+  user           User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  outboundCalls  OutboundCall[]
+
+  @@index([organizationId])
+  @@index([agentId])
+}
+
+// ─── Config & Secrets ────────────────────────────────────────────────────────
+
+model Tool {
+  toolId                String       @id @default(uuid())
+  organizationId        String
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name                  String
+  description           String
+  disable_interruptions Boolean      @default(false)
+  force_pre_tool_speech Boolean      @default(true)
+  api_url               String
+  api_method            String?      @default("POST")
+  api_headers           Json?
+  api_body              Json?
+  api_query_params      Json?
+  api_path_params       Json?
+  response_timeout_secs Int?
+  dynamic_variables     Json?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  userId                String?
+  user                  User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent                 Agent[]      @relation("AgentTools")
+
+  @@index([organizationId])
+}
+
+model Secret {
+  secretId       String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  value          String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+}
