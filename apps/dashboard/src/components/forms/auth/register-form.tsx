@@ -25,6 +25,7 @@ import OAuthButtons from "../../oauth-buttons";
 
 export function RegisterForm() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -35,6 +36,7 @@ export function RegisterForm() {
     },
   });
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
+    setLoading(true);
     const { error } = await authClient.signUp.email({
       email: data.email,
       password: data.password,
@@ -42,12 +44,13 @@ export function RegisterForm() {
       callbackURL: "/login",
     });
     if (error) {
-      toast.error(error.message || "Something went wrong");
+      console.log(error);
+      toast.error(error.statusText || "Something went wrong");
     } else {
       toast.success("Account created successfully");
+      router.push("/verify");
     }
-    form.reset();
-    router.push("/verify");
+    setLoading(false);
   };
 
   return (

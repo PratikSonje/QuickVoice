@@ -42,7 +42,7 @@ export default function Orgs() {
           <p className="text-sm text-muted-foreground mb-6">
             Create your first organization to start collaborating with your team.
           </p>
-          <Link href="/orgs">
+          <Link href="/orgs/create">
             <Button>Create your first organization</Button>
           </Link>
         </div>

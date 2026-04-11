@@ -60,7 +60,6 @@ export const auth = betterAuth({
     },
     organization: {
       enabled: true,
-
     }
   })],
 });
