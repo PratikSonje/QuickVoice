@@ -8,28 +8,6 @@ import { Building2, Users, ArrowLeft, Mail, Settings, Phone, Calendar, Shield } 
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 
-interface Member {
-  id: string;
-  organizationId: string;
-  role: "admin" | "member" | "owner";
-  createdAt: Date;
-  userId: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    image?: string;
-  };
-}
-
-interface Organization {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: Date;
-  members: Member[];
-  invitations: any[];
-}
 
 export default function OrgId() {
   const params = useParams();
@@ -49,7 +27,7 @@ export default function OrgId() {
         query: {
           organizationId: orgId,
           organizationSlug: orgSlug || undefined,
-          membersLimit: 100,
+          membersLimit: 10,
         },
       });
       

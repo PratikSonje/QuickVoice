@@ -5,7 +5,7 @@ import { apiKeyClient } from "@better-auth/api-key/client"
 import { organizationClient } from "better-auth/client/plugins"
 import { stripeClient } from "@better-auth/stripe/client"
 
-import { auth } from "./auth";
+import { auth } from "../../../server/src/lib/auth";
 export const authClient = createAuthClient({
   plugins: [inferAdditionalFields<typeof auth>(), adminClient(), apiKeyClient(), organizationClient({
     dynamicAccessControl: {

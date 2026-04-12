@@ -3,13 +3,13 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/src/config/prisma";
 import { plans } from "@/data/plans";
 import bcrypt from "bcryptjs";
-import { sendEmail } from "./mailer";
+import { sendEmail } from "../../../console/src/lib/mailer";
 import { admin } from "better-auth/plugins";
 import { apiKey } from "@better-auth/api-key";
 import { organization } from "better-auth/plugins"
 import { stripe } from "@better-auth/stripe"
 import { stripeClient } from "@/src/config/stripe";
-import { ac, roles } from "./permissions";
+import { ac, roles } from "../../../console/src/lib/permissions";
 // ─── Better Auth server instance ────────────────────────────────────────────
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
