@@ -325,7 +325,9 @@ export const AgentConfigurationScalarFieldEnum = {
   agent_language: 'agent_language',
   initiation_webhook: 'initiation_webhook',
   post_call_webhook: 'post_call_webhook',
-  variables: 'variables'
+  variables: 'variables',
+  preemptive_generation: 'preemptive_generation',
+  timezone: 'timezone'
 } as const
 
 export type AgentConfigurationScalarFieldEnum = (typeof AgentConfigurationScalarFieldEnum)[keyof typeof AgentConfigurationScalarFieldEnum]

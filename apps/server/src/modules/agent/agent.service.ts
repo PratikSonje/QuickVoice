@@ -1,12 +1,13 @@
+import { Prisma } from "../../../prisma/generated/prisma/client.js";
 import { BadRequestError } from "../../common/errors/badRequest.js";
 import { NotFoundError } from "../../common/errors/notFound.js";
 import { generateSlug } from "../../common/utils/generateSlug.js";
 import * as agentRepository from "./agent.repository.js";
-import type { CreateAgentArgs, UpdateAgentInput } from "./agent.schema.js";
+import type { ConfigureAgentArgs, CreateAgentArgs, UpdateAgentInput } from "./agent.schema.js";
 
 
 export const createAgent = async (args: CreateAgentArgs) => {
-  
+
   const agentSlug = generateSlug(args.name);
   const existing = await agentRepository.findBySlug(
     args.organizationId,
@@ -62,4 +63,36 @@ export const updateAgent = async (
   }
 
   return updated;
+};
+
+export const configureAgent = async (args: ConfigureAgentArgs) => {
+  const { organizationId, userId, agentId, ...data } = args;
+
+  const configuration = await agentRepository.configureAgent(
+    organizationId,
+    agentId,
+    data
+  );
+
+  if (!configuration) {
+    throw new NotFoundError("Agent not found");
+  }
+
+  return configuration;
+};
+
+export const getAgentConfig = async (
+  organizationId: string,
+  agentId: string
+) => {
+  const configuration = await agentRepository.getAgentConfig(
+    organizationId,
+    agentId
+  );
+
+  if (!configuration) {
+    throw new NotFoundError("Agent configuration not found");
+  }
+
+  return configuration;
 };

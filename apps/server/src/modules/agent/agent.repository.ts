@@ -1,5 +1,6 @@
+import { Prisma } from "../../../prisma/generated/prisma/client.js";
 import prisma from "../../config/prisma.js";
-import type { CreateAgentArgs, UpdateAgentInput } from "./agent.schema.js";
+import type { CreateAgentArgs, UpdateAgentInput, ConfigureAgentInput } from "./agent.schema.js";
 
 type CreateAgentInput = CreateAgentArgs & { agentSlug: string };
 type UpdateAgentRepoInput = UpdateAgentInput & { agentSlug?: string };
@@ -48,4 +49,84 @@ export const updateAgent = async (
   });
   if (result.count === 0) return null;
   return prisma.agent.findUnique({ where: { agentId } });
+};
+
+export const configureAgent = async (
+  organizationId: string,
+  agentId: string,
+  data: ConfigureAgentInput
+) => {
+  // Tenant pre-check — bail early with null (service maps to NotFoundError).
+  // findUnique on the PK, then compare org, is cheaper than a composite findFirst.
+  const agent = await prisma.agent.findFirst({
+    where: {
+      agentId,
+      organizationId
+    }
+  });
+  if (!agent ) return null;
+
+  const prismaConfigData = {
+    ...data,
+    initiation_webhook: data.initiation_webhook ?? Prisma.JsonNull,
+    post_call_webhook: data.post_call_webhook ?? Prisma.JsonNull,
+  };
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.agentConfiguration.findUnique({
+      where: { agentId },
+      select: { agentConfigId: true },
+    });
+
+    if (existing) {
+      // Update path — do NOT touch isConfigured (already true from first create).
+      return tx.agentConfiguration.update({
+        where: { agentId },
+        data: prismaConfigData,
+      });
+    }
+
+    // Create path — write the config and flip the agent flag atomically.
+    const [configuration] = await Promise.all([
+      tx.agentConfiguration.create({
+        data: {
+          agentId,
+          ...prismaConfigData,
+          concurrent_calls_limit: 5,
+          daily_calls_limit: 20,
+          max_conversation_duration_seconds: 600,
+          silence_end_call_timeout_seconds: 30,
+          turn_timeout_seconds: 30,
+          user_input_audio_format: "mp3",
+          store_call_audio: true,
+          zero_pii_retention: false,
+          conversation_retention_days: 30,
+          enable_auth_for_agent_api: false,
+          voice_similarity_boost: 0.5,
+          voice_speed: 1.0,
+          voice_stability: 0.5,
+        },
+      }),
+      tx.agent.update({
+        where: { agentId },
+        data: { isConfigured: true },
+      }),
+    ]);
+
+    return configuration;
+  });
+};
+
+export const getAgentConfig = async (
+  organizationId: string,
+  agentId: string
+) => {
+  // Filter through the agent relation so a config row owned by another
+  // org cannot be returned even if the caller guesses a valid agentId.
+  return prisma.agentConfiguration.findFirst({
+    where: {
+      agentId,
+      agent: { organizationId },
+    },
+  });
 };

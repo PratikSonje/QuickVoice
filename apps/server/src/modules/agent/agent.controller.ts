@@ -54,3 +54,50 @@ export const updateAgent = async (req: Request, res: Response) => {
     data: agent,
   });
 };
+
+
+export const configureAgent = async (req: Request, res: Response) => {
+  if (!req.auth?.activeOrganizationId) {
+    throw new ForbiddenError("No active organization for this request");
+  }
+
+  const agentId = req.params.agentId;
+  if (typeof agentId !== "string" || agentId.length === 0) {
+    throw new BadRequestError("Agent id is required");
+  }
+
+  const configuration = await agentService.configureAgent({
+    ...req.body,
+    agentId,
+    organizationId: req.auth.activeOrganizationId,
+    userId: req.auth.userId,
+  });
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Agent configured successfully",
+    data: configuration,
+  });
+};
+
+export const getAgentConfig = async (req: Request, res: Response) => {
+  if (!req.auth?.activeOrganizationId) {
+    throw new ForbiddenError("No active organization for this request");
+  }
+
+  const agentId = req.params.agentId;
+  if (typeof agentId !== "string" || agentId.length === 0) {
+    throw new BadRequestError("Agent id is required");
+  }
+
+  const configuration = await agentService.getAgentConfig(
+    req.auth.activeOrganizationId,
+    agentId
+  );
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Agent configuration fetched successfully",
+    data: configuration,
+  });
+};

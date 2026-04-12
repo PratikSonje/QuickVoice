@@ -4,7 +4,7 @@ import authMiddleware from "../../middleware/auth.middleware.js";
 import { requirePermission } from "../../middleware/authorize.middleware.js";
 import validate from "../../middleware/validate.middleware.js";
 import * as agentController from "./agent.controller.js";
-import { createAgentSchema, updateAgentSchema } from "./agent.schema.js";
+import { configureAgentSchema, createAgentSchema, updateAgentSchema } from "./agent.schema.js";
 
 const router = Router();
 
@@ -30,5 +30,22 @@ router.patch(
   validate(updateAgentSchema),
   agentController.updateAgent
 );
+
+
+router.post(
+  "/:agentId/config",
+  authMiddleware,
+  requirePermission({ agentConfiguration: ["create", "update"] }),
+  validate(configureAgentSchema),
+  agentController.configureAgent
+);
+
+router.get(
+  "/:agentId/config",
+  authMiddleware,
+  requirePermission({ agentConfiguration: ["read"] }),
+  agentController.getAgentConfig
+);
+
 
 export default router;

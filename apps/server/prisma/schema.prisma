@@ -366,6 +366,8 @@ model AgentConfiguration {
   initiation_webhook                Json?
   post_call_webhook                 Json?
   variables                         Json?
+  preemptive_generation             Boolean  @default(false)
+  timezone                          String   @default("UTC")
 }
 
 model KnowledgeSource {

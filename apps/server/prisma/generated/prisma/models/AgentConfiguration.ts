@@ -82,6 +82,8 @@ export type AgentConfigurationMinAggregateOutputType = {
   zero_pii_retention: boolean | null
   llmModel: string | null
   agent_language: string | null
+  preemptive_generation: boolean | null
+  timezone: string | null
 }
 
 export type AgentConfigurationMaxAggregateOutputType = {
@@ -112,6 +114,8 @@ export type AgentConfigurationMaxAggregateOutputType = {
   zero_pii_retention: boolean | null
   llmModel: string | null
   agent_language: string | null
+  preemptive_generation: boolean | null
+  timezone: string | null
 }
 
 export type AgentConfigurationCountAggregateOutputType = {
@@ -147,6 +151,8 @@ export type AgentConfigurationCountAggregateOutputType = {
   initiation_webhook: number
   post_call_webhook: number
   variables: number
+  preemptive_generation: number
+  timezone: number
   _all: number
 }
 
@@ -207,6 +213,8 @@ export type AgentConfigurationMinAggregateInputType = {
   zero_pii_retention?: true
   llmModel?: true
   agent_language?: true
+  preemptive_generation?: true
+  timezone?: true
 }
 
 export type AgentConfigurationMaxAggregateInputType = {
@@ -237,6 +245,8 @@ export type AgentConfigurationMaxAggregateInputType = {
   zero_pii_retention?: true
   llmModel?: true
   agent_language?: true
+  preemptive_generation?: true
+  timezone?: true
 }
 
 export type AgentConfigurationCountAggregateInputType = {
@@ -272,6 +282,8 @@ export type AgentConfigurationCountAggregateInputType = {
   initiation_webhook?: true
   post_call_webhook?: true
   variables?: true
+  preemptive_generation?: true
+  timezone?: true
   _all?: true
 }
 
@@ -394,6 +406,8 @@ export type AgentConfigurationGroupByOutputType = {
   initiation_webhook: runtime.JsonValue | null
   post_call_webhook: runtime.JsonValue | null
   variables: runtime.JsonValue | null
+  preemptive_generation: boolean
+  timezone: string
   _count: AgentConfigurationCountAggregateOutputType | null
   _avg: AgentConfigurationAvgAggregateOutputType | null
   _sum: AgentConfigurationSumAggregateOutputType | null
@@ -452,6 +466,8 @@ export type AgentConfigurationWhereInput = {
   initiation_webhook?: Prisma.JsonNullableFilter<"AgentConfiguration">
   post_call_webhook?: Prisma.JsonNullableFilter<"AgentConfiguration">
   variables?: Prisma.JsonNullableFilter<"AgentConfiguration">
+  preemptive_generation?: Prisma.BoolFilter<"AgentConfiguration"> | boolean
+  timezone?: Prisma.StringFilter<"AgentConfiguration"> | string
   agent?: Prisma.XOR<Prisma.AgentScalarRelationFilter, Prisma.AgentWhereInput>
 }
 
@@ -488,6 +504,8 @@ export type AgentConfigurationOrderByWithRelationInput = {
   initiation_webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   post_call_webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   variables?: Prisma.SortOrderInput | Prisma.SortOrder
+  preemptive_generation?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   agent?: Prisma.AgentOrderByWithRelationInput
 }
 
@@ -527,6 +545,8 @@ export type AgentConfigurationWhereUniqueInput = Prisma.AtLeast<{
   initiation_webhook?: Prisma.JsonNullableFilter<"AgentConfiguration">
   post_call_webhook?: Prisma.JsonNullableFilter<"AgentConfiguration">
   variables?: Prisma.JsonNullableFilter<"AgentConfiguration">
+  preemptive_generation?: Prisma.BoolFilter<"AgentConfiguration"> | boolean
+  timezone?: Prisma.StringFilter<"AgentConfiguration"> | string
   agent?: Prisma.XOR<Prisma.AgentScalarRelationFilter, Prisma.AgentWhereInput>
 }, "agentConfigId" | "agentId">
 
@@ -563,6 +583,8 @@ export type AgentConfigurationOrderByWithAggregationInput = {
   initiation_webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   post_call_webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   variables?: Prisma.SortOrderInput | Prisma.SortOrder
+  preemptive_generation?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   _count?: Prisma.AgentConfigurationCountOrderByAggregateInput
   _avg?: Prisma.AgentConfigurationAvgOrderByAggregateInput
   _max?: Prisma.AgentConfigurationMaxOrderByAggregateInput
@@ -606,6 +628,8 @@ export type AgentConfigurationScalarWhereWithAggregatesInput = {
   initiation_webhook?: Prisma.JsonNullableWithAggregatesFilter<"AgentConfiguration">
   post_call_webhook?: Prisma.JsonNullableWithAggregatesFilter<"AgentConfiguration">
   variables?: Prisma.JsonNullableWithAggregatesFilter<"AgentConfiguration">
+  preemptive_generation?: Prisma.BoolWithAggregatesFilter<"AgentConfiguration"> | boolean
+  timezone?: Prisma.StringWithAggregatesFilter<"AgentConfiguration"> | string
 }
 
 export type AgentConfigurationCreateInput = {
@@ -640,6 +664,8 @@ export type AgentConfigurationCreateInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: boolean
+  timezone?: string
   agent: Prisma.AgentCreateNestedOneWithoutConfigurationInput
 }
 
@@ -676,6 +702,8 @@ export type AgentConfigurationUncheckedCreateInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: boolean
+  timezone?: string
 }
 
 export type AgentConfigurationUpdateInput = {
@@ -710,6 +738,8 @@ export type AgentConfigurationUpdateInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   agent?: Prisma.AgentUpdateOneRequiredWithoutConfigurationNestedInput
 }
 
@@ -746,6 +776,8 @@ export type AgentConfigurationUncheckedUpdateInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AgentConfigurationCreateManyInput = {
@@ -781,6 +813,8 @@ export type AgentConfigurationCreateManyInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: boolean
+  timezone?: string
 }
 
 export type AgentConfigurationUpdateManyMutationInput = {
@@ -815,6 +849,8 @@ export type AgentConfigurationUpdateManyMutationInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AgentConfigurationUncheckedUpdateManyInput = {
@@ -850,6 +886,8 @@ export type AgentConfigurationUncheckedUpdateManyInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AgentConfigurationNullableScalarRelationFilter = {
@@ -890,6 +928,8 @@ export type AgentConfigurationCountOrderByAggregateInput = {
   initiation_webhook?: Prisma.SortOrder
   post_call_webhook?: Prisma.SortOrder
   variables?: Prisma.SortOrder
+  preemptive_generation?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
 }
 
 export type AgentConfigurationAvgOrderByAggregateInput = {
@@ -934,6 +974,8 @@ export type AgentConfigurationMaxOrderByAggregateInput = {
   zero_pii_retention?: Prisma.SortOrder
   llmModel?: Prisma.SortOrder
   agent_language?: Prisma.SortOrder
+  preemptive_generation?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
 }
 
 export type AgentConfigurationMinOrderByAggregateInput = {
@@ -964,6 +1006,8 @@ export type AgentConfigurationMinOrderByAggregateInput = {
   zero_pii_retention?: Prisma.SortOrder
   llmModel?: Prisma.SortOrder
   agent_language?: Prisma.SortOrder
+  preemptive_generation?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
 }
 
 export type AgentConfigurationSumOrderByAggregateInput = {
@@ -1052,6 +1096,8 @@ export type AgentConfigurationCreateWithoutAgentInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: boolean
+  timezone?: string
 }
 
 export type AgentConfigurationUncheckedCreateWithoutAgentInput = {
@@ -1086,6 +1132,8 @@ export type AgentConfigurationUncheckedCreateWithoutAgentInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: boolean
+  timezone?: string
 }
 
 export type AgentConfigurationCreateOrConnectWithoutAgentInput = {
@@ -1136,6 +1184,8 @@ export type AgentConfigurationUpdateWithoutAgentInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AgentConfigurationUncheckedUpdateWithoutAgentInput = {
@@ -1170,6 +1220,8 @@ export type AgentConfigurationUncheckedUpdateWithoutAgentInput = {
   initiation_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   post_call_webhook?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   variables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  preemptive_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1207,6 +1259,8 @@ export type AgentConfigurationSelect<ExtArgs extends runtime.Types.Extensions.In
   initiation_webhook?: boolean
   post_call_webhook?: boolean
   variables?: boolean
+  preemptive_generation?: boolean
+  timezone?: boolean
   agent?: boolean | Prisma.AgentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agentConfiguration"]>
 
@@ -1243,6 +1297,8 @@ export type AgentConfigurationSelectCreateManyAndReturn<ExtArgs extends runtime.
   initiation_webhook?: boolean
   post_call_webhook?: boolean
   variables?: boolean
+  preemptive_generation?: boolean
+  timezone?: boolean
   agent?: boolean | Prisma.AgentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agentConfiguration"]>
 
@@ -1279,6 +1335,8 @@ export type AgentConfigurationSelectUpdateManyAndReturn<ExtArgs extends runtime.
   initiation_webhook?: boolean
   post_call_webhook?: boolean
   variables?: boolean
+  preemptive_generation?: boolean
+  timezone?: boolean
   agent?: boolean | Prisma.AgentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agentConfiguration"]>
 
@@ -1315,9 +1373,11 @@ export type AgentConfigurationSelectScalar = {
   initiation_webhook?: boolean
   post_call_webhook?: boolean
   variables?: boolean
+  preemptive_generation?: boolean
+  timezone?: boolean
 }
 
-export type AgentConfigurationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"agentConfigId" | "agentId" | "systemPrompt" | "firstMessage" | "temperature" | "data_needed" | "data_evaluation" | "voiceId" | "concurrent_calls_limit" | "conversation_retention_days" | "daily_calls_limit" | "enable_auth_for_agent_api" | "max_conversation_duration_seconds" | "optimize_streaming_latency" | "silence_end_call_timeout_seconds" | "store_call_audio" | "tokenLimit" | "tts_output_format" | "turn_timeout_seconds" | "update_at" | "use_flash_call" | "use_rag" | "user_input_audio_format" | "voice_similarity_boost" | "voice_speed" | "voice_stability" | "zero_pii_retention" | "llmModel" | "agent_language" | "initiation_webhook" | "post_call_webhook" | "variables", ExtArgs["result"]["agentConfiguration"]>
+export type AgentConfigurationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"agentConfigId" | "agentId" | "systemPrompt" | "firstMessage" | "temperature" | "data_needed" | "data_evaluation" | "voiceId" | "concurrent_calls_limit" | "conversation_retention_days" | "daily_calls_limit" | "enable_auth_for_agent_api" | "max_conversation_duration_seconds" | "optimize_streaming_latency" | "silence_end_call_timeout_seconds" | "store_call_audio" | "tokenLimit" | "tts_output_format" | "turn_timeout_seconds" | "update_at" | "use_flash_call" | "use_rag" | "user_input_audio_format" | "voice_similarity_boost" | "voice_speed" | "voice_stability" | "zero_pii_retention" | "llmModel" | "agent_language" | "initiation_webhook" | "post_call_webhook" | "variables" | "preemptive_generation" | "timezone", ExtArgs["result"]["agentConfiguration"]>
 export type AgentConfigurationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   agent?: boolean | Prisma.AgentDefaultArgs<ExtArgs>
 }
@@ -1366,6 +1426,8 @@ export type $AgentConfigurationPayload<ExtArgs extends runtime.Types.Extensions.
     initiation_webhook: runtime.JsonValue | null
     post_call_webhook: runtime.JsonValue | null
     variables: runtime.JsonValue | null
+    preemptive_generation: boolean
+    timezone: string
   }, ExtArgs["result"]["agentConfiguration"]>
   composites: {}
 }
@@ -1822,6 +1884,8 @@ export interface AgentConfigurationFieldRefs {
   readonly initiation_webhook: Prisma.FieldRef<"AgentConfiguration", 'Json'>
   readonly post_call_webhook: Prisma.FieldRef<"AgentConfiguration", 'Json'>
   readonly variables: Prisma.FieldRef<"AgentConfiguration", 'Json'>
+  readonly preemptive_generation: Prisma.FieldRef<"AgentConfiguration", 'Boolean'>
+  readonly timezone: Prisma.FieldRef<"AgentConfiguration", 'String'>
 }
     
 

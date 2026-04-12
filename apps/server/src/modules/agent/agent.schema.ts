@@ -26,3 +26,99 @@ export const updateAgentSchema = createAgentSchema
     message: "At least one field must be provided",
   });
 export type UpdateAgentInput = z.infer<typeof updateAgentSchema>;
+
+
+
+
+export const dataItemSchema = z.object({
+  id: z.string(),
+  type: z.string().min(1, "Data item type is required"),
+  name: z.string().min(1, "Data item value is required"),
+  description: z.string().min(5, "Description is required"),
+});
+export const dataEvaluationSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Data evaluation name is required"),
+  criteria: z.string().min(1, "Data evaluation criteria is required"),
+});
+
+export const initiation_webhookSchema = z
+  .object({
+    webhook_url: z.string().url(),
+    method: z.enum(["POST", "GET"]),
+    dynamic_variables:z.record(z.string(), z.string()).optional(),
+    headers: z.record(z.string(),  z.object({
+        value: z.string(),
+        type: z.enum(["Value", "Secret"]),
+      })).optional(),
+    body: z.record(z.string(), z.object({
+        value: z.string(),
+        type: z.enum(["Value", "Secret"]),
+      })).optional(),
+  })
+  .nullable();
+
+export const post_call_webhookSchema = z
+  .object({
+    webhook_url: z.string().url(),
+    method: z.enum(["POST"]),
+    headers: z.record(z.string(), z.object({
+        value: z.string(),
+        type: z.enum(["Value", "Secret"]),
+      })).optional(),
+    transcript: z.boolean(),
+    audio_url: z.boolean(),
+  })
+  .nullable();
+
+export const configureAgentSchema = z.object({
+  agent_language: z.string(),
+  firstMessage: z
+    .string()
+    .min(5, "First message must be at least 5 characters"),
+  systemPrompt: z
+    .string()
+    .min(10, "System prompt must be at least 10 characters"),
+  llmModel: z.string(),
+  // tokenLimit: z.number().int().positive().default(4096),
+  use_rag: z.boolean(),
+  voiceId: z.string().min(1, "Voice ID is required"),
+  data_needed: z.array(dataItemSchema),
+  data_evaluation: z.array(dataEvaluationSchema),
+  initiation_webhook: initiation_webhookSchema,
+  post_call_webhook: post_call_webhookSchema,
+  variables:z.object({
+    firstMessage:z.array(z.string()),
+    systemPrompt:z.array(z.string()),
+    placeholders: z.record(z.string(), z.string()).optional(),
+  }).optional(),
+  preemptive_generation: z.boolean(),
+  timezone: z.string().min(1, "Timezone is required"),
+  // use_flash_call: z.boolean().default(false),
+  // tts_output_format: z.string().default("mp3"),
+  // optimize_streaming_latency: z.boolean().default(false),
+  // voice_stability: z.number().min(0).max(1),
+  // voice_speed: z.number().min(0.5).max(2),
+  // voice_similarity_boost: z.number().min(0).max(1),
+  // fetch_initiation_webhook_url: z.string().optional(),
+  // post_call_webhook_url: z.string().optional(),
+  // concurrent_calls_limit: z.number().int().positive(),
+  // daily_calls_limit: z.number().int().positive(),
+  // turn_timeout_seconds: z.number().int().positive(),
+  // silence_end_call_timeout_seconds: z.number().int().positive(),
+  // max_conversation_duration_seconds: z.number().int().positive(),
+  // user_input_audio_format: z.string(),
+  // store_call_audio: z.boolean().default(true),
+  // zero_pii_retention: z.boolean().default(false),
+  // conversation_retention_days: z.number().int().positive().default(30),
+  // enable_auth_for_agent_api: z.boolean().default(false),
+});
+
+export type ConfigureAgentInput = z.infer<typeof configureAgentSchema>;
+export type ConfigureAgentArgs = ConfigureAgentInput & {
+  organizationId: string;
+  userId: string;
+  agentId: string;
+};
+export type DataItem = z.infer<typeof dataItemSchema>;
+export type DataEvaluation = z.infer<typeof dataEvaluationSchema>;
