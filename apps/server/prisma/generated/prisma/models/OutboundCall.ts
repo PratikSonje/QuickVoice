@@ -31,6 +31,7 @@ export type OutboundCallMinAggregateOutputType = {
   userId: string | null
   campaignId: string | null
   scheduledAt: Date | null
+  callLogId: string | null
   phoneNumber: string | null
   fromNumber: string | null
   firstMessage: string | null
@@ -48,6 +49,7 @@ export type OutboundCallMaxAggregateOutputType = {
   userId: string | null
   campaignId: string | null
   scheduledAt: Date | null
+  callLogId: string | null
   phoneNumber: string | null
   fromNumber: string | null
   firstMessage: string | null
@@ -65,6 +67,7 @@ export type OutboundCallCountAggregateOutputType = {
   userId: number
   campaignId: number
   scheduledAt: number
+  callLogId: number
   phoneNumber: number
   fromNumber: number
   firstMessage: number
@@ -85,6 +88,7 @@ export type OutboundCallMinAggregateInputType = {
   userId?: true
   campaignId?: true
   scheduledAt?: true
+  callLogId?: true
   phoneNumber?: true
   fromNumber?: true
   firstMessage?: true
@@ -102,6 +106,7 @@ export type OutboundCallMaxAggregateInputType = {
   userId?: true
   campaignId?: true
   scheduledAt?: true
+  callLogId?: true
   phoneNumber?: true
   fromNumber?: true
   firstMessage?: true
@@ -119,6 +124,7 @@ export type OutboundCallCountAggregateInputType = {
   userId?: true
   campaignId?: true
   scheduledAt?: true
+  callLogId?: true
   phoneNumber?: true
   fromNumber?: true
   firstMessage?: true
@@ -210,6 +216,7 @@ export type OutboundCallGroupByOutputType = {
   userId: string | null
   campaignId: string | null
   scheduledAt: Date | null
+  callLogId: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage: string | null
@@ -249,6 +256,7 @@ export type OutboundCallWhereInput = {
   userId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   campaignId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   scheduledAt?: Prisma.DateTimeNullableFilter<"OutboundCall"> | Date | string | null
+  callLogId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   phoneNumber?: Prisma.StringFilter<"OutboundCall"> | string
   fromNumber?: Prisma.StringFilter<"OutboundCall"> | string
   firstMessage?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
@@ -262,6 +270,7 @@ export type OutboundCallWhereInput = {
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   campaign?: Prisma.XOR<Prisma.CampaignNullableScalarRelationFilter, Prisma.CampaignWhereInput> | null
+  callLog?: Prisma.XOR<Prisma.CallLogNullableScalarRelationFilter, Prisma.CallLogWhereInput> | null
 }
 
 export type OutboundCallOrderByWithRelationInput = {
@@ -271,6 +280,7 @@ export type OutboundCallOrderByWithRelationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   campaignId?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  callLogId?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   firstMessage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -284,10 +294,12 @@ export type OutboundCallOrderByWithRelationInput = {
   agent?: Prisma.AgentOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   campaign?: Prisma.CampaignOrderByWithRelationInput
+  callLog?: Prisma.CallLogOrderByWithRelationInput
 }
 
 export type OutboundCallWhereUniqueInput = Prisma.AtLeast<{
   outboundId?: string
+  callLogId?: string
   AND?: Prisma.OutboundCallWhereInput | Prisma.OutboundCallWhereInput[]
   OR?: Prisma.OutboundCallWhereInput[]
   NOT?: Prisma.OutboundCallWhereInput | Prisma.OutboundCallWhereInput[]
@@ -309,7 +321,8 @@ export type OutboundCallWhereUniqueInput = Prisma.AtLeast<{
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   campaign?: Prisma.XOR<Prisma.CampaignNullableScalarRelationFilter, Prisma.CampaignWhereInput> | null
-}, "outboundId">
+  callLog?: Prisma.XOR<Prisma.CallLogNullableScalarRelationFilter, Prisma.CallLogWhereInput> | null
+}, "outboundId" | "callLogId">
 
 export type OutboundCallOrderByWithAggregationInput = {
   outboundId?: Prisma.SortOrder
@@ -318,6 +331,7 @@ export type OutboundCallOrderByWithAggregationInput = {
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   campaignId?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  callLogId?: Prisma.SortOrderInput | Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   firstMessage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -342,6 +356,7 @@ export type OutboundCallScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringNullableWithAggregatesFilter<"OutboundCall"> | string | null
   campaignId?: Prisma.StringNullableWithAggregatesFilter<"OutboundCall"> | string | null
   scheduledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"OutboundCall"> | Date | string | null
+  callLogId?: Prisma.StringNullableWithAggregatesFilter<"OutboundCall"> | string | null
   phoneNumber?: Prisma.StringWithAggregatesFilter<"OutboundCall"> | string
   fromNumber?: Prisma.StringWithAggregatesFilter<"OutboundCall"> | string
   firstMessage?: Prisma.StringNullableWithAggregatesFilter<"OutboundCall"> | string | null
@@ -369,6 +384,7 @@ export type OutboundCallCreateInput = {
   agent?: Prisma.AgentCreateNestedOneWithoutOutboundCallsInput
   user?: Prisma.UserCreateNestedOneWithoutOutboundCallsInput
   campaign?: Prisma.CampaignCreateNestedOneWithoutOutboundCallsInput
+  callLog?: Prisma.CallLogCreateNestedOneWithoutOutboundInput
 }
 
 export type OutboundCallUncheckedCreateInput = {
@@ -378,6 +394,7 @@ export type OutboundCallUncheckedCreateInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -405,6 +422,7 @@ export type OutboundCallUpdateInput = {
   agent?: Prisma.AgentUpdateOneWithoutOutboundCallsNestedInput
   user?: Prisma.UserUpdateOneWithoutOutboundCallsNestedInput
   campaign?: Prisma.CampaignUpdateOneWithoutOutboundCallsNestedInput
+  callLog?: Prisma.CallLogUpdateOneWithoutOutboundNestedInput
 }
 
 export type OutboundCallUncheckedUpdateInput = {
@@ -414,6 +432,7 @@ export type OutboundCallUncheckedUpdateInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -432,6 +451,7 @@ export type OutboundCallCreateManyInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -464,6 +484,7 @@ export type OutboundCallUncheckedUpdateManyInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -485,6 +506,11 @@ export type OutboundCallOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type OutboundCallNullableScalarRelationFilter = {
+  is?: Prisma.OutboundCallWhereInput | null
+  isNot?: Prisma.OutboundCallWhereInput | null
+}
+
 export type OutboundCallCountOrderByAggregateInput = {
   outboundId?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -492,6 +518,7 @@ export type OutboundCallCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   campaignId?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  callLogId?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   firstMessage?: Prisma.SortOrder
@@ -510,6 +537,7 @@ export type OutboundCallMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   campaignId?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  callLogId?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   firstMessage?: Prisma.SortOrder
@@ -527,6 +555,7 @@ export type OutboundCallMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   campaignId?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  callLogId?: Prisma.SortOrder
   phoneNumber?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   firstMessage?: Prisma.SortOrder
@@ -663,6 +692,38 @@ export type OutboundCallUncheckedUpdateManyWithoutAgentNestedInput = {
   deleteMany?: Prisma.OutboundCallScalarWhereInput | Prisma.OutboundCallScalarWhereInput[]
 }
 
+export type OutboundCallCreateNestedOneWithoutCallLogInput = {
+  create?: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+  connectOrCreate?: Prisma.OutboundCallCreateOrConnectWithoutCallLogInput
+  connect?: Prisma.OutboundCallWhereUniqueInput
+}
+
+export type OutboundCallUncheckedCreateNestedOneWithoutCallLogInput = {
+  create?: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+  connectOrCreate?: Prisma.OutboundCallCreateOrConnectWithoutCallLogInput
+  connect?: Prisma.OutboundCallWhereUniqueInput
+}
+
+export type OutboundCallUpdateOneWithoutCallLogNestedInput = {
+  create?: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+  connectOrCreate?: Prisma.OutboundCallCreateOrConnectWithoutCallLogInput
+  upsert?: Prisma.OutboundCallUpsertWithoutCallLogInput
+  disconnect?: Prisma.OutboundCallWhereInput | boolean
+  delete?: Prisma.OutboundCallWhereInput | boolean
+  connect?: Prisma.OutboundCallWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OutboundCallUpdateToOneWithWhereWithoutCallLogInput, Prisma.OutboundCallUpdateWithoutCallLogInput>, Prisma.OutboundCallUncheckedUpdateWithoutCallLogInput>
+}
+
+export type OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput = {
+  create?: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+  connectOrCreate?: Prisma.OutboundCallCreateOrConnectWithoutCallLogInput
+  upsert?: Prisma.OutboundCallUpsertWithoutCallLogInput
+  disconnect?: Prisma.OutboundCallWhereInput | boolean
+  delete?: Prisma.OutboundCallWhereInput | boolean
+  connect?: Prisma.OutboundCallWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OutboundCallUpdateToOneWithWhereWithoutCallLogInput, Prisma.OutboundCallUpdateWithoutCallLogInput>, Prisma.OutboundCallUncheckedUpdateWithoutCallLogInput>
+}
+
 export type EnumOutboundCallModeFieldUpdateOperationsInput = {
   set?: $Enums.OutboundCallMode
 }
@@ -724,6 +785,7 @@ export type OutboundCallCreateWithoutUserInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutOutboundCallsInput
   agent?: Prisma.AgentCreateNestedOneWithoutOutboundCallsInput
   campaign?: Prisma.CampaignCreateNestedOneWithoutOutboundCallsInput
+  callLog?: Prisma.CallLogCreateNestedOneWithoutOutboundInput
 }
 
 export type OutboundCallUncheckedCreateWithoutUserInput = {
@@ -732,6 +794,7 @@ export type OutboundCallUncheckedCreateWithoutUserInput = {
   agentId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -779,6 +842,7 @@ export type OutboundCallScalarWhereInput = {
   userId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   campaignId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   scheduledAt?: Prisma.DateTimeNullableFilter<"OutboundCall"> | Date | string | null
+  callLogId?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
   phoneNumber?: Prisma.StringFilter<"OutboundCall"> | string
   fromNumber?: Prisma.StringFilter<"OutboundCall"> | string
   firstMessage?: Prisma.StringNullableFilter<"OutboundCall"> | string | null
@@ -805,6 +869,7 @@ export type OutboundCallCreateWithoutOrganizationInput = {
   agent?: Prisma.AgentCreateNestedOneWithoutOutboundCallsInput
   user?: Prisma.UserCreateNestedOneWithoutOutboundCallsInput
   campaign?: Prisma.CampaignCreateNestedOneWithoutOutboundCallsInput
+  callLog?: Prisma.CallLogCreateNestedOneWithoutOutboundInput
 }
 
 export type OutboundCallUncheckedCreateWithoutOrganizationInput = {
@@ -813,6 +878,7 @@ export type OutboundCallUncheckedCreateWithoutOrganizationInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -865,6 +931,7 @@ export type OutboundCallCreateWithoutAgentInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutOutboundCallsInput
   user?: Prisma.UserCreateNestedOneWithoutOutboundCallsInput
   campaign?: Prisma.CampaignCreateNestedOneWithoutOutboundCallsInput
+  callLog?: Prisma.CallLogCreateNestedOneWithoutOutboundInput
 }
 
 export type OutboundCallUncheckedCreateWithoutAgentInput = {
@@ -873,6 +940,7 @@ export type OutboundCallUncheckedCreateWithoutAgentInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -910,6 +978,94 @@ export type OutboundCallUpdateManyWithWhereWithoutAgentInput = {
   data: Prisma.XOR<Prisma.OutboundCallUpdateManyMutationInput, Prisma.OutboundCallUncheckedUpdateManyWithoutAgentInput>
 }
 
+export type OutboundCallCreateWithoutCallLogInput = {
+  outboundId?: string
+  scheduledAt?: Date | string | null
+  phoneNumber: string
+  fromNumber: string
+  firstMessage?: string | null
+  systemPrompt?: string | null
+  optionalData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  mode: $Enums.OutboundCallMode
+  status: $Enums.CallStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutOutboundCallsInput
+  agent?: Prisma.AgentCreateNestedOneWithoutOutboundCallsInput
+  user?: Prisma.UserCreateNestedOneWithoutOutboundCallsInput
+  campaign?: Prisma.CampaignCreateNestedOneWithoutOutboundCallsInput
+}
+
+export type OutboundCallUncheckedCreateWithoutCallLogInput = {
+  outboundId?: string
+  organizationId: string
+  agentId?: string | null
+  userId?: string | null
+  campaignId?: string | null
+  scheduledAt?: Date | string | null
+  phoneNumber: string
+  fromNumber: string
+  firstMessage?: string | null
+  systemPrompt?: string | null
+  optionalData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  mode: $Enums.OutboundCallMode
+  status: $Enums.CallStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type OutboundCallCreateOrConnectWithoutCallLogInput = {
+  where: Prisma.OutboundCallWhereUniqueInput
+  create: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+}
+
+export type OutboundCallUpsertWithoutCallLogInput = {
+  update: Prisma.XOR<Prisma.OutboundCallUpdateWithoutCallLogInput, Prisma.OutboundCallUncheckedUpdateWithoutCallLogInput>
+  create: Prisma.XOR<Prisma.OutboundCallCreateWithoutCallLogInput, Prisma.OutboundCallUncheckedCreateWithoutCallLogInput>
+  where?: Prisma.OutboundCallWhereInput
+}
+
+export type OutboundCallUpdateToOneWithWhereWithoutCallLogInput = {
+  where?: Prisma.OutboundCallWhereInput
+  data: Prisma.XOR<Prisma.OutboundCallUpdateWithoutCallLogInput, Prisma.OutboundCallUncheckedUpdateWithoutCallLogInput>
+}
+
+export type OutboundCallUpdateWithoutCallLogInput = {
+  outboundId?: Prisma.StringFieldUpdateOperationsInput | string
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  optionalData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  mode?: Prisma.EnumOutboundCallModeFieldUpdateOperationsInput | $Enums.OutboundCallMode
+  status?: Prisma.EnumCallStatusFieldUpdateOperationsInput | $Enums.CallStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutOutboundCallsNestedInput
+  agent?: Prisma.AgentUpdateOneWithoutOutboundCallsNestedInput
+  user?: Prisma.UserUpdateOneWithoutOutboundCallsNestedInput
+  campaign?: Prisma.CampaignUpdateOneWithoutOutboundCallsNestedInput
+}
+
+export type OutboundCallUncheckedUpdateWithoutCallLogInput = {
+  outboundId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  optionalData?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  mode?: Prisma.EnumOutboundCallModeFieldUpdateOperationsInput | $Enums.OutboundCallMode
+  status?: Prisma.EnumCallStatusFieldUpdateOperationsInput | $Enums.CallStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type OutboundCallCreateWithoutCampaignInput = {
   outboundId?: string
   scheduledAt?: Date | string | null
@@ -925,6 +1081,7 @@ export type OutboundCallCreateWithoutCampaignInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutOutboundCallsInput
   agent?: Prisma.AgentCreateNestedOneWithoutOutboundCallsInput
   user?: Prisma.UserCreateNestedOneWithoutOutboundCallsInput
+  callLog?: Prisma.CallLogCreateNestedOneWithoutOutboundInput
 }
 
 export type OutboundCallUncheckedCreateWithoutCampaignInput = {
@@ -933,6 +1090,7 @@ export type OutboundCallUncheckedCreateWithoutCampaignInput = {
   agentId?: string | null
   userId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -976,6 +1134,7 @@ export type OutboundCallCreateManyUserInput = {
   agentId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -1002,6 +1161,7 @@ export type OutboundCallUpdateWithoutUserInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutOutboundCallsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutOutboundCallsNestedInput
   campaign?: Prisma.CampaignUpdateOneWithoutOutboundCallsNestedInput
+  callLog?: Prisma.CallLogUpdateOneWithoutOutboundNestedInput
 }
 
 export type OutboundCallUncheckedUpdateWithoutUserInput = {
@@ -1010,6 +1170,7 @@ export type OutboundCallUncheckedUpdateWithoutUserInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1027,6 +1188,7 @@ export type OutboundCallUncheckedUpdateManyWithoutUserInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1044,6 +1206,7 @@ export type OutboundCallCreateManyOrganizationInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -1070,6 +1233,7 @@ export type OutboundCallUpdateWithoutOrganizationInput = {
   agent?: Prisma.AgentUpdateOneWithoutOutboundCallsNestedInput
   user?: Prisma.UserUpdateOneWithoutOutboundCallsNestedInput
   campaign?: Prisma.CampaignUpdateOneWithoutOutboundCallsNestedInput
+  callLog?: Prisma.CallLogUpdateOneWithoutOutboundNestedInput
 }
 
 export type OutboundCallUncheckedUpdateWithoutOrganizationInput = {
@@ -1078,6 +1242,7 @@ export type OutboundCallUncheckedUpdateWithoutOrganizationInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1095,6 +1260,7 @@ export type OutboundCallUncheckedUpdateManyWithoutOrganizationInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1112,6 +1278,7 @@ export type OutboundCallCreateManyAgentInput = {
   userId?: string | null
   campaignId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -1138,6 +1305,7 @@ export type OutboundCallUpdateWithoutAgentInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutOutboundCallsNestedInput
   user?: Prisma.UserUpdateOneWithoutOutboundCallsNestedInput
   campaign?: Prisma.CampaignUpdateOneWithoutOutboundCallsNestedInput
+  callLog?: Prisma.CallLogUpdateOneWithoutOutboundNestedInput
 }
 
 export type OutboundCallUncheckedUpdateWithoutAgentInput = {
@@ -1146,6 +1314,7 @@ export type OutboundCallUncheckedUpdateWithoutAgentInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1163,6 +1332,7 @@ export type OutboundCallUncheckedUpdateManyWithoutAgentInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   campaignId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1180,6 +1350,7 @@ export type OutboundCallCreateManyCampaignInput = {
   agentId?: string | null
   userId?: string | null
   scheduledAt?: Date | string | null
+  callLogId?: string | null
   phoneNumber: string
   fromNumber: string
   firstMessage?: string | null
@@ -1206,6 +1377,7 @@ export type OutboundCallUpdateWithoutCampaignInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutOutboundCallsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutOutboundCallsNestedInput
   user?: Prisma.UserUpdateOneWithoutOutboundCallsNestedInput
+  callLog?: Prisma.CallLogUpdateOneWithoutOutboundNestedInput
 }
 
 export type OutboundCallUncheckedUpdateWithoutCampaignInput = {
@@ -1214,6 +1386,7 @@ export type OutboundCallUncheckedUpdateWithoutCampaignInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1231,6 +1404,7 @@ export type OutboundCallUncheckedUpdateManyWithoutCampaignInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  callLogId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   firstMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1251,6 +1425,7 @@ export type OutboundCallSelect<ExtArgs extends runtime.Types.Extensions.Internal
   userId?: boolean
   campaignId?: boolean
   scheduledAt?: boolean
+  callLogId?: boolean
   phoneNumber?: boolean
   fromNumber?: boolean
   firstMessage?: boolean
@@ -1264,6 +1439,7 @@ export type OutboundCallSelect<ExtArgs extends runtime.Types.Extensions.Internal
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }, ExtArgs["result"]["outboundCall"]>
 
 export type OutboundCallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1273,6 +1449,7 @@ export type OutboundCallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   userId?: boolean
   campaignId?: boolean
   scheduledAt?: boolean
+  callLogId?: boolean
   phoneNumber?: boolean
   fromNumber?: boolean
   firstMessage?: boolean
@@ -1286,6 +1463,7 @@ export type OutboundCallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }, ExtArgs["result"]["outboundCall"]>
 
 export type OutboundCallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1295,6 +1473,7 @@ export type OutboundCallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   userId?: boolean
   campaignId?: boolean
   scheduledAt?: boolean
+  callLogId?: boolean
   phoneNumber?: boolean
   fromNumber?: boolean
   firstMessage?: boolean
@@ -1308,6 +1487,7 @@ export type OutboundCallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }, ExtArgs["result"]["outboundCall"]>
 
 export type OutboundCallSelectScalar = {
@@ -1317,6 +1497,7 @@ export type OutboundCallSelectScalar = {
   userId?: boolean
   campaignId?: boolean
   scheduledAt?: boolean
+  callLogId?: boolean
   phoneNumber?: boolean
   fromNumber?: boolean
   firstMessage?: boolean
@@ -1328,24 +1509,27 @@ export type OutboundCallSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OutboundCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"outboundId" | "organizationId" | "agentId" | "userId" | "campaignId" | "scheduledAt" | "phoneNumber" | "fromNumber" | "firstMessage" | "systemPrompt" | "optionalData" | "mode" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["outboundCall"]>
+export type OutboundCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"outboundId" | "organizationId" | "agentId" | "userId" | "campaignId" | "scheduledAt" | "callLogId" | "phoneNumber" | "fromNumber" | "firstMessage" | "systemPrompt" | "optionalData" | "mode" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["outboundCall"]>
 export type OutboundCallInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }
 export type OutboundCallIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }
 export type OutboundCallIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.OutboundCall$agentArgs<ExtArgs>
   user?: boolean | Prisma.OutboundCall$userArgs<ExtArgs>
   campaign?: boolean | Prisma.OutboundCall$campaignArgs<ExtArgs>
+  callLog?: boolean | Prisma.OutboundCall$callLogArgs<ExtArgs>
 }
 
 export type $OutboundCallPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1355,6 +1539,7 @@ export type $OutboundCallPayload<ExtArgs extends runtime.Types.Extensions.Intern
     agent: Prisma.$AgentPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs> | null
     campaign: Prisma.$CampaignPayload<ExtArgs> | null
+    callLog: Prisma.$CallLogPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     outboundId: string
@@ -1363,6 +1548,7 @@ export type $OutboundCallPayload<ExtArgs extends runtime.Types.Extensions.Intern
     userId: string | null
     campaignId: string | null
     scheduledAt: Date | null
+    callLogId: string | null
     phoneNumber: string
     fromNumber: string
     firstMessage: string | null
@@ -1770,6 +1956,7 @@ export interface Prisma__OutboundCallClient<T, Null = never, ExtArgs extends run
   agent<T extends Prisma.OutboundCall$agentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OutboundCall$agentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.OutboundCall$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OutboundCall$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   campaign<T extends Prisma.OutboundCall$campaignArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OutboundCall$campaignArgs<ExtArgs>>): Prisma.Prisma__CampaignClient<runtime.Types.Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  callLog<T extends Prisma.OutboundCall$callLogArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OutboundCall$callLogArgs<ExtArgs>>): Prisma.Prisma__CallLogClient<runtime.Types.Result.GetResult<Prisma.$CallLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1805,6 +1992,7 @@ export interface OutboundCallFieldRefs {
   readonly userId: Prisma.FieldRef<"OutboundCall", 'String'>
   readonly campaignId: Prisma.FieldRef<"OutboundCall", 'String'>
   readonly scheduledAt: Prisma.FieldRef<"OutboundCall", 'DateTime'>
+  readonly callLogId: Prisma.FieldRef<"OutboundCall", 'String'>
   readonly phoneNumber: Prisma.FieldRef<"OutboundCall", 'String'>
   readonly fromNumber: Prisma.FieldRef<"OutboundCall", 'String'>
   readonly firstMessage: Prisma.FieldRef<"OutboundCall", 'String'>
@@ -2269,6 +2457,25 @@ export type OutboundCall$campaignArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.CampaignInclude<ExtArgs> | null
   where?: Prisma.CampaignWhereInput
+}
+
+/**
+ * OutboundCall.callLog
+ */
+export type OutboundCall$callLogArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CallLog
+   */
+  select?: Prisma.CallLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CallLog
+   */
+  omit?: Prisma.CallLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CallLogInclude<ExtArgs> | null
+  where?: Prisma.CallLogWhereInput
 }
 
 /**

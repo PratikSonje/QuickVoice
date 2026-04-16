@@ -395,6 +395,7 @@ export const OutboundCallScalarFieldEnum = {
   userId: 'userId',
   campaignId: 'campaignId',
   scheduledAt: 'scheduledAt',
+  callLogId: 'callLogId',
   phoneNumber: 'phoneNumber',
   fromNumber: 'fromNumber',
   firstMessage: 'firstMessage',

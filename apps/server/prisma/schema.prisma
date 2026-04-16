@@ -422,6 +422,7 @@ model CallLog {
   transcripts        CallTranscript[]
   // TODO Change in api for delete and fetch credits
   deleted            Boolean          @default(false)
+  outbound           OutboundCall?    
 
   @@index([organizationId])
   @@index([organizationId, startTime])
@@ -455,7 +456,8 @@ model OutboundCall {
   campaignId     String?
   campaign       Campaign?    @relation(fields: [campaignId], references: [campaignId], onDelete: SetNull)
   scheduledAt    DateTime?
-
+  callLogId      String?        @unique
+  callLog        CallLog?       @relation(fields: [callLogId], references: [callId], onDelete: SetNull)
   // Call Data
   phoneNumber  String
   fromNumber   String

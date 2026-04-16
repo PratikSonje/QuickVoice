@@ -308,6 +308,7 @@ export type CallLogWhereInput = {
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transcripts?: Prisma.CallTranscriptListRelationFilter
+  outbound?: Prisma.XOR<Prisma.OutboundCallNullableScalarRelationFilter, Prisma.OutboundCallWhereInput> | null
 }
 
 export type CallLogOrderByWithRelationInput = {
@@ -332,6 +333,7 @@ export type CallLogOrderByWithRelationInput = {
   agent?: Prisma.AgentOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   transcripts?: Prisma.CallTranscriptOrderByRelationAggregateInput
+  outbound?: Prisma.OutboundCallOrderByWithRelationInput
 }
 
 export type CallLogWhereUniqueInput = Prisma.AtLeast<{
@@ -359,6 +361,7 @@ export type CallLogWhereUniqueInput = Prisma.AtLeast<{
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transcripts?: Prisma.CallTranscriptListRelationFilter
+  outbound?: Prisma.XOR<Prisma.OutboundCallNullableScalarRelationFilter, Prisma.OutboundCallWhereInput> | null
 }, "callId">
 
 export type CallLogOrderByWithAggregationInput = {
@@ -428,6 +431,7 @@ export type CallLogCreateInput = {
   agent?: Prisma.AgentCreateNestedOneWithoutCallLogsInput
   user?: Prisma.UserCreateNestedOneWithoutCallLogsInput
   transcripts?: Prisma.CallTranscriptCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUncheckedCreateInput = {
@@ -449,6 +453,7 @@ export type CallLogUncheckedCreateInput = {
   callCostCents?: number | null
   deleted?: boolean
   transcripts?: Prisma.CallTranscriptUncheckedCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallUncheckedCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUpdateInput = {
@@ -470,6 +475,7 @@ export type CallLogUpdateInput = {
   agent?: Prisma.AgentUpdateOneWithoutCallLogsNestedInput
   user?: Prisma.UserUpdateOneWithoutCallLogsNestedInput
   transcripts?: Prisma.CallTranscriptUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateInput = {
@@ -491,6 +497,7 @@ export type CallLogUncheckedUpdateInput = {
   callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transcripts?: Prisma.CallTranscriptUncheckedUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogCreateManyInput = {
@@ -627,6 +634,11 @@ export type CallLogSumOrderByAggregateInput = {
 export type CallLogScalarRelationFilter = {
   is?: Prisma.CallLogWhereInput
   isNot?: Prisma.CallLogWhereInput
+}
+
+export type CallLogNullableScalarRelationFilter = {
+  is?: Prisma.CallLogWhereInput | null
+  isNot?: Prisma.CallLogWhereInput | null
 }
 
 export type CallLogCreateNestedManyWithoutUserInput = {
@@ -773,6 +785,22 @@ export type CallLogUpdateOneRequiredWithoutTranscriptsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CallLogUpdateToOneWithWhereWithoutTranscriptsInput, Prisma.CallLogUpdateWithoutTranscriptsInput>, Prisma.CallLogUncheckedUpdateWithoutTranscriptsInput>
 }
 
+export type CallLogCreateNestedOneWithoutOutboundInput = {
+  create?: Prisma.XOR<Prisma.CallLogCreateWithoutOutboundInput, Prisma.CallLogUncheckedCreateWithoutOutboundInput>
+  connectOrCreate?: Prisma.CallLogCreateOrConnectWithoutOutboundInput
+  connect?: Prisma.CallLogWhereUniqueInput
+}
+
+export type CallLogUpdateOneWithoutOutboundNestedInput = {
+  create?: Prisma.XOR<Prisma.CallLogCreateWithoutOutboundInput, Prisma.CallLogUncheckedCreateWithoutOutboundInput>
+  connectOrCreate?: Prisma.CallLogCreateOrConnectWithoutOutboundInput
+  upsert?: Prisma.CallLogUpsertWithoutOutboundInput
+  disconnect?: Prisma.CallLogWhereInput | boolean
+  delete?: Prisma.CallLogWhereInput | boolean
+  connect?: Prisma.CallLogWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CallLogUpdateToOneWithWhereWithoutOutboundInput, Prisma.CallLogUpdateWithoutOutboundInput>, Prisma.CallLogUncheckedUpdateWithoutOutboundInput>
+}
+
 export type CallLogCreateWithoutUserInput = {
   callId?: string
   startTime?: Date | string | null
@@ -791,6 +819,7 @@ export type CallLogCreateWithoutUserInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutCallLogsInput
   agent?: Prisma.AgentCreateNestedOneWithoutCallLogsInput
   transcripts?: Prisma.CallTranscriptCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUncheckedCreateWithoutUserInput = {
@@ -811,6 +840,7 @@ export type CallLogUncheckedCreateWithoutUserInput = {
   callCostCents?: number | null
   deleted?: boolean
   transcripts?: Prisma.CallTranscriptUncheckedCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallUncheckedCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogCreateOrConnectWithoutUserInput = {
@@ -880,6 +910,7 @@ export type CallLogCreateWithoutOrganizationInput = {
   agent?: Prisma.AgentCreateNestedOneWithoutCallLogsInput
   user?: Prisma.UserCreateNestedOneWithoutCallLogsInput
   transcripts?: Prisma.CallTranscriptCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUncheckedCreateWithoutOrganizationInput = {
@@ -900,6 +931,7 @@ export type CallLogUncheckedCreateWithoutOrganizationInput = {
   callCostCents?: number | null
   deleted?: boolean
   transcripts?: Prisma.CallTranscriptUncheckedCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallUncheckedCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogCreateOrConnectWithoutOrganizationInput = {
@@ -946,6 +978,7 @@ export type CallLogCreateWithoutAgentInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutCallLogsInput
   user?: Prisma.UserCreateNestedOneWithoutCallLogsInput
   transcripts?: Prisma.CallTranscriptCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUncheckedCreateWithoutAgentInput = {
@@ -966,6 +999,7 @@ export type CallLogUncheckedCreateWithoutAgentInput = {
   callCostCents?: number | null
   deleted?: boolean
   transcripts?: Prisma.CallTranscriptUncheckedCreateNestedManyWithoutCallLogInput
+  outbound?: Prisma.OutboundCallUncheckedCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogCreateOrConnectWithoutAgentInput = {
@@ -1012,6 +1046,7 @@ export type CallLogCreateWithoutTranscriptsInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutCallLogsInput
   agent?: Prisma.AgentCreateNestedOneWithoutCallLogsInput
   user?: Prisma.UserCreateNestedOneWithoutCallLogsInput
+  outbound?: Prisma.OutboundCallCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogUncheckedCreateWithoutTranscriptsInput = {
@@ -1032,6 +1067,7 @@ export type CallLogUncheckedCreateWithoutTranscriptsInput = {
   dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   callCostCents?: number | null
   deleted?: boolean
+  outbound?: Prisma.OutboundCallUncheckedCreateNestedOneWithoutCallLogInput
 }
 
 export type CallLogCreateOrConnectWithoutTranscriptsInput = {
@@ -1068,6 +1104,7 @@ export type CallLogUpdateWithoutTranscriptsInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCallLogsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutCallLogsNestedInput
   user?: Prisma.UserUpdateOneWithoutCallLogsNestedInput
+  outbound?: Prisma.OutboundCallUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateWithoutTranscriptsInput = {
@@ -1088,6 +1125,107 @@ export type CallLogUncheckedUpdateWithoutTranscriptsInput = {
   dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outbound?: Prisma.OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput
+}
+
+export type CallLogCreateWithoutOutboundInput = {
+  callId?: string
+  startTime?: Date | string | null
+  endTime?: Date | string | null
+  durationSeconds?: number | null
+  status: $Enums.CallStatus
+  audioRecordingPath?: string | null
+  callerId?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sessionId?: string | null
+  direction?: string | null
+  dataExtracted?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  callCostCents?: number | null
+  deleted?: boolean
+  organization: Prisma.OrganizationCreateNestedOneWithoutCallLogsInput
+  agent?: Prisma.AgentCreateNestedOneWithoutCallLogsInput
+  user?: Prisma.UserCreateNestedOneWithoutCallLogsInput
+  transcripts?: Prisma.CallTranscriptCreateNestedManyWithoutCallLogInput
+}
+
+export type CallLogUncheckedCreateWithoutOutboundInput = {
+  callId?: string
+  organizationId: string
+  agentId?: string | null
+  userId?: string | null
+  startTime?: Date | string | null
+  endTime?: Date | string | null
+  durationSeconds?: number | null
+  status: $Enums.CallStatus
+  audioRecordingPath?: string | null
+  callerId?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sessionId?: string | null
+  direction?: string | null
+  dataExtracted?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  callCostCents?: number | null
+  deleted?: boolean
+  transcripts?: Prisma.CallTranscriptUncheckedCreateNestedManyWithoutCallLogInput
+}
+
+export type CallLogCreateOrConnectWithoutOutboundInput = {
+  where: Prisma.CallLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.CallLogCreateWithoutOutboundInput, Prisma.CallLogUncheckedCreateWithoutOutboundInput>
+}
+
+export type CallLogUpsertWithoutOutboundInput = {
+  update: Prisma.XOR<Prisma.CallLogUpdateWithoutOutboundInput, Prisma.CallLogUncheckedUpdateWithoutOutboundInput>
+  create: Prisma.XOR<Prisma.CallLogCreateWithoutOutboundInput, Prisma.CallLogUncheckedCreateWithoutOutboundInput>
+  where?: Prisma.CallLogWhereInput
+}
+
+export type CallLogUpdateToOneWithWhereWithoutOutboundInput = {
+  where?: Prisma.CallLogWhereInput
+  data: Prisma.XOR<Prisma.CallLogUpdateWithoutOutboundInput, Prisma.CallLogUncheckedUpdateWithoutOutboundInput>
+}
+
+export type CallLogUpdateWithoutOutboundInput = {
+  callId?: Prisma.StringFieldUpdateOperationsInput | string
+  startTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  durationSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumCallStatusFieldUpdateOperationsInput | $Enums.CallStatus
+  audioRecordingPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  callerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dataExtracted?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutCallLogsNestedInput
+  agent?: Prisma.AgentUpdateOneWithoutCallLogsNestedInput
+  user?: Prisma.UserUpdateOneWithoutCallLogsNestedInput
+  transcripts?: Prisma.CallTranscriptUpdateManyWithoutCallLogNestedInput
+}
+
+export type CallLogUncheckedUpdateWithoutOutboundInput = {
+  callId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  durationSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumCallStatusFieldUpdateOperationsInput | $Enums.CallStatus
+  audioRecordingPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  callerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dataExtracted?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  dataEvaluation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transcripts?: Prisma.CallTranscriptUncheckedUpdateManyWithoutCallLogNestedInput
 }
 
 export type CallLogCreateManyUserInput = {
@@ -1127,6 +1265,7 @@ export type CallLogUpdateWithoutUserInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCallLogsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutCallLogsNestedInput
   transcripts?: Prisma.CallTranscriptUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateWithoutUserInput = {
@@ -1147,6 +1286,7 @@ export type CallLogUncheckedUpdateWithoutUserInput = {
   callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transcripts?: Prisma.CallTranscriptUncheckedUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateManyWithoutUserInput = {
@@ -1205,6 +1345,7 @@ export type CallLogUpdateWithoutOrganizationInput = {
   agent?: Prisma.AgentUpdateOneWithoutCallLogsNestedInput
   user?: Prisma.UserUpdateOneWithoutCallLogsNestedInput
   transcripts?: Prisma.CallTranscriptUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateWithoutOrganizationInput = {
@@ -1225,6 +1366,7 @@ export type CallLogUncheckedUpdateWithoutOrganizationInput = {
   callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transcripts?: Prisma.CallTranscriptUncheckedUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1283,6 +1425,7 @@ export type CallLogUpdateWithoutAgentInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCallLogsNestedInput
   user?: Prisma.UserUpdateOneWithoutCallLogsNestedInput
   transcripts?: Prisma.CallTranscriptUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateWithoutAgentInput = {
@@ -1303,6 +1446,7 @@ export type CallLogUncheckedUpdateWithoutAgentInput = {
   callCostCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   deleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transcripts?: Prisma.CallTranscriptUncheckedUpdateManyWithoutCallLogNestedInput
+  outbound?: Prisma.OutboundCallUncheckedUpdateOneWithoutCallLogNestedInput
 }
 
 export type CallLogUncheckedUpdateManyWithoutAgentInput = {
@@ -1377,6 +1521,7 @@ export type CallLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   agent?: boolean | Prisma.CallLog$agentArgs<ExtArgs>
   user?: boolean | Prisma.CallLog$userArgs<ExtArgs>
   transcripts?: boolean | Prisma.CallLog$transcriptsArgs<ExtArgs>
+  outbound?: boolean | Prisma.CallLog$outboundArgs<ExtArgs>
   _count?: boolean | Prisma.CallLogCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["callLog"]>
 
@@ -1452,6 +1597,7 @@ export type CallLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   agent?: boolean | Prisma.CallLog$agentArgs<ExtArgs>
   user?: boolean | Prisma.CallLog$userArgs<ExtArgs>
   transcripts?: boolean | Prisma.CallLog$transcriptsArgs<ExtArgs>
+  outbound?: boolean | Prisma.CallLog$outboundArgs<ExtArgs>
   _count?: boolean | Prisma.CallLogCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CallLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1472,6 +1618,7 @@ export type $CallLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     agent: Prisma.$AgentPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs> | null
     transcripts: Prisma.$CallTranscriptPayload<ExtArgs>[]
+    outbound: Prisma.$OutboundCallPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     callId: string
@@ -1889,6 +2036,7 @@ export interface Prisma__CallLogClient<T, Null = never, ExtArgs extends runtime.
   agent<T extends Prisma.CallLog$agentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CallLog$agentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.CallLog$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CallLog$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transcripts<T extends Prisma.CallLog$transcriptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CallLog$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CallTranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  outbound<T extends Prisma.CallLog$outboundArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CallLog$outboundArgs<ExtArgs>>): Prisma.Prisma__OutboundCallClient<runtime.Types.Result.GetResult<Prisma.$OutboundCallPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2395,6 +2543,25 @@ export type CallLog$transcriptsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.CallTranscriptScalarFieldEnum | Prisma.CallTranscriptScalarFieldEnum[]
+}
+
+/**
+ * CallLog.outbound
+ */
+export type CallLog$outboundArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OutboundCall
+   */
+  select?: Prisma.OutboundCallSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OutboundCall
+   */
+  omit?: Prisma.OutboundCallOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OutboundCallInclude<ExtArgs> | null
+  where?: Prisma.OutboundCallWhereInput
 }
 
 /**
