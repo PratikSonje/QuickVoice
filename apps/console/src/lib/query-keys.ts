@@ -1,0 +1,47 @@
+import type { CallListParams } from "@/src/lib/api/resources/calls";
+import type { DashboardRange } from "@/src/lib/api/resources/dashboard";
+
+export const queryKeys = {
+  agents: {
+    all: ["agents"] as const,
+    list: () => [...queryKeys.agents.all, "list"] as const,
+    detail: (id: string) => [...queryKeys.agents.all, "detail", id] as const,
+    config: (id: string) => [...queryKeys.agents.all, "config", id] as const,
+  },
+  numbers: {
+    all: ["numbers"] as const,
+    list: () => [...queryKeys.numbers.all, "list"] as const,
+    search: (p: Record<string, unknown>) =>
+      [...queryKeys.numbers.all, "search", p] as const,
+  },
+  calls: {
+    all: ["calls"] as const,
+    list: (params: CallListParams) =>
+      [...queryKeys.calls.all, "list", params] as const,
+    detail: (id: string) => [...queryKeys.calls.all, "detail", id] as const,
+    transcript: (id: string) => [...queryKeys.calls.all, "transcript", id] as const,
+  },
+  kb: {
+    all: ["kb"] as const,
+    list: (agentId?: string) => [...queryKeys.kb.all, "list", agentId ?? null] as const,
+  },
+  dashboard: {
+    all: ["dashboard"] as const,
+    summary: (range: DashboardRange) =>
+      [...queryKeys.dashboard.all, "summary", range] as const,
+  },
+  org: {
+    all: ["org"] as const,
+    members: () => [...queryKeys.org.all, "members"] as const,
+    invitations: () => [...queryKeys.org.all, "invitations"] as const,
+  },
+  apiKeys: {
+    all: ["apiKeys"] as const,
+    list: () => [...queryKeys.apiKeys.all, "list"] as const,
+  },
+  billing: {
+    all: ["billing"] as const,
+    subscription: () => [...queryKeys.billing.all, "subscription"] as const,
+    usage: () => [...queryKeys.billing.all, "usage"] as const,
+  },
+};

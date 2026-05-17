@@ -3,8 +3,11 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/src/lib/utils";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/src/providers/theme-provider";
+import { QueryProvider } from "@/src/providers/query-provider";
+import { TooltipProvider } from "@/src/components/ui/tooltip";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +21,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "QuickVoice",
-  description: "QuickVoice is a platform for creating and managing voice agents.",
+  description:
+    "QuickVoice is a platform for creating and managing voice agents.",
 };
 
 export default function RootLayout({
@@ -29,11 +33,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased dark", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      suppressHydrationWarning
+      className={cn(
+        "h-full antialiased",
+        geistSans.variable,
+        geistMono.variable,
+        "font-sans",
+        inter.variable
+      )}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-        <Toaster />
+        <ThemeProvider>
+          <QueryProvider>
+            <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+          </QueryProvider>
+          <Toaster richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

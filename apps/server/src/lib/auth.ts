@@ -52,10 +52,10 @@ export const auth = betterAuth({
       enableSessionForAPIKeys: true,
     }),
     organization({
+      ac,
+      roles,
       dynamicAccessControl: {
         enabled: true,
-        ac,
-        roles: roles,
       },
     }),
     stripe({

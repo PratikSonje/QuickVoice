@@ -1,7 +1,13 @@
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { getSession } from "@/src/lib/server-session";
+
+export default async function Home() {
+  const session = await getSession();
+  if (!session?.user) {
+    redirect("/login");
+  }
+  if (!session.session?.activeOrganizationId) {
+    redirect("/orgs");
+  }
+  redirect("/dashboard");
 }
