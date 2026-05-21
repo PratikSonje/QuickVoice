@@ -19,7 +19,7 @@ router.get(
 
 router.get(
   "/",
-  authMiddleware,
+  authMiddleware, 
   requirePermission({ phoneNumber: ["read"] }),
   phoneController.listNumbers
 );

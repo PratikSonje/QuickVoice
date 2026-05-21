@@ -15,11 +15,29 @@ import { serve as serveInngest } from "inngest/express";
 import { inngest } from "./config/inngest.js";
 import { inngestFunctions } from "./inngest/index.js";
 import apiRouter from "./router.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 
 const app = express();
 
 const port = process.env.PORT || 5000;
 const apiVersion = process.env.API_VERSION || "v1";
+
+app.get(`/api/${apiVersion}/docs.json`, (_req, res) => {
+  res.json(swaggerSpec);
+});
+
+app.use(
+  `/api/${apiVersion}/docs`,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    swaggerOptions: {
+      persistAuthorization: true,
+      withCredentials: true,
+    },
+  })
+);
 
 /**
  * =========================

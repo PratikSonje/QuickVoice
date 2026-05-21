@@ -59,13 +59,13 @@ export const kbIngest = inngest.createFunction(
         return { status: res.status };
       });
 
+      // TODO:add store logic
       // Lambda succeeded — mark all sources as ACTIVE and increment agent count.
       if (kbIds.length > 0) {
         await step.run("mark-active", () =>
           kbRepository.markActive(kbIds, agentId)
         );
       }
-      // TODO:add store logic
 
       return { success: true };
     } catch (err) {

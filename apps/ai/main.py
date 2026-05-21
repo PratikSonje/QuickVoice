@@ -18,6 +18,8 @@ from utils.logger import logger
 import json
 import asyncio
 from datetime import datetime
+import os
+import sys
 
 load_dotenv(".env")
 
@@ -107,6 +109,17 @@ async def entrypoint(ctx: JobContext):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "api":
+        import uvicorn
+
+        uvicorn.run(
+            "api:app",
+            host=os.getenv("AI_API_HOST", "0.0.0.0"),
+            port=int(os.getenv("AI_API_PORT", "8000")),
+            reload=os.getenv("AI_API_RELOAD", "false").lower() == "true",
+        )
+        raise SystemExit(0)
+
     agents.cli.run_app(
         agents.WorkerOptions(entrypoint_fnc=entrypoint, agent_name="QuickVoice")
     )

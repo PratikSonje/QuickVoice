@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -31,15 +31,15 @@ export function RangeSwitcher({ current }: { current: DashboardRange }) {
       size="sm"
       value={current}
       onValueChange={onChange}
-      className="rounded-lg border bg-card p-0.5"
+      className="border bg-background p-1"
     >
-      {RANGES.map((r) => (
+      {RANGES.map((range) => (
         <ToggleGroupItem
-          key={r.value}
-          value={r.value}
-          className="rounded-md px-3 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          key={range.value}
+          value={range.value}
+          className="h-8 px-3 text-xs font-semibold text-muted-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
         >
-          {r.label}
+          {range.label}
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

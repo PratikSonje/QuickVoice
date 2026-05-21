@@ -27,7 +27,7 @@ export type AvailableNumber = {
 
 
 
-export const searchAvailableNumbers = async (
+export const  searchAvailableNumbers = async (
   input: SearchNumbersInput
 ): Promise<AvailableNumber[]> => {
   const { provider, country, areaCode, limit } = input;

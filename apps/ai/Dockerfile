@@ -68,3 +68,6 @@ RUN python "main.py" download-files
 # Run the application
 # The "start" command tells the worker to connect to LiveKit and begin waiting for jobs.
 CMD ["python", "main.py", "start"]
+
+# To run FastAPI instead, override the command:
+#   python main.py api

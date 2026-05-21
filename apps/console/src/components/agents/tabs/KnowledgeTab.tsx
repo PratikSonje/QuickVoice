@@ -13,79 +13,79 @@ import { queryKeys } from "@/src/lib/query-keys";
 import type { KbSourceType } from "@/src/lib/api/types";
 
 const SOURCE_ICON: Record<KbSourceType, typeof FileText> = {
-  PDF: FileText,
-  TXT: FileText,
-  DOCX: FileText,
-  CSV: FileText,
-  URL: LinkIcon,
+ PDF: FileText,
+ TXT: FileText,
+ DOCX: FileText,
+ CSV: FileText,
+ URL: LinkIcon,
 };
 
 export function KnowledgeTab({ agentId }: { agentId: string }) {
-  const { data: sources, isLoading } = useQuery({
-    queryKey: queryKeys.kb.list(agentId),
-    queryFn: () => kbApi.list(agentId),
-  });
+ const { data: sources, isLoading } = useQuery({
+ queryKey: queryKeys.kb.list(agentId),
+ queryFn: () => kbApi.list(agentId),
+ });
 
-  return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border bg-card p-6">
-        <div className="mb-5 flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <h2 className="text-base font-semibold">Attached documents</h2>
-            <p className="text-sm text-muted-foreground">
-              When RAG is enabled in Advanced, the agent can cite these.
-            </p>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/kb">
-              Open knowledge base <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </div>
+ return (
+ <div className="space-y-6">
+ <section className="border bg-card p-6">
+ <div className="mb-5 flex items-start justify-between gap-3">
+ <div className="space-y-1">
+ <h2 className="text-base font-semibold">Attached documents</h2>
+ <p className="text-sm text-muted-foreground">
+ When RAG is enabled in Advanced, the agent can cite these.
+ </p>
+ </div>
+ <Button asChild variant="outline">
+ <Link href="/kb">
+ Open knowledge base <ArrowRight className="size-4" />
+ </Link>
+ </Button>
+ </div>
 
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full" />
-            ))}
-          </div>
-        ) : !sources?.length ? (
-          <EmptyState
-            icon={BookOpen}
-            title="No documents attached"
-            description="Upload a document in the Knowledge Base and assign it to this agent."
-            className="border-0"
-          />
-        ) : (
-          <div className="divide-y">
-            {sources.map((s) => {
-              const Icon = SOURCE_ICON[s.sourceType] ?? FileText;
-              return (
-                <div
-                  key={s.kbId}
-                  className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
-                >
-                  <div className="flex size-9 items-center justify-center rounded-lg border bg-muted/30">
-                    <Icon className="size-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{s.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {s.originalFileName ?? s.sourceType}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={s.status === "ACTIVE" ? "default" : "secondary"}
-                    className="shrink-0 uppercase tracking-wide"
-                  >
-                    {s.status.toLowerCase()}
-                  </Badge>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-    </div>
-  );
+ {isLoading ? (
+ <div className="space-y-2">
+ {[...Array(3)].map((_, i) => (
+ <Skeleton key={i} className="h-14 w-full" />
+ ))}
+ </div>
+ ) : !sources?.length ? (
+ <EmptyState
+ icon={BookOpen}
+ title="No documents attached"
+ description="Upload a document in the Knowledge Base and assign it to this agent."
+ className="border-0"
+ />
+ ) : (
+ <div className="divide-y">
+ {sources.map((s) => {
+ const Icon = SOURCE_ICON[s.sourceType] ?? FileText;
+ return (
+ <div
+ key={s.kbId}
+ className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+ >
+ <div className="flex size-9 items-center justify-center border bg-muted/30">
+ <Icon className="size-4" />
+ </div>
+ <div className="min-w-0 flex-1">
+ <p className="truncate text-sm font-medium">{s.name}</p>
+ <p className="truncate text-xs text-muted-foreground">
+ {s.originalFileName ?? s.sourceType}
+ </p>
+ </div>
+ <Badge
+ variant={s.status === "ACTIVE" ? "default" : "secondary"}
+ className="shrink-0 uppercase tracking-wide"
+ >
+ {s.status.toLowerCase()}
+ </Badge>
+ </div>
+ );
+ })}
+ </div>
+ )}
+ </section>
+ </div>
+ );
 }

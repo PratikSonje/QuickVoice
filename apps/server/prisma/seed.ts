@@ -53,6 +53,12 @@ function daysAgo(days: number, hours = 0, minutes = 0) {
   d.setMinutes(d.getMinutes() - minutes);
   return d;
 }
+function hoursAgo(hours: number, minutes = 0) {
+  const d = new Date();
+  d.setHours(d.getHours() - hours);
+  d.setMinutes(d.getMinutes() - minutes);
+  return d;
+}
 
 // -------- Fixtures ------------------------------------------------------
 const AGENT_FIXTURES = [
@@ -269,23 +275,42 @@ async function main() {
   }
 
   // -------- Call logs + transcripts ------------------------------------
-  console.log(`  ... generating call logs (this may take a moment)`);
-  const callCount = 48;
-  for (let i = 0; i < callCount; i++) {
+  console.log(`  ... generating dashboard call history (this may take a moment)`);
+  const recentCalls = range(42).map((i) => ({
+    startTime: hoursAgo(Math.floor(i / 2), (i * 11) % 60),
+    weight: "recent",
+  }));
+  const weekCalls = range(54).map((i) => ({
+    startTime: daysAgo(1 + (i % 6), Math.floor((i * 5) % 18), (i * 7) % 60),
+    weight: "week",
+  }));
+  const monthCalls = range(64).map((i) => ({
+    startTime: daysAgo(7 + (i % 23), Math.floor((i * 3) % 20), (i * 13) % 60),
+    weight: "month",
+  }));
+  const callFixtures = [...recentCalls, ...weekCalls, ...monthCalls].sort(
+    (a, b) => a.startTime.getTime() - b.startTime.getTime()
+  );
+
+  for (let i = 0; i < callFixtures.length; i++) {
     const agent = agents[i % agents.length]!;
-    const status = pick(CALL_STATUSES);
-    const direction = Math.random() < 0.7 ? "inbound" : "outbound";
+    const fixture = callFixtures[i]!;
+    const status: CallStatus =
+      i % 13 === 0
+        ? "FAILED"
+        : i % 9 === 0
+          ? "NOT_ANSWERED"
+          : i % 17 === 0
+            ? "IN_PROGRESS"
+            : pick(CALL_STATUSES);
+    const direction = i % 4 === 0 ? "outbound" : "inbound";
     const durationSec =
       status === "COMPLETED"
-        ? 60 + Math.floor(Math.random() * 240)
+        ? 55 + ((i * 37) % 320)
         : status === "NOT_ANSWERED"
           ? 0
-          : 20 + Math.floor(Math.random() * 60);
-    const startTime = daysAgo(
-      Math.floor(Math.random() * 29),
-      Math.floor(Math.random() * 24),
-      Math.floor(Math.random() * 60)
-    );
+          : 18 + ((i * 19) % 80);
+    const startTime = fixture.startTime;
     const endTime =
       durationSec > 0 ? new Date(startTime.getTime() + durationSec * 1000) : null;
 
@@ -301,6 +326,11 @@ async function main() {
         callerId: randomPhone(),
         direction,
         audioRecordingPath: null,
+        metadata: {
+          seedWeight: fixture.weight,
+          source: "dashboard-seed",
+          intent: pick(["pricing", "support", "qualification", "reschedule"]),
+        },
         callCostCents:
           status === "COMPLETED"
             ? Math.max(1, Math.round((durationSec / 60) * 5))
@@ -356,7 +386,7 @@ async function main() {
       await prisma.callTranscript.createMany({ data: transcripts });
     }
   }
-  console.log(`  ✓ call logs: ${callCount} created`);
+  console.log(`  ✓ call logs: ${callFixtures.length} created`);
 
   // Denormalized counters on agents.
   for (const a of agents) {

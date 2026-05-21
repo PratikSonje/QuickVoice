@@ -56,15 +56,15 @@ export function AppSidebar({
 } & React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border/60 p-3.5">
         <OrgSwitcher activeOrgId={activeOrgId} />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="gap-1 py-2.5">
         <NavMain label="Platform" items={primaryNav} />
-        <SidebarSeparator />
+        <SidebarSeparator className="mx-5 bg-sidebar-border/50" />
         <NavMain label="Workspace" items={settingsNav} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-sidebar-border/60 p-3.5">
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

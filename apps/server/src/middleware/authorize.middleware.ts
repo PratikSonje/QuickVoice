@@ -10,8 +10,10 @@
 //   );
 //
 // Evaluates permissions against the user's role in req.auth.activeOrganizationId
-// via better-auth's hasPermission API. Internal callers (authMethod = "internal")
-// bypass the check entirely per the trust-boundary policy in auth.middleware.ts.
+// via better-auth's hasPermission API. Internal callers bypass the check per
+// the trust-boundary policy in auth.middleware.ts. API keys are already scoped
+// to one organization by auth.middleware.ts, so they are authorized at the org
+// boundary instead of via Better Auth's session-only RBAC helper.
 
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { fromNodeHeaders } from "better-auth/node";
@@ -62,6 +64,10 @@ export const requirePermission =
 
       if (!req.auth.activeOrganizationId) {
         throw new ForbiddenError("No active organization for this request");
+      }
+
+      if (req.auth.authMethod === "apiKey") {
+        return next();
       }
 
       const result = await auth.api.hasPermission({
