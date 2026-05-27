@@ -1,0 +1,24 @@
+name: quickvoice-dev
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: quickvoice-dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quickvoice
+      POSTGRES_PASSWORD: quickvoice
+      POSTGRES_DB: quickvoice
+    ports:
+      - "5432:5432"
+    volumes:
+      - quickvoice_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quickvoice -d quickvoice"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  quickvoice_postgres_data:

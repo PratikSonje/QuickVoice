@@ -1,3 +1,57 @@
+# QuickVoice
+
+## Local development
+
+This repo is wired for local SSH development through Go Task. The main command is:
+
+```sh
+task up:dev
+```
+
+`task up` and `task dev` are aliases. Go Task treats spaces as separate task names, so prefer `task up:dev` for the explicit form.
+
+Before running it on a fresh Ubuntu host, install Docker, Docker Compose, Go, and go-task if they are missing:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y docker.io docker-compose-v2 golang-go
+sudo usermod -aG docker "$USER"
+go install github.com/go-task/task/v3/cmd/task@latest
+export PATH="$PATH:$HOME/go/bin"
+```
+
+Reconnect the SSH session after changing Docker group membership. Then run:
+
+```sh
+task up:dev
+```
+
+That command creates local env files from `*.env.dev.example`, activates `pnpm@9.0.0`, installs Node dependencies, creates the AI Python virtualenv, starts Postgres via `docker-compose.dev.yml`, runs Prisma migrations, and launches the local services:
+
+- Console: `http://localhost:3000`
+- Marketing site: `http://localhost:3001`
+- API: `http://localhost:5000/api/v1/health`
+- API docs: `http://localhost:5000/api/v1/docs`
+- AI API: `http://localhost:8000/health`
+
+Edit the generated env files after the first run if you need real Google, Stripe, LiveKit, Twilio, Telnyx, or AWS credentials. The generated files are ignored by git.
+
+Useful individual tasks:
+
+```sh
+task doctor
+task env:dev
+task docker:up
+task db:migrate
+task server:dev
+task console:dev
+task web:dev
+task ai:api
+task ai:worker
+```
+
+---
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
