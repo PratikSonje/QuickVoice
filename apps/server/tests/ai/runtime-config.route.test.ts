@@ -24,6 +24,7 @@ before(async () => {
         systemPrompt: "Route prompt.",
         llmModel: "openai/gpt-4o-mini",
         llmProvider: "openai",
+        sttModel: "deepgram/nova-3",
         ttsModel: "deepgram/aura-2",
         voiceId: "aura-2-asteria-en",
         agent_language: "en-US",

@@ -21,6 +21,8 @@ class ConfigHandlerTests(unittest.TestCase):
                 "firstMessage": "Hello, thanks for calling QuickVoice.",
                 "systemPrompt": "You are a concise support agent.",
                 "llmModel": "gpt-4o-mini",
+                "sttModel": "nova-3",
+                "ttsModel": "aura-2",
                 "voiceId": "aura-2-asteria-en",
                 "agent_language": "en",
                 "use_rag": True,
@@ -41,6 +43,7 @@ class ConfigHandlerTests(unittest.TestCase):
         self.assertEqual(config["system_prompt"], "You are a concise support agent.")
         self.assertEqual(config["llm_model"], "openai/gpt-4o-mini")
         self.assertEqual(config["llm_provider"], "openai")
+        self.assertEqual(config["stt_model"], "deepgram/nova-3")
         self.assertEqual(config["tts_model"], "deepgram/aura-2")
         self.assertEqual(config["voice"], "aura-2-asteria-en")
         self.assertEqual(config["agent_language"], "en-US")
@@ -65,6 +68,8 @@ class ConfigHandlerTests(unittest.TestCase):
                     "firstMessage": "Hello from server.",
                     "systemPrompt": "Server prompt.",
                     "llmModel": "google/gemini-2.5-flash",
+                    "sttModel": "universal-streaming",
+                    "ttsModel": "eleven-flash-v2.5",
                     "voiceId": "aura-2-hera-en",
                     "agent_language": "en-US",
                     "provider": "TELNYX",
@@ -84,6 +89,8 @@ class ConfigHandlerTests(unittest.TestCase):
         self.assertEqual(config["first_message"], "Hello from server.")
         self.assertEqual(config["system_prompt"], "Server prompt.")
         self.assertEqual(config["llm_provider"], "google")
+        self.assertEqual(config["stt_model"], "assemblyai/universal-streaming")
+        self.assertEqual(config["tts_model"], "elevenlabs/eleven-flash-v2.5")
         self.assertEqual(config["provider"], "TELNYX")
         self.assertEqual(len(calls), 1)
         url, headers = calls[0]

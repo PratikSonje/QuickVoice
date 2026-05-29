@@ -13,6 +13,8 @@ const source = {
     firstMessage: "Hello from DB.",
     systemPrompt: "Prompt from DB.",
     llmModel: "gpt-4o-mini",
+    sttModel: "nova-3",
+    ttsModel: "aura-2",
     voiceId: "aura-2-asteria-en",
     agent_language: "en",
     use_rag: false,

@@ -61,6 +61,8 @@ export interface AgentConfiguration {
   voice_stability: number;
   zero_pii_retention: boolean;
   llmModel: string;
+  sttModel: string;
+  ttsModel: string;
   agent_language: string;
   initiation_webhook: WebhookConfig | null;
   post_call_webhook: WebhookConfig | null;

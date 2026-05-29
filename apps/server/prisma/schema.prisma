@@ -362,6 +362,8 @@ model AgentConfiguration {
   voice_stability                   Float
   zero_pii_retention                Boolean  @default(false)
   llmModel                          String   @default("gpt-4o-mini")
+  sttModel                          String   @default("nova-3")
+  ttsModel                          String   @default("aura-2")
   agent_language                    String   @default("en")
   initiation_webhook                Json?
   post_call_webhook                 Json?

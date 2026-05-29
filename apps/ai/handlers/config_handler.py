@@ -17,6 +17,7 @@ DEFAULT_CONFIG = {
     "agent_language": "en-US",
     "llm_model": "google/gemini-2.5-flash",
     "llm_provider": "google",
+    "stt_model": "deepgram/nova-3",
     "tts_model": "deepgram/aura-2",
     "use_rag": False,
     "voice": "aura-2-asteria-en",
@@ -67,6 +68,8 @@ async def get_config(
 
 def normalize_config(raw: dict[str, Any]) -> dict[str, Any]:
     llm = _normalize_llm_model(_pick(raw, "llmModel", "llm_model") or DEFAULT_CONFIG["llm_model"])
+    stt = _normalize_stt_model(_pick(raw, "sttModel", "stt_model") or DEFAULT_CONFIG["stt_model"])
+    tts = _normalize_tts_model(_pick(raw, "ttsModel", "tts_model") or DEFAULT_CONFIG["tts_model"])
     voice = _pick(raw, "voiceId", "voice") or DEFAULT_CONFIG["voice"]
 
     config = dict(DEFAULT_CONFIG)
@@ -82,7 +85,8 @@ def normalize_config(raw: dict[str, Any]) -> dict[str, Any]:
             "agent_language": _normalize_language(_pick(raw, "agent_language") or DEFAULT_CONFIG["agent_language"]),
             "llm_model": llm["model"],
             "llm_provider": _pick(raw, "llmProvider", "llm_provider") or llm["provider"],
-            "tts_model": _pick(raw, "ttsModel", "tts_model") or _normalize_tts_model(voice),
+            "stt_model": stt,
+            "tts_model": tts,
             "voice": voice,
             "use_rag": bool(_pick(raw, "use_rag") or False),
             "data_needed": _pick(raw, "data_needed") or [],
@@ -123,10 +127,48 @@ def _infer_llm_provider(model: str) -> str:
     return "openai"
 
 
-def _normalize_tts_model(voice: str) -> str:
-    if voice.startswith("aura-2-"):
-        return "deepgram/aura-2"
-    return DEFAULT_CONFIG["tts_model"]
+def _normalize_tts_model(model: str) -> str:
+    value = model.strip()
+    if "/" in value:
+        return value
+
+    provider = _infer_tts_provider(value)
+    return f"{provider}/{value}"
+
+
+def _infer_tts_provider(model: str) -> str:
+    lower = model.lower()
+    if lower.startswith("eleven"):
+        return "elevenlabs"
+    if lower.startswith("sonic"):
+        return "cartesia"
+    if lower.startswith("gpt-"):
+        return "openai"
+    if lower.startswith("rime-"):
+        return "rime"
+    return "deepgram"
+
+
+def _normalize_stt_model(model: str) -> str:
+    value = model.strip()
+    if "/" in value:
+        return value
+
+    provider = _infer_stt_provider(value)
+    return f"{provider}/{value}"
+
+
+def _infer_stt_provider(model: str) -> str:
+    lower = model.lower()
+    if lower.startswith("universal"):
+        return "assemblyai"
+    if lower.startswith("gladia"):
+        return "gladia"
+    if lower.startswith("speechmatics"):
+        return "speechmatics"
+    if lower.startswith("elevenlabs"):
+        return "elevenlabs"
+    return "deepgram"
 
 
 def _normalize_language(language: str) -> str:

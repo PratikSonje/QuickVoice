@@ -26,6 +26,8 @@ export interface ConfigureAgentInput {
   firstMessage: string;
   systemPrompt: string;
   llmModel: string;
+  sttModel: string;
+  ttsModel: string;
   use_rag: boolean;
   voiceId: string;
   data_needed: Array<{

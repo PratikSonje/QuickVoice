@@ -8,6 +8,8 @@ type RuntimeConfigSource = {
     firstMessage?: string | null;
     systemPrompt?: string | null;
     llmModel?: string | null;
+    sttModel?: string | null;
+    ttsModel?: string | null;
     voiceId?: string | null;
     agent_language?: string | null;
     use_rag?: boolean | null;
@@ -25,6 +27,8 @@ export type AgentRuntimeConfig = ReturnType<typeof buildAgentRuntimeConfig>;
 
 export function buildAgentRuntimeConfig(input: RuntimeConfigSource) {
   const llm = normalizeLlmModel(input.configuration.llmModel ?? "gpt-4o-mini");
+  const sttModel = normalizeSttModel(input.configuration.sttModel ?? "nova-3");
+  const ttsModel = normalizeTtsModel(input.configuration.ttsModel ?? "aura-2");
   const voiceId = input.configuration.voiceId ?? "aura-2-asteria-en";
 
   return {
@@ -40,7 +44,8 @@ export function buildAgentRuntimeConfig(input: RuntimeConfigSource) {
       "You are a friendly, reliable voice assistant.",
     llmModel: llm.model,
     llmProvider: llm.provider,
-    ttsModel: normalizeTtsModel(voiceId),
+    sttModel,
+    ttsModel,
     voiceId,
     agent_language: normalizeLanguage(input.configuration.agent_language ?? "en-US"),
     use_rag: input.configuration.use_rag ?? false,
@@ -72,9 +77,38 @@ function inferLlmProvider(model: string) {
   return "openai";
 }
 
-function normalizeTtsModel(voiceId: string) {
-  if (voiceId.startsWith("aura-2-")) return "deepgram/aura-2";
-  return "deepgram/aura-2";
+function normalizeTtsModel(model: string) {
+  const trimmed = model.trim();
+  if (trimmed.includes("/")) return trimmed;
+
+  const provider = inferTtsProvider(trimmed);
+  return `${provider}/${trimmed}`;
+}
+
+function inferTtsProvider(model: string) {
+  const lower = model.toLowerCase();
+  if (lower.startsWith("eleven")) return "elevenlabs";
+  if (lower.startsWith("sonic")) return "cartesia";
+  if (lower.startsWith("gpt-")) return "openai";
+  if (lower.startsWith("rime-")) return "rime";
+  return "deepgram";
+}
+
+function normalizeSttModel(model: string) {
+  const trimmed = model.trim();
+  if (trimmed.includes("/")) return trimmed;
+
+  const provider = inferSttProvider(trimmed);
+  return `${provider}/${trimmed}`;
+}
+
+function inferSttProvider(model: string) {
+  const lower = model.toLowerCase();
+  if (lower.startsWith("universal")) return "assemblyai";
+  if (lower.startsWith("gladia")) return "gladia";
+  if (lower.startsWith("speechmatics")) return "speechmatics";
+  if (lower.startsWith("elevenlabs")) return "elevenlabs";
+  return "deepgram";
 }
 
 function normalizeLanguage(language: string) {

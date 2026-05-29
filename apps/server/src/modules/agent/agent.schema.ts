@@ -80,6 +80,8 @@ export const configureAgentSchema = z.object({
     .string()
     .min(10, "System prompt must be at least 10 characters"),
   llmModel: z.string(),
+  sttModel: z.string().min(1, "STT model is required"),
+  ttsModel: z.string().min(1, "TTS model is required"),
   // tokenLimit: z.number().int().positive().default(4096),
   use_rag: z.boolean(),
   voiceId: z.string().min(1, "Voice ID is required"),
