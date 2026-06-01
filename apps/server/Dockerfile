@@ -32,6 +32,10 @@ FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app/apps/server
 
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system --gid 1001 nodejs \
     && useradd --system --uid 1001 --gid nodejs --home-dir /app server
 
@@ -42,7 +46,8 @@ COPY --from=build --chown=server:nodejs /app/apps/server/dist ./dist
 COPY --from=build --chown=server:nodejs /app/apps/server/prisma ./prisma
 COPY --from=build --chown=server:nodejs /app/apps/server/prisma.config.ts ./prisma.config.ts
 RUN test -x /app/node_modules/.bin/prisma
+RUN test -f /app/apps/server/dist/src/index.js
 
 USER server
 EXPOSE 8000
-CMD ["sh", "-c", "../../node_modules/.bin/prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "../../node_modules/.bin/prisma migrate deploy && node dist/src/index.js"]
