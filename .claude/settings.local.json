@@ -10,5 +10,9 @@
       "mcp__context7__query-docs",
       "mcp__context7__resolve-library-id"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "shadcn",
+    "context7"
+  ]
 }

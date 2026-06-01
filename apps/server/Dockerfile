@@ -43,4 +43,4 @@ COPY --from=build --chown=server:nodejs /app/apps/server/prisma ./prisma
 
 USER server
 EXPOSE 8000
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/index.js"]
