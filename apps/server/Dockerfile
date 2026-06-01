@@ -27,20 +27,22 @@ WORKDIR /app/apps/server
 ENV DATABASE_URL="postgresql://quickvoice:quickvoice@localhost:5432/quickvoice"
 RUN pnpm exec prisma generate
 RUN pnpm run build
-WORKDIR /app
-RUN pnpm deploy --filter server --prod /prod/server
 
 FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 ENV NODE_ENV=production
-WORKDIR /app
+WORKDIR /app/apps/server
 
 RUN groupadd --system --gid 1001 nodejs \
     && useradd --system --uid 1001 --gid nodejs --home-dir /app server
 
-COPY --from=build --chown=server:nodejs /prod/server ./
+COPY --from=build --chown=server:nodejs /app/package.json /app/package.json
+COPY --from=build --chown=server:nodejs /app/node_modules /app/node_modules
+COPY --from=build --chown=server:nodejs /app/apps/server/package.json ./package.json
 COPY --from=build --chown=server:nodejs /app/apps/server/dist ./dist
 COPY --from=build --chown=server:nodejs /app/apps/server/prisma ./prisma
+COPY --from=build --chown=server:nodejs /app/apps/server/prisma.config.ts ./prisma.config.ts
+RUN test -x /app/node_modules/.bin/prisma
 
 USER server
 EXPOSE 8000
-CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "../../node_modules/.bin/prisma migrate deploy && node dist/index.js"]
