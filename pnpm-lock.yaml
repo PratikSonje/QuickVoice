@@ -202,6 +202,9 @@ importers:
       ws:
         specifier: ^8.20.0
         version: 8.20.0
+      zeptomail:
+        specifier: ^6.2.1
+        version: 6.2.1
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -6941,6 +6944,9 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
+
+  zeptomail@6.2.1:
+    resolution: {integrity: sha512-5QbN0RACqXrvE4yS0ETvZLx5zC/DRDN2QZlse0HQKMrB4R2G0ciY5rgFZDFUAqssYxCFOyOhKo3QUphRYfrVUg==}
 
   wsl-utils@0.3.1:
     resolution: {integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==}
@@ -14875,6 +14881,10 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@8.20.0: {}
+
+  zeptomail@6.2.1:
+    dependencies:
+      node-fetch: 2.7.0
 
   wsl-utils@0.3.1:
     dependencies:
