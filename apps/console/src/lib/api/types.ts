@@ -14,7 +14,7 @@ export type CallStatus =
   | "FAILED";
 
 export type KbStatus = "PROCESSING" | "ACTIVE" | "ERROR";
-export type KbSourceType = "PDF" | "TXT" | "CSV" | "DOCX" | "URL";
+export type KbSourceType = "PDF" | "TXT" | "CSV" | "DOCX" | "XLSX" | "XLS" | "URL";
 
 export interface Agent {
   agentId: string;

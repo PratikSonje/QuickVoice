@@ -23,6 +23,15 @@ router.get(
   kbController.listKnowledgeSources
 );
 
+// Returns a presigned S3 PUT URL for direct browser-to-S3 file upload.
+// Query params: fileName (string), contentType (MIME string)
+router.get(
+  "/upload-url",
+  authMiddleware,
+  requirePermission({ knowledgeSource: ["create"] }),
+  kbController.getUploadUrl
+);
+
 router.delete(
   "/:kbId",
   authMiddleware,

@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader2, Plus } from "lucide-react";
+import { useRef, useState } from "react";
+import { Loader2, Plus, UploadCloud, Link } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -18,6 +15,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -25,162 +23,199 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/src/components/ui/form";
 import { useCreateKb } from "@/src/hooks/queries/kb";
 import { useAgents } from "@/src/hooks/queries/agents";
+import { kbApi } from "@/src/lib/api/resources/kb";
 import { authClient } from "@/src/lib/auth-client";
+import type { KbSourceType } from "@/src/lib/api/types";
 
 const UNASSIGNED = "__none__";
 
-const schema = z.object({
-  name: z.string().min(2),
-  url: z.string().url("Must be a valid URL"),
-  agentId: z.string(),
-});
+const ACCEPTED_TYPES: Record<string, KbSourceType> = {
+  "application/pdf": "PDF",
+  "text/plain": "TXT",
+  "text/csv": "CSV",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
+  "application/vnd.ms-excel": "XLS",
+};
 
-type FormValues = z.infer<typeof schema>;
+const ACCEPT_STRING = Object.keys(ACCEPTED_TYPES)
+  .concat([".pdf", ".txt", ".csv", ".docx", ".xlsx", ".xls"])
+  .join(",");
 
-// TODO: swap to presigned S3 upload when `POST /v1/kb/upload-url` lands. Until
-// then we only support URL-paste ingestion (sourceType = URL).
+function deriveSourceType(file: File): KbSourceType {
+  return ACCEPTED_TYPES[file.type] ?? "TXT";
+}
+
 export function UploadDialog({ defaultAgentId }: { defaultAgentId?: string }) {
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"url" | "file">("url");
+  const [busy, setBusy] = useState(false);
+
+  // URL tab state
+  const [urlName, setUrlName] = useState("");
+  const [url, setUrl] = useState("");
+
+  // File tab state
+  const [file, setFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Shared
+  const [agentId, setAgentId] = useState(defaultAgentId ?? UNASSIGNED);
+
   const { data: agents } = useAgents();
   const create = useCreateKb();
   const { data: session } = authClient.useSession();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: "",
-      url: "",
-      agentId: defaultAgentId ?? UNASSIGNED,
-    },
-  });
+  function reset() {
+    setUrlName(""); setUrl(""); setFile(null); setFileName(""); setAgentId(defaultAgentId ?? UNASSIGNED);
+    if (fileRef.current) fileRef.current.value = "";
+  }
 
-  async function onSubmit(values: FormValues) {
+  async function handleSubmit() {
     if (!session?.user || !session.session?.activeOrganizationId) {
       toast.error("Not signed in");
       return;
     }
-    await create.mutateAsync({
-      organizationId: session.session.activeOrganizationId,
-      userId: session.user.id,
-      agentId: values.agentId === UNASSIGNED ? null : values.agentId,
-      documents: [
-        {
-          name: values.name,
-          sourceType: "URL",
-          url: values.url,
-        },
-      ],
-    });
-    setOpen(false);
-    form.reset();
+    const org = session.session.activeOrganizationId;
+    const user = session.user.id;
+    const resolvedAgent = agentId === UNASSIGNED ? null : agentId;
+
+    setBusy(true);
+    try {
+      if (tab === "url") {
+        if (!urlName.trim() || !url.trim()) { toast.error("Name and URL are required"); return; }
+        await create.mutateAsync({
+          organizationId: org, userId: user, agentId: resolvedAgent,
+          documents: [{ name: urlName.trim(), sourceType: "URL", url: url.trim() }],
+        });
+      } else {
+        if (!file || !fileName.trim()) { toast.error("File and a display name are required"); return; }
+        const sourceType = deriveSourceType(file);
+        // 1. Get presigned upload URL
+        const { uploadUrl, s3Key } = await kbApi.getUploadUrl(file.name, file.type || "application/octet-stream");
+        // 2. Upload directly to S3
+        const uploadRes = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+        });
+        if (!uploadRes.ok) throw new Error(`S3 upload failed: ${uploadRes.status}`);
+        // 3. Create KB record (triggers BullMQ processing)
+        await create.mutateAsync({
+          organizationId: org, userId: user, agentId: resolvedAgent,
+          documents: [{ name: fileName.trim(), sourceType, s3Key, originalFileName: file.name }],
+        });
+      }
+      setOpen(false);
+      reset();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus /> Add document
-        </Button>
+        <Button><Plus /> Add document</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add a document</DialogTitle>
           <DialogDescription>
-            Paste a URL to ingest as a knowledge source. File uploads are
-            coming soon.
+            Paste a URL or upload a file to add it as a knowledge source.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Display name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Q4 pricing FAQ" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://…"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="agentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Attach to agent (optional)</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={UNASSIGNED}>Leave unassigned</SelectItem>
-                      {(agents ?? []).map((a) => (
-                        <SelectItem key={a.agentId} value={a.agentId}>
-                          {a.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    You can attach it later from an agent&apos;s Knowledge tab.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={create.isPending}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={create.isPending}>
-                {create.isPending ? (
-                  <>
-                    <Loader2 className="animate-spin" /> Adding…
-                  </>
-                ) : (
-                  "Add document"
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+
+        {/* tab switcher */}
+        <div className="flex gap-1 rounded-lg bg-muted p-1">
+          {(["url", "file"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                tab === t ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t === "url" ? <Link className="size-3.5" /> : <UploadCloud className="size-3.5" />}
+              {t === "url" ? "URL" : "File"}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          {tab === "url" ? (
+            <>
+              <div className="space-y-1.5">
+                <Label>Display name</Label>
+                <Input placeholder="Q4 pricing FAQ" value={urlName} onChange={(e) => setUrlName(e.target.value)} disabled={busy} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>URL</Label>
+                <Input type="url" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} disabled={busy} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1.5">
+                <Label>File</Label>
+                <div
+                  className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center transition-colors hover:border-primary/50 hover:bg-muted/30"
+                  onClick={() => fileRef.current?.click()}
+                >
+                  <UploadCloud className="size-8 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">{file ? file.name : "Click to select a file"}</p>
+                    <p className="text-xs text-muted-foreground">PDF, DOCX, TXT, CSV, XLSX, XLS</p>
+                  </div>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept={ACCEPT_STRING}
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      setFile(f);
+                      if (f && !fileName) setFileName(f.name.replace(/\.[^.]+$/, ""));
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Display name</Label>
+                <Input placeholder="Product manual" value={fileName} onChange={(e) => setFileName(e.target.value)} disabled={busy} />
+              </div>
+            </>
+          )}
+
+          {/* agent selector */}
+          <div className="space-y-1.5">
+            <Label>Attach to agent (optional)</Label>
+            <Select value={agentId} onValueChange={setAgentId} disabled={busy}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={UNASSIGNED}>Leave unassigned</SelectItem>
+                {(agents ?? []).map((a) => (
+                  <SelectItem key={a.agentId} value={a.agentId}>{a.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={busy}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={busy}>
+            {busy ? <><Loader2 className="animate-spin" /> Processing…</> : "Add document"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

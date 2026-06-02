@@ -1,7 +1,9 @@
+import { randomUUID } from "crypto";
 import { StatusCodes } from "http-status-codes";
 
 import { BadRequestError } from "../../common/errors/badRequest.js";
 import { authorized } from "../../middleware/authorize.middleware.js";
+import { generateUploadUrl } from "../../config/s3.js";
 import * as kbService from "./kb.service.js";
 import { listKbQuerySchema } from "./kb.schema.js";
 
@@ -36,5 +38,26 @@ export const deleteKnowledgeSource = authorized(async (req, res) => {
   res.status(StatusCodes.OK).json({
     success: true,
     message: "Knowledge source deleted successfully",
+  });
+});
+
+// Returns a short-lived presigned S3 PUT URL so the browser can upload
+// directly to S3 without routing through the server.
+export const getUploadUrl = authorized(async (req, res) => {
+  const fileName = req.query.fileName as string | undefined;
+  const contentType = req.query.contentType as string | undefined;
+
+  if (!fileName || !contentType) {
+    throw new BadRequestError("fileName and contentType query params are required");
+  }
+
+  const ext = fileName.split(".").pop() ?? "";
+  const s3Key = `kb/${req.auth.activeOrganizationId}/${randomUUID()}.${ext}`;
+  const uploadUrl = await generateUploadUrl(s3Key, contentType);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Upload URL generated",
+    data: { uploadUrl, s3Key },
   });
 });

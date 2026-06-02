@@ -16,6 +16,7 @@ import { serve as serveInngest } from "inngest/express";
 import { inngest } from "./config/inngest.js";
 import { inngestFunctions } from "./inngest/index.js";
 import apiRouter from "./router.js";
+import "./workers/kb.worker.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 
