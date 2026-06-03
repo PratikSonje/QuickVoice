@@ -7,6 +7,7 @@ import kbRouter from "./modules/kb/kb.route.js";
 import phoneRouter from "./modules/numbers/phone.route.js";
 import outboundCallRouter from "./modules/outbound/outbound-call.route.js";
 import toolRouter from "./modules/tools/tool.route.js";
+import mcpRouter from "./modules/mcp/mcp.route.js";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/dashboard", dashboardRouter);
 router.use("/kb", kbRouter);
 router.use("/outbound-calls", outboundCallRouter);
 router.use("/tools", toolRouter);
+router.use("/mcp", mcpRouter);
 
 export default router;

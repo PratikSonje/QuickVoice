@@ -157,10 +157,23 @@ export const getAgentConfigByNumber= async (
       agent: {
         include: {
           configuration: true,
+          tools: true,
+          mcpConnections: {
+            where: { enabled: true },
+            include: {
+              mcpConnection: true,
+            },
+          },
         },
       },
     },
   });
   
-  return phone?.agent?.configuration ?? null;
+  if (!phone?.agent?.configuration) return null;
+
+  return {
+    ...phone.agent.configuration,
+    tools: phone.agent.tools,
+    mcpConnections: phone.agent.mcpConnections.map((item) => item.mcpConnection),
+  };
 }

@@ -50,4 +50,10 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.tools.all, "detail", id] as const,
     agentTools: (agentId: string) => [...queryKeys.tools.all, "agent", agentId] as const,
   },
+  mcp: {
+    all: ["mcp"] as const,
+    catalog: () => [...queryKeys.mcp.all, "catalog"] as const,
+    connections: () => [...queryKeys.mcp.all, "connections"] as const,
+    agentConnections: (agentId: string) => [...queryKeys.mcp.all, "agent", agentId] as const,
+  },
 };

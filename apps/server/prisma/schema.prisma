@@ -63,6 +63,20 @@ enum TelephonyProvider {
   TELNYX @map("telnyx")
 }
 
+enum McpConnectionStatus {
+  PENDING
+  CONNECTED
+  AUTH_REQUIRED
+  INPUT_REQUIRED
+  ERROR
+  DISCONNECTED
+}
+
+enum McpCatalogSource {
+  SMITHERY
+  CUSTOM
+}
+
 // ─── Better Auth Core Tables ─────────────────────────────────────────────────
 
 model User {
@@ -91,6 +105,7 @@ model User {
   outboundCalls    OutboundCall[]
   campaigns        Campaign[]
   tools            Tool[]
+  mcpConnections   McpConnection[]
   secrets          Secret[]
 
   @@unique([email])
@@ -193,6 +208,10 @@ model Organization {
   knowledgeSources  KnowledgeSource[]
   phoneNumbers      PhoneNumber[]
   tools             Tool[]
+  mcpConnections    McpConnection[]
+  mcpCatalogItems   McpServerCatalogItem[]
+  agentMcpConnections AgentMcpConnection[]
+  mcpToolExecutionLogs McpToolExecutionLog[]
   secrets           Secret[]
   callLogs          CallLog[]
   outboundCalls     OutboundCall[]
@@ -327,6 +346,8 @@ model Agent {
   toolsCount            Int                 @default(0)
 
   tools Tool[] @relation("AgentTools")
+  mcpConnections AgentMcpConnection[]
+  mcpToolExecutionLogs McpToolExecutionLog[]
 
   @@unique([organizationId, agentSlug])
   @@index([userId])
@@ -528,6 +549,101 @@ model Tool {
 
   @@index([organizationId])
   @@index([userId])
+}
+
+model McpServerCatalogItem {
+  mcpServerId     String           @id @default(uuid())
+  organizationId  String?
+  organization    Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  slug            String
+  name            String
+  description     String
+  source          McpCatalogSource @default(SMITHERY)
+  provider        String           @default("smithery")
+  mcpUrl          String
+  smitheryServerKey String?
+  authType        String           @default("oauth")
+  categories      Json?            @default("[]")
+  verified        Boolean          @default(false)
+  toolCount       Int              @default(0)
+  metadata        Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  connections     McpConnection[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([source])
+  @@index([verified])
+}
+
+model McpConnection {
+  mcpConnectionId       String              @id @default(uuid())
+  organizationId        String
+  organization          Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId                String?
+  user                  User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  catalogItemId         String?
+  catalogItem           McpServerCatalogItem? @relation(fields: [catalogItemId], references: [mcpServerId], onDelete: SetNull)
+  displayName           String
+  provider              String              @default("smithery")
+  mcpUrl                String
+  smitheryNamespace     String
+  smitheryConnectionId  String
+  status                McpConnectionStatus @default(PENDING)
+  setupUrl              String?
+  tools                 Json?               @default("[]")
+  metadata              Json?
+  lastSyncedAt          DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  agents                AgentMcpConnection[]
+  executionLogs         McpToolExecutionLog[]
+
+  @@unique([organizationId, smitheryConnectionId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
+}
+
+model AgentMcpConnection {
+  agentMcpConnectionId String        @id @default(uuid())
+  organizationId       String
+  organization         Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId              String
+  agent                Agent         @relation(fields: [agentId], references: [agentId], onDelete: Cascade)
+  mcpConnectionId      String
+  mcpConnection        McpConnection @relation(fields: [mcpConnectionId], references: [mcpConnectionId], onDelete: Cascade)
+  enabled              Boolean       @default(true)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@unique([agentId, mcpConnectionId])
+  @@index([organizationId])
+  @@index([mcpConnectionId])
+}
+
+model McpToolExecutionLog {
+  mcpToolExecutionLogId String        @id @default(uuid())
+  organizationId        String
+  organization          Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId               String?
+  agent                 Agent?        @relation(fields: [agentId], references: [agentId], onDelete: SetNull)
+  mcpConnectionId       String
+  mcpConnection         McpConnection @relation(fields: [mcpConnectionId], references: [mcpConnectionId], onDelete: Cascade)
+  toolName              String
+  callId                String?
+  status                String
+  latencyMs             Int?
+  argumentsPreview      Json?
+  resultPreview         Json?
+  error                 String?
+  createdAt             DateTime      @default(now())
+
+  @@index([organizationId])
+  @@index([agentId])
+  @@index([mcpConnectionId])
+  @@index([createdAt])
 }
 
 model Secret {

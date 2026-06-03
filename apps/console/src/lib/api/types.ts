@@ -182,6 +182,70 @@ export interface Tool {
   agent: { agentId: string; name: string }[];
 }
 
+export type McpConnectionStatus =
+  | "PENDING"
+  | "CONNECTED"
+  | "AUTH_REQUIRED"
+  | "INPUT_REQUIRED"
+  | "ERROR"
+  | "DISCONNECTED";
+
+export interface McpCatalogItem {
+  slug: string;
+  name: string;
+  description: string;
+  provider: string;
+  source: "SMITHERY" | "CUSTOM";
+  mcpUrl: string;
+  smitheryServerKey?: string | null;
+  authType: string;
+  categories: string[];
+  verified: boolean;
+  toolCount: number;
+  connected?: boolean;
+  mcpConnectionId?: string | null;
+  connectionStatus?: McpConnectionStatus | null;
+  setupUrl?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+export interface McpToolDescriptor {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown> | null;
+}
+
+export interface McpConnection {
+  mcpConnectionId: string;
+  organizationId: string;
+  userId: string | null;
+  catalogItemId: string | null;
+  displayName: string;
+  provider: string;
+  mcpUrl: string;
+  smitheryNamespace: string;
+  smitheryConnectionId: string;
+  status: McpConnectionStatus;
+  setupUrl: string | null;
+  tools: McpToolDescriptor[] | null;
+  metadata: Record<string, unknown> | null;
+  lastSyncedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  agents?: { agentId: string; name: string }[];
+}
+
+export interface AgentMcpConnection {
+  agentMcpConnectionId: string;
+  organizationId: string;
+  agentId: string;
+  mcpConnectionId: string;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  mcpConnection: McpConnection;
+}
+
 export interface CursorPage<T> {
   data: T[];
   nextCursor: string | null;

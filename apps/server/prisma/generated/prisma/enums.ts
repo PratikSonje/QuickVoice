@@ -14,6 +14,8 @@ export const sourceType = {
   TXT: 'TXT',
   CSV: 'CSV',
   DOCX: 'DOCX',
+  XLSX: 'XLSX',
+  XLS: 'XLS',
   URL: 'URL'
 } as const
 
@@ -80,3 +82,23 @@ export const TelephonyProvider = {
 } as const
 
 export type TelephonyProvider = (typeof TelephonyProvider)[keyof typeof TelephonyProvider]
+
+
+export const McpConnectionStatus = {
+  PENDING: 'PENDING',
+  CONNECTED: 'CONNECTED',
+  AUTH_REQUIRED: 'AUTH_REQUIRED',
+  INPUT_REQUIRED: 'INPUT_REQUIRED',
+  ERROR: 'ERROR',
+  DISCONNECTED: 'DISCONNECTED'
+} as const
+
+export type McpConnectionStatus = (typeof McpConnectionStatus)[keyof typeof McpConnectionStatus]
+
+
+export const McpCatalogSource = {
+  SMITHERY: 'SMITHERY',
+  CUSTOM: 'CUSTOM'
+} as const
+
+export type McpCatalogSource = (typeof McpCatalogSource)[keyof typeof McpCatalogSource]

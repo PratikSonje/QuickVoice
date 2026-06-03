@@ -309,6 +309,8 @@ export type AgentWhereInput = {
   outboundCalls?: Prisma.OutboundCallListRelationFilter
   campaigns?: Prisma.CampaignListRelationFilter
   tools?: Prisma.ToolListRelationFilter
+  mcpConnections?: Prisma.AgentMcpConnectionListRelationFilter
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogListRelationFilter
 }
 
 export type AgentOrderByWithRelationInput = {
@@ -335,6 +337,8 @@ export type AgentOrderByWithRelationInput = {
   outboundCalls?: Prisma.OutboundCallOrderByRelationAggregateInput
   campaigns?: Prisma.CampaignOrderByRelationAggregateInput
   tools?: Prisma.ToolOrderByRelationAggregateInput
+  mcpConnections?: Prisma.AgentMcpConnectionOrderByRelationAggregateInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogOrderByRelationAggregateInput
 }
 
 export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -365,6 +369,8 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   outboundCalls?: Prisma.OutboundCallListRelationFilter
   campaigns?: Prisma.CampaignListRelationFilter
   tools?: Prisma.ToolListRelationFilter
+  mcpConnections?: Prisma.AgentMcpConnectionListRelationFilter
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogListRelationFilter
 }, "agentId" | "organizationId_agentSlug">
 
 export type AgentOrderByWithAggregationInput = {
@@ -431,6 +437,8 @@ export type AgentCreateInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateInput = {
@@ -455,6 +463,8 @@ export type AgentUncheckedCreateInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUpdateInput = {
@@ -479,6 +489,8 @@ export type AgentUpdateInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateInput = {
@@ -503,6 +515,8 @@ export type AgentUncheckedUpdateInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyInput = {
@@ -868,6 +882,36 @@ export type AgentUncheckedUpdateManyWithoutToolsNestedInput = {
   deleteMany?: Prisma.AgentScalarWhereInput | Prisma.AgentScalarWhereInput[]
 }
 
+export type AgentCreateNestedOneWithoutMcpConnectionsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutMcpConnectionsInput, Prisma.AgentUncheckedCreateWithoutMcpConnectionsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutMcpConnectionsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneRequiredWithoutMcpConnectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutMcpConnectionsInput, Prisma.AgentUncheckedCreateWithoutMcpConnectionsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutMcpConnectionsInput
+  upsert?: Prisma.AgentUpsertWithoutMcpConnectionsInput
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutMcpConnectionsInput, Prisma.AgentUpdateWithoutMcpConnectionsInput>, Prisma.AgentUncheckedUpdateWithoutMcpConnectionsInput>
+}
+
+export type AgentCreateNestedOneWithoutMcpToolExecutionLogsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedCreateWithoutMcpToolExecutionLogsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutMcpToolExecutionLogsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneWithoutMcpToolExecutionLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedCreateWithoutMcpToolExecutionLogsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutMcpToolExecutionLogsInput
+  upsert?: Prisma.AgentUpsertWithoutMcpToolExecutionLogsInput
+  disconnect?: Prisma.AgentWhereInput | boolean
+  delete?: Prisma.AgentWhereInput | boolean
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutMcpToolExecutionLogsInput, Prisma.AgentUpdateWithoutMcpToolExecutionLogsInput>, Prisma.AgentUncheckedUpdateWithoutMcpToolExecutionLogsInput>
+}
+
 export type AgentCreateWithoutUserInput = {
   agentId?: string
   agentSlug: string
@@ -889,6 +933,8 @@ export type AgentCreateWithoutUserInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutUserInput = {
@@ -912,6 +958,8 @@ export type AgentUncheckedCreateWithoutUserInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutUserInput = {
@@ -981,6 +1029,8 @@ export type AgentCreateWithoutOrganizationInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutOrganizationInput = {
@@ -1004,6 +1054,8 @@ export type AgentUncheckedCreateWithoutOrganizationInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutOrganizationInput = {
@@ -1053,6 +1105,8 @@ export type AgentCreateWithoutPhoneNumbersInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutPhoneNumbersInput = {
@@ -1076,6 +1130,8 @@ export type AgentUncheckedCreateWithoutPhoneNumbersInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutPhoneNumbersInput = {
@@ -1115,6 +1171,8 @@ export type AgentUpdateWithoutPhoneNumbersInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutPhoneNumbersInput = {
@@ -1138,6 +1196,8 @@ export type AgentUncheckedUpdateWithoutPhoneNumbersInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutConfigurationInput = {
@@ -1161,6 +1221,8 @@ export type AgentCreateWithoutConfigurationInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutConfigurationInput = {
@@ -1184,6 +1246,8 @@ export type AgentUncheckedCreateWithoutConfigurationInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutConfigurationInput = {
@@ -1223,6 +1287,8 @@ export type AgentUpdateWithoutConfigurationInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutConfigurationInput = {
@@ -1246,6 +1312,8 @@ export type AgentUncheckedUpdateWithoutConfigurationInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutKnowledgeSourcesInput = {
@@ -1269,6 +1337,8 @@ export type AgentCreateWithoutKnowledgeSourcesInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutKnowledgeSourcesInput = {
@@ -1292,6 +1362,8 @@ export type AgentUncheckedCreateWithoutKnowledgeSourcesInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutKnowledgeSourcesInput = {
@@ -1331,6 +1403,8 @@ export type AgentUpdateWithoutKnowledgeSourcesInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutKnowledgeSourcesInput = {
@@ -1354,6 +1428,8 @@ export type AgentUncheckedUpdateWithoutKnowledgeSourcesInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutCallLogsInput = {
@@ -1377,6 +1453,8 @@ export type AgentCreateWithoutCallLogsInput = {
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutCallLogsInput = {
@@ -1400,6 +1478,8 @@ export type AgentUncheckedCreateWithoutCallLogsInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutCallLogsInput = {
@@ -1439,6 +1519,8 @@ export type AgentUpdateWithoutCallLogsInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutCallLogsInput = {
@@ -1462,6 +1544,8 @@ export type AgentUncheckedUpdateWithoutCallLogsInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutOutboundCallsInput = {
@@ -1485,6 +1569,8 @@ export type AgentCreateWithoutOutboundCallsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutOutboundCallsInput = {
@@ -1508,6 +1594,8 @@ export type AgentUncheckedCreateWithoutOutboundCallsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutOutboundCallsInput = {
@@ -1547,6 +1635,8 @@ export type AgentUpdateWithoutOutboundCallsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutOutboundCallsInput = {
@@ -1570,6 +1660,8 @@ export type AgentUncheckedUpdateWithoutOutboundCallsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutCampaignsInput = {
@@ -1593,6 +1685,8 @@ export type AgentCreateWithoutCampaignsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceCreateNestedManyWithoutAgentInput
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutCampaignsInput = {
@@ -1616,6 +1710,8 @@ export type AgentUncheckedCreateWithoutCampaignsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedCreateNestedManyWithoutAgentInput
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutCampaignsInput = {
@@ -1655,6 +1751,8 @@ export type AgentUpdateWithoutCampaignsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUpdateManyWithoutAgentNestedInput
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutCampaignsInput = {
@@ -1678,6 +1776,8 @@ export type AgentUncheckedUpdateWithoutCampaignsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedUpdateManyWithoutAgentNestedInput
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutToolsInput = {
@@ -1701,6 +1801,8 @@ export type AgentCreateWithoutToolsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceCreateNestedManyWithoutAgentInput
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutToolsInput = {
@@ -1724,6 +1826,8 @@ export type AgentUncheckedCreateWithoutToolsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedCreateNestedManyWithoutAgentInput
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
   campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutToolsInput = {
@@ -1745,6 +1849,238 @@ export type AgentUpdateWithWhereUniqueWithoutToolsInput = {
 export type AgentUpdateManyWithWhereWithoutToolsInput = {
   where: Prisma.AgentScalarWhereInput
   data: Prisma.XOR<Prisma.AgentUpdateManyMutationInput, Prisma.AgentUncheckedUpdateManyWithoutToolsInput>
+}
+
+export type AgentCreateWithoutMcpConnectionsInput = {
+  agentId?: string
+  agentSlug: string
+  name: string
+  templateId?: string | null
+  isActive?: boolean
+  isConfigured?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  callLogsCount?: number
+  knowledgeSourcesCount?: number
+  phoneNumbersCount?: number
+  toolsCount?: number
+  organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
+  user?: Prisma.UserCreateNestedOneWithoutAgentsInput
+  configuration?: Prisma.AgentConfigurationCreateNestedOneWithoutAgentInput
+  callLogs?: Prisma.CallLogCreateNestedManyWithoutAgentInput
+  phoneNumbers?: Prisma.PhoneNumberCreateNestedManyWithoutAgentInput
+  knowledgeSources?: Prisma.KnowledgeSourceCreateNestedManyWithoutAgentInput
+  outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
+  campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
+  tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogCreateNestedManyWithoutAgentInput
+}
+
+export type AgentUncheckedCreateWithoutMcpConnectionsInput = {
+  agentId?: string
+  agentSlug: string
+  organizationId: string
+  userId?: string | null
+  name: string
+  templateId?: string | null
+  isActive?: boolean
+  isConfigured?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  callLogsCount?: number
+  knowledgeSourcesCount?: number
+  phoneNumbersCount?: number
+  toolsCount?: number
+  configuration?: Prisma.AgentConfigurationUncheckedCreateNestedOneWithoutAgentInput
+  callLogs?: Prisma.CallLogUncheckedCreateNestedManyWithoutAgentInput
+  phoneNumbers?: Prisma.PhoneNumberUncheckedCreateNestedManyWithoutAgentInput
+  knowledgeSources?: Prisma.KnowledgeSourceUncheckedCreateNestedManyWithoutAgentInput
+  outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
+  campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
+  tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentCreateOrConnectWithoutMcpConnectionsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutMcpConnectionsInput, Prisma.AgentUncheckedCreateWithoutMcpConnectionsInput>
+}
+
+export type AgentUpsertWithoutMcpConnectionsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutMcpConnectionsInput, Prisma.AgentUncheckedUpdateWithoutMcpConnectionsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutMcpConnectionsInput, Prisma.AgentUncheckedCreateWithoutMcpConnectionsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutMcpConnectionsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutMcpConnectionsInput, Prisma.AgentUncheckedUpdateWithoutMcpConnectionsInput>
+}
+
+export type AgentUpdateWithoutMcpConnectionsInput = {
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isConfigured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  callLogsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  knowledgeSourcesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  phoneNumbersCount?: Prisma.IntFieldUpdateOperationsInput | number
+  toolsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
+  user?: Prisma.UserUpdateOneWithoutAgentsNestedInput
+  configuration?: Prisma.AgentConfigurationUpdateOneWithoutAgentNestedInput
+  callLogs?: Prisma.CallLogUpdateManyWithoutAgentNestedInput
+  phoneNumbers?: Prisma.PhoneNumberUpdateManyWithoutAgentNestedInput
+  knowledgeSources?: Prisma.KnowledgeSourceUpdateManyWithoutAgentNestedInput
+  outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
+  campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
+  tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutMcpConnectionsInput = {
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isConfigured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  callLogsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  knowledgeSourcesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  phoneNumbersCount?: Prisma.IntFieldUpdateOperationsInput | number
+  toolsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  configuration?: Prisma.AgentConfigurationUncheckedUpdateOneWithoutAgentNestedInput
+  callLogs?: Prisma.CallLogUncheckedUpdateManyWithoutAgentNestedInput
+  phoneNumbers?: Prisma.PhoneNumberUncheckedUpdateManyWithoutAgentNestedInput
+  knowledgeSources?: Prisma.KnowledgeSourceUncheckedUpdateManyWithoutAgentNestedInput
+  outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
+  campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
+  tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentCreateWithoutMcpToolExecutionLogsInput = {
+  agentId?: string
+  agentSlug: string
+  name: string
+  templateId?: string | null
+  isActive?: boolean
+  isConfigured?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  callLogsCount?: number
+  knowledgeSourcesCount?: number
+  phoneNumbersCount?: number
+  toolsCount?: number
+  organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
+  user?: Prisma.UserCreateNestedOneWithoutAgentsInput
+  configuration?: Prisma.AgentConfigurationCreateNestedOneWithoutAgentInput
+  callLogs?: Prisma.CallLogCreateNestedManyWithoutAgentInput
+  phoneNumbers?: Prisma.PhoneNumberCreateNestedManyWithoutAgentInput
+  knowledgeSources?: Prisma.KnowledgeSourceCreateNestedManyWithoutAgentInput
+  outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutAgentInput
+  campaigns?: Prisma.CampaignCreateNestedManyWithoutAgentInput
+  tools?: Prisma.ToolCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionCreateNestedManyWithoutAgentInput
+}
+
+export type AgentUncheckedCreateWithoutMcpToolExecutionLogsInput = {
+  agentId?: string
+  agentSlug: string
+  organizationId: string
+  userId?: string | null
+  name: string
+  templateId?: string | null
+  isActive?: boolean
+  isConfigured?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  callLogsCount?: number
+  knowledgeSourcesCount?: number
+  phoneNumbersCount?: number
+  toolsCount?: number
+  configuration?: Prisma.AgentConfigurationUncheckedCreateNestedOneWithoutAgentInput
+  callLogs?: Prisma.CallLogUncheckedCreateNestedManyWithoutAgentInput
+  phoneNumbers?: Prisma.PhoneNumberUncheckedCreateNestedManyWithoutAgentInput
+  knowledgeSources?: Prisma.KnowledgeSourceUncheckedCreateNestedManyWithoutAgentInput
+  outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutAgentInput
+  campaigns?: Prisma.CampaignUncheckedCreateNestedManyWithoutAgentInput
+  tools?: Prisma.ToolUncheckedCreateNestedManyWithoutAgentInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentCreateOrConnectWithoutMcpToolExecutionLogsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedCreateWithoutMcpToolExecutionLogsInput>
+}
+
+export type AgentUpsertWithoutMcpToolExecutionLogsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedUpdateWithoutMcpToolExecutionLogsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedCreateWithoutMcpToolExecutionLogsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutMcpToolExecutionLogsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutMcpToolExecutionLogsInput, Prisma.AgentUncheckedUpdateWithoutMcpToolExecutionLogsInput>
+}
+
+export type AgentUpdateWithoutMcpToolExecutionLogsInput = {
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isConfigured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  callLogsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  knowledgeSourcesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  phoneNumbersCount?: Prisma.IntFieldUpdateOperationsInput | number
+  toolsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
+  user?: Prisma.UserUpdateOneWithoutAgentsNestedInput
+  configuration?: Prisma.AgentConfigurationUpdateOneWithoutAgentNestedInput
+  callLogs?: Prisma.CallLogUpdateManyWithoutAgentNestedInput
+  phoneNumbers?: Prisma.PhoneNumberUpdateManyWithoutAgentNestedInput
+  knowledgeSources?: Prisma.KnowledgeSourceUpdateManyWithoutAgentNestedInput
+  outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
+  campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
+  tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutMcpToolExecutionLogsInput = {
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isConfigured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  callLogsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  knowledgeSourcesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  phoneNumbersCount?: Prisma.IntFieldUpdateOperationsInput | number
+  toolsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  configuration?: Prisma.AgentConfigurationUncheckedUpdateOneWithoutAgentNestedInput
+  callLogs?: Prisma.CallLogUncheckedUpdateManyWithoutAgentNestedInput
+  phoneNumbers?: Prisma.PhoneNumberUncheckedUpdateManyWithoutAgentNestedInput
+  knowledgeSources?: Prisma.KnowledgeSourceUncheckedUpdateManyWithoutAgentNestedInput
+  outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
+  campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
+  tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyUserInput = {
@@ -1784,6 +2120,8 @@ export type AgentUpdateWithoutUserInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutUserInput = {
@@ -1807,6 +2145,8 @@ export type AgentUncheckedUpdateWithoutUserInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutUserInput = {
@@ -1862,6 +2202,8 @@ export type AgentUpdateWithoutOrganizationInput = {
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutOrganizationInput = {
@@ -1885,6 +2227,8 @@ export type AgentUncheckedUpdateWithoutOrganizationInput = {
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
   tools?: Prisma.ToolUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutOrganizationInput = {
@@ -1924,6 +2268,8 @@ export type AgentUpdateWithoutToolsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUpdateManyWithoutAgentNestedInput
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutToolsInput = {
@@ -1947,6 +2293,8 @@ export type AgentUncheckedUpdateWithoutToolsInput = {
   knowledgeSources?: Prisma.KnowledgeSourceUncheckedUpdateManyWithoutAgentNestedInput
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutAgentNestedInput
   campaigns?: Prisma.CampaignUncheckedUpdateManyWithoutAgentNestedInput
+  mcpConnections?: Prisma.AgentMcpConnectionUncheckedUpdateManyWithoutAgentNestedInput
+  mcpToolExecutionLogs?: Prisma.McpToolExecutionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutToolsInput = {
@@ -1978,6 +2326,8 @@ export type AgentCountOutputType = {
   outboundCalls: number
   campaigns: number
   tools: number
+  mcpConnections: number
+  mcpToolExecutionLogs: number
 }
 
 export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1987,6 +2337,8 @@ export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   outboundCalls?: boolean | AgentCountOutputTypeCountOutboundCallsArgs
   campaigns?: boolean | AgentCountOutputTypeCountCampaignsArgs
   tools?: boolean | AgentCountOutputTypeCountToolsArgs
+  mcpConnections?: boolean | AgentCountOutputTypeCountMcpConnectionsArgs
+  mcpToolExecutionLogs?: boolean | AgentCountOutputTypeCountMcpToolExecutionLogsArgs
 }
 
 /**
@@ -2041,6 +2393,20 @@ export type AgentCountOutputTypeCountToolsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.ToolWhereInput
 }
 
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountMcpConnectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentMcpConnectionWhereInput
+}
+
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountMcpToolExecutionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.McpToolExecutionLogWhereInput
+}
+
 
 export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   agentId?: boolean
@@ -2066,6 +2432,8 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   outboundCalls?: boolean | Prisma.Agent$outboundCallsArgs<ExtArgs>
   campaigns?: boolean | Prisma.Agent$campaignsArgs<ExtArgs>
   tools?: boolean | Prisma.Agent$toolsArgs<ExtArgs>
+  mcpConnections?: boolean | Prisma.Agent$mcpConnectionsArgs<ExtArgs>
+  mcpToolExecutionLogs?: boolean | Prisma.Agent$mcpToolExecutionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -2135,6 +2503,8 @@ export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   outboundCalls?: boolean | Prisma.Agent$outboundCallsArgs<ExtArgs>
   campaigns?: boolean | Prisma.Agent$campaignsArgs<ExtArgs>
   tools?: boolean | Prisma.Agent$toolsArgs<ExtArgs>
+  mcpConnections?: boolean | Prisma.Agent$mcpConnectionsArgs<ExtArgs>
+  mcpToolExecutionLogs?: boolean | Prisma.Agent$mcpToolExecutionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2158,6 +2528,8 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     outboundCalls: Prisma.$OutboundCallPayload<ExtArgs>[]
     campaigns: Prisma.$CampaignPayload<ExtArgs>[]
     tools: Prisma.$ToolPayload<ExtArgs>[]
+    mcpConnections: Prisma.$AgentMcpConnectionPayload<ExtArgs>[]
+    mcpToolExecutionLogs: Prisma.$McpToolExecutionLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     agentId: string
@@ -2577,6 +2949,8 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   outboundCalls<T extends Prisma.Agent$outboundCallsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$outboundCallsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OutboundCallPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   campaigns<T extends Prisma.Agent$campaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tools<T extends Prisma.Agent$toolsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$toolsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ToolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  mcpConnections<T extends Prisma.Agent$mcpConnectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$mcpConnectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMcpConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  mcpToolExecutionLogs<T extends Prisma.Agent$mcpToolExecutionLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$mcpToolExecutionLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$McpToolExecutionLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3200,6 +3574,54 @@ export type Agent$toolsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.ToolScalarFieldEnum | Prisma.ToolScalarFieldEnum[]
+}
+
+/**
+ * Agent.mcpConnections
+ */
+export type Agent$mcpConnectionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentMcpConnection
+   */
+  select?: Prisma.AgentMcpConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentMcpConnection
+   */
+  omit?: Prisma.AgentMcpConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentMcpConnectionInclude<ExtArgs> | null
+  where?: Prisma.AgentMcpConnectionWhereInput
+  orderBy?: Prisma.AgentMcpConnectionOrderByWithRelationInput | Prisma.AgentMcpConnectionOrderByWithRelationInput[]
+  cursor?: Prisma.AgentMcpConnectionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentMcpConnectionScalarFieldEnum | Prisma.AgentMcpConnectionScalarFieldEnum[]
+}
+
+/**
+ * Agent.mcpToolExecutionLogs
+ */
+export type Agent$mcpToolExecutionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the McpToolExecutionLog
+   */
+  select?: Prisma.McpToolExecutionLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the McpToolExecutionLog
+   */
+  omit?: Prisma.McpToolExecutionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.McpToolExecutionLogInclude<ExtArgs> | null
+  where?: Prisma.McpToolExecutionLogWhereInput
+  orderBy?: Prisma.McpToolExecutionLogOrderByWithRelationInput | Prisma.McpToolExecutionLogOrderByWithRelationInput[]
+  cursor?: Prisma.McpToolExecutionLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.McpToolExecutionLogScalarFieldEnum | Prisma.McpToolExecutionLogScalarFieldEnum[]
 }
 
 /**

@@ -70,6 +70,10 @@ export const ModelName = {
   OutboundCall: 'OutboundCall',
   Campaign: 'Campaign',
   Tool: 'Tool',
+  McpServerCatalogItem: 'McpServerCatalogItem',
+  McpConnection: 'McpConnection',
+  AgentMcpConnection: 'AgentMcpConnection',
+  McpToolExecutionLog: 'McpToolExecutionLog',
   Secret: 'Secret'
 } as const
 
@@ -449,6 +453,81 @@ export const ToolScalarFieldEnum = {
 } as const
 
 export type ToolScalarFieldEnum = (typeof ToolScalarFieldEnum)[keyof typeof ToolScalarFieldEnum]
+
+
+export const McpServerCatalogItemScalarFieldEnum = {
+  mcpServerId: 'mcpServerId',
+  organizationId: 'organizationId',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  source: 'source',
+  provider: 'provider',
+  mcpUrl: 'mcpUrl',
+  smitheryServerKey: 'smitheryServerKey',
+  authType: 'authType',
+  categories: 'categories',
+  verified: 'verified',
+  toolCount: 'toolCount',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpServerCatalogItemScalarFieldEnum = (typeof McpServerCatalogItemScalarFieldEnum)[keyof typeof McpServerCatalogItemScalarFieldEnum]
+
+
+export const McpConnectionScalarFieldEnum = {
+  mcpConnectionId: 'mcpConnectionId',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  catalogItemId: 'catalogItemId',
+  displayName: 'displayName',
+  provider: 'provider',
+  mcpUrl: 'mcpUrl',
+  smitheryNamespace: 'smitheryNamespace',
+  smitheryConnectionId: 'smitheryConnectionId',
+  status: 'status',
+  setupUrl: 'setupUrl',
+  tools: 'tools',
+  metadata: 'metadata',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpConnectionScalarFieldEnum = (typeof McpConnectionScalarFieldEnum)[keyof typeof McpConnectionScalarFieldEnum]
+
+
+export const AgentMcpConnectionScalarFieldEnum = {
+  agentMcpConnectionId: 'agentMcpConnectionId',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  mcpConnectionId: 'mcpConnectionId',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentMcpConnectionScalarFieldEnum = (typeof AgentMcpConnectionScalarFieldEnum)[keyof typeof AgentMcpConnectionScalarFieldEnum]
+
+
+export const McpToolExecutionLogScalarFieldEnum = {
+  mcpToolExecutionLogId: 'mcpToolExecutionLogId',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  mcpConnectionId: 'mcpConnectionId',
+  toolName: 'toolName',
+  callId: 'callId',
+  status: 'status',
+  latencyMs: 'latencyMs',
+  argumentsPreview: 'argumentsPreview',
+  resultPreview: 'resultPreview',
+  error: 'error',
+  createdAt: 'createdAt'
+} as const
+
+export type McpToolExecutionLogScalarFieldEnum = (typeof McpToolExecutionLogScalarFieldEnum)[keyof typeof McpToolExecutionLogScalarFieldEnum]
 
 
 export const SecretScalarFieldEnum = {

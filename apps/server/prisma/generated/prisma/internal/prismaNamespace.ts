@@ -403,6 +403,10 @@ export const ModelName = {
   OutboundCall: 'OutboundCall',
   Campaign: 'Campaign',
   Tool: 'Tool',
+  McpServerCatalogItem: 'McpServerCatalogItem',
+  McpConnection: 'McpConnection',
+  AgentMcpConnection: 'AgentMcpConnection',
+  McpToolExecutionLog: 'McpToolExecutionLog',
   Secret: 'Secret'
 } as const
 
@@ -419,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "apikey" | "organization" | "organizationRole" | "member" | "invitation" | "subscription" | "phoneNumber" | "agent" | "agentConfiguration" | "knowledgeSource" | "callLog" | "callTranscript" | "outboundCall" | "campaign" | "tool" | "secret"
+    modelProps: "user" | "session" | "account" | "verification" | "apikey" | "organization" | "organizationRole" | "member" | "invitation" | "subscription" | "phoneNumber" | "agent" | "agentConfiguration" | "knowledgeSource" | "callLog" | "callTranscript" | "outboundCall" | "campaign" | "tool" | "mcpServerCatalogItem" | "mcpConnection" | "agentMcpConnection" | "mcpToolExecutionLog" | "secret"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1829,6 +1833,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    McpServerCatalogItem: {
+      payload: Prisma.$McpServerCatalogItemPayload<ExtArgs>
+      fields: Prisma.McpServerCatalogItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpServerCatalogItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpServerCatalogItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        findFirst: {
+          args: Prisma.McpServerCatalogItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpServerCatalogItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        findMany: {
+          args: Prisma.McpServerCatalogItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>[]
+        }
+        create: {
+          args: Prisma.McpServerCatalogItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        createMany: {
+          args: Prisma.McpServerCatalogItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpServerCatalogItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>[]
+        }
+        delete: {
+          args: Prisma.McpServerCatalogItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        update: {
+          args: Prisma.McpServerCatalogItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpServerCatalogItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpServerCatalogItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpServerCatalogItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpServerCatalogItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpServerCatalogItemPayload>
+        }
+        aggregate: {
+          args: Prisma.McpServerCatalogItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpServerCatalogItem>
+        }
+        groupBy: {
+          args: Prisma.McpServerCatalogItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpServerCatalogItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpServerCatalogItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpServerCatalogItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpConnection: {
+      payload: Prisma.$McpConnectionPayload<ExtArgs>
+      fields: Prisma.McpConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.McpConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.McpConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.McpConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.McpConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.McpConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        update: {
+          args: Prisma.McpConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.McpConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpConnection>
+        }
+        groupBy: {
+          args: Prisma.McpConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgentMcpConnection: {
+      payload: Prisma.$AgentMcpConnectionPayload<ExtArgs>
+      fields: Prisma.AgentMcpConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentMcpConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentMcpConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentMcpConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentMcpConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.AgentMcpConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.AgentMcpConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.AgentMcpConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentMcpConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentMcpConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        update: {
+          args: Prisma.AgentMcpConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentMcpConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentMcpConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentMcpConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentMcpConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMcpConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentMcpConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentMcpConnection>
+        }
+        groupBy: {
+          args: Prisma.AgentMcpConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentMcpConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentMcpConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentMcpConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpToolExecutionLog: {
+      payload: Prisma.$McpToolExecutionLogPayload<ExtArgs>
+      fields: Prisma.McpToolExecutionLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpToolExecutionLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpToolExecutionLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        findFirst: {
+          args: Prisma.McpToolExecutionLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpToolExecutionLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        findMany: {
+          args: Prisma.McpToolExecutionLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>[]
+        }
+        create: {
+          args: Prisma.McpToolExecutionLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        createMany: {
+          args: Prisma.McpToolExecutionLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpToolExecutionLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>[]
+        }
+        delete: {
+          args: Prisma.McpToolExecutionLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        update: {
+          args: Prisma.McpToolExecutionLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpToolExecutionLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpToolExecutionLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpToolExecutionLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpToolExecutionLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpToolExecutionLogPayload>
+        }
+        aggregate: {
+          args: Prisma.McpToolExecutionLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpToolExecutionLog>
+        }
+        groupBy: {
+          args: Prisma.McpToolExecutionLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpToolExecutionLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpToolExecutionLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpToolExecutionLogCountAggregateOutputType> | number
+        }
+      }
+    }
     Secret: {
       payload: Prisma.$SecretPayload<ExtArgs>
       fields: Prisma.SecretFieldRefs
@@ -2304,6 +2604,81 @@ export const ToolScalarFieldEnum = {
 export type ToolScalarFieldEnum = (typeof ToolScalarFieldEnum)[keyof typeof ToolScalarFieldEnum]
 
 
+export const McpServerCatalogItemScalarFieldEnum = {
+  mcpServerId: 'mcpServerId',
+  organizationId: 'organizationId',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  source: 'source',
+  provider: 'provider',
+  mcpUrl: 'mcpUrl',
+  smitheryServerKey: 'smitheryServerKey',
+  authType: 'authType',
+  categories: 'categories',
+  verified: 'verified',
+  toolCount: 'toolCount',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpServerCatalogItemScalarFieldEnum = (typeof McpServerCatalogItemScalarFieldEnum)[keyof typeof McpServerCatalogItemScalarFieldEnum]
+
+
+export const McpConnectionScalarFieldEnum = {
+  mcpConnectionId: 'mcpConnectionId',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  catalogItemId: 'catalogItemId',
+  displayName: 'displayName',
+  provider: 'provider',
+  mcpUrl: 'mcpUrl',
+  smitheryNamespace: 'smitheryNamespace',
+  smitheryConnectionId: 'smitheryConnectionId',
+  status: 'status',
+  setupUrl: 'setupUrl',
+  tools: 'tools',
+  metadata: 'metadata',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpConnectionScalarFieldEnum = (typeof McpConnectionScalarFieldEnum)[keyof typeof McpConnectionScalarFieldEnum]
+
+
+export const AgentMcpConnectionScalarFieldEnum = {
+  agentMcpConnectionId: 'agentMcpConnectionId',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  mcpConnectionId: 'mcpConnectionId',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentMcpConnectionScalarFieldEnum = (typeof AgentMcpConnectionScalarFieldEnum)[keyof typeof AgentMcpConnectionScalarFieldEnum]
+
+
+export const McpToolExecutionLogScalarFieldEnum = {
+  mcpToolExecutionLogId: 'mcpToolExecutionLogId',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  mcpConnectionId: 'mcpConnectionId',
+  toolName: 'toolName',
+  callId: 'callId',
+  status: 'status',
+  latencyMs: 'latencyMs',
+  argumentsPreview: 'argumentsPreview',
+  resultPreview: 'resultPreview',
+  error: 'error',
+  createdAt: 'createdAt'
+} as const
+
+export type McpToolExecutionLogScalarFieldEnum = (typeof McpToolExecutionLogScalarFieldEnum)[keyof typeof McpToolExecutionLogScalarFieldEnum]
+
+
 export const SecretScalarFieldEnum = {
   secretId: 'secretId',
   organizationId: 'organizationId',
@@ -2538,6 +2913,34 @@ export type EnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 export type ListEnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'McpCatalogSource'
+ */
+export type EnumMcpCatalogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpCatalogSource'>
+    
+
+
+/**
+ * Reference to a field of type 'McpCatalogSource[]'
+ */
+export type ListEnumMcpCatalogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpCatalogSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'McpConnectionStatus'
+ */
+export type EnumMcpConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpConnectionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'McpConnectionStatus[]'
+ */
+export type ListEnumMcpConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpConnectionStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2667,6 +3070,10 @@ export type GlobalOmitConfig = {
   outboundCall?: Prisma.OutboundCallOmit
   campaign?: Prisma.CampaignOmit
   tool?: Prisma.ToolOmit
+  mcpServerCatalogItem?: Prisma.McpServerCatalogItemOmit
+  mcpConnection?: Prisma.McpConnectionOmit
+  agentMcpConnection?: Prisma.AgentMcpConnectionOmit
+  mcpToolExecutionLog?: Prisma.McpToolExecutionLogOmit
   secret?: Prisma.SecretOmit
 }
 

@@ -86,6 +86,8 @@ def normalize_config(raw: dict[str, Any]) -> dict[str, Any]:
             "use_rag": bool(_pick(raw, "use_rag") or False),
             "data_needed": _pick(raw, "data_needed") or [],
             "data_evaluation": _pick(raw, "data_evaluation") or [],
+            "tools": _pick(raw, "tools") or [],
+            "mcp_connections": _pick(raw, "mcpConnections", "mcp_connections") or [],
             "initiation_webhook": _pick(raw, "initiation_webhook"),
             "post_call_webhook": _pick(raw, "post_call_webhook"),
             "variables": _pick(raw, "variables"),

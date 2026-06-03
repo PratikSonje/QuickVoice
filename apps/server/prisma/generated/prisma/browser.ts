@@ -113,6 +113,26 @@ export type Campaign = Prisma.CampaignModel
  */
 export type Tool = Prisma.ToolModel
 /**
+ * Model McpServerCatalogItem
+ * 
+ */
+export type McpServerCatalogItem = Prisma.McpServerCatalogItemModel
+/**
+ * Model McpConnection
+ * 
+ */
+export type McpConnection = Prisma.McpConnectionModel
+/**
+ * Model AgentMcpConnection
+ * 
+ */
+export type AgentMcpConnection = Prisma.AgentMcpConnectionModel
+/**
+ * Model McpToolExecutionLog
+ * 
+ */
+export type McpToolExecutionLog = Prisma.McpToolExecutionLogModel
+/**
  * Model Secret
  * 
  */

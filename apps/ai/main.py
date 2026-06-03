@@ -7,6 +7,7 @@ from livekit.agents import (
     JobContext,
     LanguageCode,
     TurnHandlingOptions,
+    function_tool,
     inference,
     room_io,
 )
@@ -15,9 +16,11 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from handlers.calllog_handler import build_call_log_payload, post_call_log
 from handlers.config_handler import get_config
 from handlers.livekit_handler import get_transcripts, recording_path as build_recording_path, start_recording
+from handlers.mcp_handler import build_mcp_tool_instructions, call_mcp_tool, parse_arguments_json
 from handlers.worker_handler import build_call_context, parse_metadata, speak_first_message
 from utils.logger import logger
 import asyncio
+import json
 from datetime import datetime, timezone
 import os
 import sys
@@ -26,8 +29,30 @@ load_dotenv(".env")
 
 
 class Assistant(Agent):
-    def __init__(self, system_prompt: str):
+    def __init__(self, system_prompt: str, config: dict, call_context: dict):
         super().__init__(instructions=system_prompt)
+        self._config = config
+        self._call_context = call_context
+
+    @function_tool
+    async def call_mcp_tool(self, connection_id: str, tool_name: str, arguments_json: str = "{}") -> str:
+        """
+        Call an attached MCP tool using a connected MCP connection.
+
+        Args:
+            connection_id: The MCP connection ID from the connected tools list.
+            tool_name: The exact MCP tool name to execute.
+            arguments_json: A JSON object string containing the tool arguments.
+        """
+        arguments = parse_arguments_json(arguments_json)
+        result = await call_mcp_tool(
+            connection_id=connection_id,
+            tool_name=tool_name,
+            arguments=arguments,
+            config=self._config,
+            call_context=self._call_context,
+        )
+        return json.dumps(result.get("data", result), ensure_ascii=False)
 
 
 async def entrypoint(ctx: JobContext):
@@ -76,11 +101,14 @@ async def entrypoint(ctx: JobContext):
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),
         preemptive_generation=config.get("preemptive_generation", True),
     )
-    agent = Assistant(
-        system_prompt=config.get(
+    system_prompt = config.get(
             "system_prompt",
             "You are a friendly, reliable voice assistant that answers questions, explains topics, and completes tasks with available tools.",
-        )
+        ) + build_mcp_tool_instructions(config.get("mcp_connections") or [])
+    agent = Assistant(
+        system_prompt=system_prompt,
+        config=config,
+        call_context=call_context,
     )
     await session.start(
         room=ctx.room,

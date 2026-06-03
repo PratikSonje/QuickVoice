@@ -8,6 +8,9 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { Button } from "@/src/components/ui/button";
 import { ToolCard } from "@/src/components/tools/ToolCard";
 import { ToolSheet } from "@/src/components/tools/ToolSheet";
+import { McpConnectionsList } from "@/src/components/tools/McpConnectionsList";
+import { McpMarketplace } from "@/src/components/tools/McpMarketplace";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { useTools } from "@/src/hooks/queries/tools";
 
 function SkeletonRow() {
@@ -38,29 +41,47 @@ export default function ToolsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Your Tools"
-        description="Manage the external APIs your agents can invoke."
+        title="Tools marketplace"
+        description="Connect MCP servers or manage HTTP tools your agents can invoke."
         actions={addButton}
       />
 
-      {isLoading ? (
-        <div className="space-y-3">
-          {[...Array(3)].map((_, i) => <SkeletonRow key={i} />)}
-        </div>
-      ) : !tools?.length ? (
-        <EmptyState
-          icon={Webhook}
-          title="No tools yet"
-          description="Create an HTTP tool to let your agents call external APIs mid-conversation."
-          action={addButton}
-        />
-      ) : (
-        <div className="space-y-3">
-          {tools.map((tool) => (
-            <ToolCard key={tool.toolId} tool={tool} />
-          ))}
-        </div>
-      )}
+      <Tabs defaultValue="marketplace" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="http">HTTP tools</TabsTrigger>
+          <TabsTrigger value="marketplace">MCP marketplace</TabsTrigger>
+          <TabsTrigger value="connections">Connected MCPs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="http" className="mt-0">
+          {isLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => <SkeletonRow key={i} />)}
+            </div>
+          ) : !tools?.length ? (
+            <EmptyState
+              icon={Webhook}
+              title="No tools yet"
+              description="Create an HTTP tool to let your agents call external APIs mid-conversation."
+              action={addButton}
+            />
+          ) : (
+            <div className="space-y-3">
+              {tools.map((tool) => (
+                <ToolCard key={tool.toolId} tool={tool} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="marketplace" className="mt-0">
+          <McpMarketplace />
+        </TabsContent>
+
+        <TabsContent value="connections" className="mt-0">
+          <McpConnectionsList />
+        </TabsContent>
+      </Tabs>
 
       <ToolSheet mode="create" open={createOpen} onOpenChange={setCreateOpen} />
     </div>
