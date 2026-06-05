@@ -2,9 +2,9 @@
 # For more information on the build process, see https://docs.livekit.io/agents/ops/deployment/builds/
 # syntax=docker/dockerfile:1
 
-# Use the official Python base image with Python 3.13
+# Use the official Python base image with Python 3.12
 # We use the slim variant to keep the image size smaller while still having essential tools
-ARG PYTHON_VERSION=3.13
+ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim AS base
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
@@ -13,6 +13,9 @@ ENV PYTHONUNBUFFERED=1
 
 # Disable pip version check to speed up builds
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# FastAPI default port for the combined AI service.
+ENV AI_API_PORT=5555
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
@@ -30,7 +33,7 @@ RUN adduser \
 # g++: C++ compiler needed for building Python packages with C++ extensions
 # python3-dev: Python development headers needed for compilation
 # We clean up the apt cache after installation to keep the image size down
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     python3-dev \
@@ -65,9 +68,12 @@ USER appuser
 # dependencies at runtime, which improves startup time and reliability
 RUN python "main.py" download-files
 
-# Run the application
-# The "start" command tells the worker to connect to LiveKit and begin waiting for jobs.
-CMD ["python", "main.py", "start"]
+# FastAPI listens on this port when the combined server or API-only command runs.
+EXPOSE 5555
 
-# To run FastAPI instead, override the command:
+# Run FastAPI and the LiveKit worker together.
+CMD ["python", "main.py", "serve"]
+
+# To run one service instead, override the command:
 #   python main.py api
+#   python main.py start

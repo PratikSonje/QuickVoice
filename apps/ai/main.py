@@ -23,9 +23,67 @@ import asyncio
 import json
 from datetime import datetime, timezone
 import os
+from pathlib import Path
+import signal
+import subprocess
 import sys
+import time
 
-load_dotenv(".env")
+APP_DIR = Path(__file__).resolve().parent
+load_dotenv(APP_DIR / ".env")
+
+API_PORT = int(os.getenv("AI_API_PORT", "5555"))
+
+
+def run_combined_server() -> int:
+    commands = {
+        "api": [sys.executable, str(APP_DIR / "main.py"), "api"],
+        "worker": [sys.executable, str(APP_DIR / "main.py"), "start"],
+    }
+    processes: dict[str, subprocess.Popen] = {}
+    shutting_down = False
+
+    def stop_children() -> None:
+        nonlocal shutting_down
+        if shutting_down:
+            return
+        shutting_down = True
+
+        for name, process in processes.items():
+            if process.poll() is None:
+                logger.info(f"Stopping {name} process")
+                process.terminate()
+
+        deadline = time.monotonic() + 10
+        for name, process in processes.items():
+            while process.poll() is None and time.monotonic() < deadline:
+                time.sleep(0.2)
+            if process.poll() is None:
+                logger.warning(f"Killing unresponsive {name} process")
+                process.kill()
+
+    def handle_signal(signum, _frame) -> None:
+        logger.info(f"Received signal {signum}; shutting down AI services")
+        stop_children()
+
+    for handled_signal in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(handled_signal, handle_signal)
+
+    try:
+        for name, command in commands.items():
+            logger.info(f"Starting {name}: {' '.join(command)}")
+            processes[name] = subprocess.Popen(command, cwd=APP_DIR)
+
+        while True:
+            for name, process in processes.items():
+                return_code = process.poll()
+                if return_code is not None:
+                    logger.error(f"{name} process exited with code {return_code}")
+                    stop_children()
+                    return return_code or 1
+            time.sleep(1)
+    finally:
+        stop_children()
 
 
 class Assistant(Agent):
@@ -164,13 +222,16 @@ async def entrypoint(ctx: JobContext):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "serve":
+        raise SystemExit(run_combined_server())
+
     if len(sys.argv) > 1 and sys.argv[1] == "api":
         import uvicorn
 
         uvicorn.run(
             "api:app",
             host=os.getenv("AI_API_HOST", "0.0.0.0"),
-            port=int(os.getenv("AI_API_PORT", "8000")),
+            port=API_PORT,
             reload=os.getenv("AI_API_RELOAD", "false").lower() == "true",
         )
         raise SystemExit(0)
