@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { CheckCircle2, Loader2, PhoneOutgoing, RefreshCw } from "lucide-react";
 
 import { EmptyState } from "@/src/components/common/EmptyState";
+import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -25,6 +26,11 @@ type DialableAgent = Agent & {
   numbers: PhoneNumber[];
 };
 
+type StartedCall = {
+  phoneNumber: string;
+  fromNumber: string;
+};
+
 function asDialableAgents(agents: Agent[], numbers: PhoneNumber[]) {
   return agents
     .filter((agent) => agent.isActive && agent.isConfigured)
@@ -33,6 +39,10 @@ function asDialableAgents(agents: Agent[], numbers: PhoneNumber[]) {
       numbers: numbers.filter((number) => number.agentId === agent.agentId),
     }))
     .filter((agent) => agent.numbers.length > 0);
+}
+
+function formatProvider(provider: PhoneNumber["provider"]) {
+  return provider.toLowerCase() === "telnyx" ? "Telnyx" : "Twilio";
 }
 
 export function QuickCallForm() {
@@ -50,6 +60,7 @@ export function QuickCallForm() {
   const [firstMessage, setFirstMessage] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [startedCall, setStartedCall] = useState<StartedCall | null>(null);
 
   const agentId = dialableAgents.some((agent) => agent.agentId === requestedAgentId)
     ? requestedAgentId
@@ -60,8 +71,16 @@ export function QuickCallForm() {
   )
     ? requestedFromNumber
     : selectedAgent?.numbers[0]?.number ?? "";
+  const selectedNumber = selectedAgent?.numbers.find(
+    (number) => number.number === fromNumber
+  );
 
   const isLoading = agentsLoading || numbersLoading;
+  const canSubmit =
+    Boolean(agentId) &&
+    Boolean(fromNumber) &&
+    phoneNumber.trim().length >= 10 &&
+    !quickCall.isPending;
 
   function refresh() {
     refetchAgents();
@@ -71,6 +90,7 @@ export function QuickCallForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
+    setStartedCall(null);
 
     const parsed = quickCallSchema.safeParse({
       agentId,
@@ -88,6 +108,10 @@ export function QuickCallForm() {
 
     try {
       await quickCall.mutateAsync(parsed.data);
+      setStartedCall({
+        phoneNumber: parsed.data.phoneNumber,
+        fromNumber: parsed.data.fromNumber,
+      });
     } catch {
       // The mutation hook owns the toast; keep the form in place for retry.
     }
@@ -101,9 +125,9 @@ export function QuickCallForm() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="h-[520px] animate-pulse border bg-card" />
-        <div className="h-64 animate-pulse border bg-card" />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="h-[560px] animate-pulse border bg-card" />
+        <div className="h-72 animate-pulse border bg-card" />
       </div>
     );
   }
@@ -124,65 +148,72 @@ export function QuickCallForm() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-4 pb-20 xl:grid-cols-[minmax(0,1fr)_340px] xl:pb-0">
       <form onSubmit={onSubmit} className="border bg-card">
-        <div className="border-b px-5 py-4">
+        <div className="flex flex-col gap-2 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-base font-semibold text-foreground">Quick call</h2>
+          {selectedNumber ? (
+            <Badge variant="outline">{formatProvider(selectedNumber.provider)}</Badge>
+          ) : null}
         </div>
 
         <div className="grid gap-5 p-5">
-          <div className="grid gap-2">
-            <Label htmlFor="agent">Agent</Label>
-            <Select value={agentId} onValueChange={selectAgent}>
-              <SelectTrigger id="agent" className="w-full">
-                <SelectValue placeholder="Select agent" />
-              </SelectTrigger>
-              <SelectContent>
-                {dialableAgents.map((agent) => (
-                  <SelectItem key={agent.agentId} value={agent.agentId}>
-                    {agent.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="agent">Agent</Label>
+              <Select value={agentId} onValueChange={selectAgent}>
+                <SelectTrigger id="agent" className="w-full">
+                  <SelectValue placeholder="Select agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dialableAgents.map((agent) => (
+                    <SelectItem key={agent.agentId} value={agent.agentId}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="fromNumber">From</Label>
+              <Select value={fromNumber} onValueChange={setRequestedFromNumber}>
+                <SelectTrigger id="fromNumber" className="w-full">
+                  <SelectValue placeholder="Select caller ID" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(selectedAgent?.numbers ?? []).map((number) => (
+                    <SelectItem key={number.phId} value={number.number}>
+                      {number.number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="fromNumber">From</Label>
-            <Select value={fromNumber} onValueChange={setRequestedFromNumber}>
-              <SelectTrigger id="fromNumber" className="w-full">
-                <SelectValue placeholder="Select caller ID" />
-              </SelectTrigger>
-              <SelectContent>
-                {(selectedAgent?.numbers ?? []).map((number) => (
-                  <SelectItem key={number.phId} value={number.number}>
-                    {number.number}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="phoneNumber">To</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                inputMode="tel"
+                placeholder="+15551234567"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="phoneNumber">To</Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              inputMode="tel"
-              placeholder="+15551234567"
-              value={phoneNumber}
-              onChange={(event) => setPhoneNumber(event.target.value)}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="username">Name</Label>
-            <Input
-              id="username"
-              placeholder="Contact name"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
+            <div className="grid gap-2">
+              <Label htmlFor="username">Name</Label>
+              <Input
+                id="username"
+                placeholder="Contact name"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+              />
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -211,11 +242,20 @@ export function QuickCallForm() {
             <p className="text-sm text-destructive">{formError}</p>
           ) : null}
 
+          {startedCall ? (
+            <div
+              aria-live="polite"
+              className="border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+            >
+              Started call to {startedCall.phoneNumber} from {startedCall.fromNumber}.
+            </div>
+          ) : null}
+
           <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
             <Button type="button" variant="outline" onClick={refresh}>
               <RefreshCw /> Refresh
             </Button>
-            <Button type="submit" disabled={quickCall.isPending}>
+            <Button type="submit" disabled={!canSubmit}>
               {quickCall.isPending ? <Loader2 className="animate-spin" /> : <PhoneOutgoing />}
               Start call
             </Button>
@@ -232,9 +272,24 @@ export function QuickCallForm() {
           {dialableAgents.map((agent: DialableAgent) => (
             <div key={agent.agentId} className="border-b pb-3 last:border-0 last:pb-0">
               <p className="truncate text-sm font-medium text-foreground">{agent.name}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {agent.numbers.length} assigned number{agent.numbers.length === 1 ? "" : "s"}
-              </p>
+              <div className="mt-2 space-y-2">
+                {agent.numbers.map((number) => (
+                  <div
+                    key={number.phId}
+                    className="flex min-w-0 items-center justify-between gap-2 text-xs"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-foreground">
+                        {number.friendlyName || number.number}
+                      </p>
+                      <p className="break-all text-muted-foreground">{number.number}</p>
+                    </div>
+                    <Badge variant="secondary" className="shrink-0">
+                      {formatProvider(number.provider)}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
