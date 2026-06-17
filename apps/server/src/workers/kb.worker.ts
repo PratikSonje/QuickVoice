@@ -4,7 +4,7 @@ import { generateDownloadUrl } from "../config/s3.js";
 import * as kbRepository from "../modules/kb/kb.repository.js";
 import type { KbJobData, KbJobName } from "../queues/kb.queue.js";
 
-const AI_API_URL = process.env.AI_API_URL ?? "http://localhost:8000";
+const AI_API_URL = process.env.AI_API_URL ?? "http://localhost:5555";
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY ?? "";
 
 export const kbWorker = new Worker<KbJobData, void, KbJobName>(
