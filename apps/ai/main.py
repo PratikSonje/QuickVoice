@@ -17,6 +17,7 @@ from handlers.calllog_handler import build_call_log_payload, post_call_log
 from handlers.config_handler import get_config
 from handlers.livekit_handler import get_transcripts, recording_path as build_recording_path, start_recording
 from handlers.mcp_handler import build_mcp_tool_instructions, call_mcp_tool, parse_arguments_json
+from handlers.rag_handler import get_rag_context
 from handlers.worker_handler import (
     apply_metadata_overrides,
     build_call_context,
@@ -38,6 +39,26 @@ APP_DIR = Path(__file__).resolve().parent
 load_dotenv(APP_DIR / ".env")
 
 API_PORT = int(os.getenv("AI_API_PORT", "5555"))
+DEFAULT_SYSTEM_PROMPT = (
+    "You are a friendly, reliable voice assistant that answers questions, "
+    "explains topics, and completes tasks with available tools."
+)
+RAG_TOOL_INSTRUCTIONS = (
+    "\n\nKnowledge base search is available through search_knowledge_base. "
+    "When a user asks about company policies, uploaded documents, FAQs, "
+    "pricing, procedures, or any answer that may depend on the configured "
+    "knowledge base, call search_knowledge_base with the user's question "
+    "before answering. Use retrieved context as the source of truth, and say "
+    "when the knowledge base does not contain the answer."
+)
+
+
+def build_agent_instructions(config: dict) -> str:
+    instructions = config.get("system_prompt") or DEFAULT_SYSTEM_PROMPT
+    if config.get("use_rag"):
+        instructions += RAG_TOOL_INSTRUCTIONS
+    instructions += build_mcp_tool_instructions(config.get("mcp_connections") or [])
+    return instructions
 
 
 def run_combined_server() -> int:
@@ -96,6 +117,29 @@ class Assistant(Agent):
         super().__init__(instructions=system_prompt)
         self._config = config
         self._call_context = call_context
+
+    @function_tool
+    async def search_knowledge_base(self, query: str, top_k: int = 5) -> str:
+        """
+        Search the configured agent knowledge base for relevant context.
+
+        Args:
+            query: The user question or the topic to search for.
+            top_k: Maximum number of matching chunks to retrieve.
+        """
+        if not self._config.get("use_rag"):
+            return "Knowledge base search is disabled for this agent."
+
+        agent_id = self._call_context.get("agent_id") or self._config.get("agent_id")
+        if not agent_id:
+            return "Knowledge base search is unavailable because this call has no agent_id."
+
+        normalized_query = (query or "").strip()
+        if not normalized_query:
+            return "A search query is required."
+
+        context = await get_rag_context(str(agent_id), normalized_query, top_k=top_k)
+        return context or "No matching knowledge base context found."
 
     @function_tool
     async def call_mcp_tool(self, connection_id: str, tool_name: str, arguments_json: str = "{}") -> str:
@@ -165,10 +209,7 @@ async def entrypoint(ctx: JobContext):
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),
         preemptive_generation=config.get("preemptive_generation", True),
     )
-    system_prompt = config.get(
-            "system_prompt",
-            "You are a friendly, reliable voice assistant that answers questions, explains topics, and completes tasks with available tools.",
-        ) + build_mcp_tool_instructions(config.get("mcp_connections") or [])
+    system_prompt = build_agent_instructions(config)
     agent = Assistant(
         system_prompt=system_prompt,
         config=config,
