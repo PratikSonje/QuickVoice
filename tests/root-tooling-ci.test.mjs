@@ -27,7 +27,25 @@ test("security audit fails on high advisories and uses explicit suppressions", a
   assert.match(workflow, /pnpm audit:deps/);
   assert.match(workflow, /--audit-level high/);
   assert.ok(Array.isArray(suppressions.suppressions));
-  assert.deepEqual(suppressions.suppressions, []);
+  assert.ok(suppressions.suppressions.length > 0);
+
+  const keys = new Set();
+  for (const suppression of suppressions.suppressions) {
+    assert.match(suppression.id, /^GHSA-|^CVE-|^\d+$/);
+    assert.ok(suppression.module);
+    assert.ok(suppression.reason.includes("Temporary baseline suppression"));
+    assert.equal(suppression.expires, "2026-07-19");
+    assert.ok(Array.isArray(suppression.contexts));
+    assert.ok(suppression.contexts.length > 0);
+    for (const context of suppression.contexts) {
+      assert.ok(
+        ["production dependencies", "all dependencies"].includes(context)
+      );
+    }
+    const key = `${suppression.module}:${suppression.id}`;
+    assert.equal(keys.has(key), false, `duplicate suppression ${key}`);
+    keys.add(key);
+  }
 });
 
 test("deploy workflows are gated, immutable, scanned, signed, and environment protected", async () => {

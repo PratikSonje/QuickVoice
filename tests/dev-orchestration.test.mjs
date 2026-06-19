@@ -135,7 +135,7 @@ test("root package exposes aggregate CI and test scripts", async () => {
   const pkg = JSON.parse(await text("package.json"));
 
   assert.equal(pkg.scripts.test, "node --test tests/*.test.mjs && pnpm --filter server test");
-  assert.equal(pkg.scripts["ci:local"], "pnpm check:tasks && pnpm lint && pnpm check-types && pnpm build && pnpm test && pnpm ci:python && pnpm ci:docker");
+  assert.equal(pkg.scripts["ci:local"], "pnpm check:tasks && pnpm check:configs && pnpm lint && pnpm check-types && pnpm build && pnpm test && pnpm ci:python && pnpm ci:docker");
   assert.equal(pkg.scripts["check:tasks"], "node scripts/verify-turbo-tasks.mjs");
   assert.equal(pkg.scripts["audit:deps"], "node scripts/security-audit.mjs");
 });
