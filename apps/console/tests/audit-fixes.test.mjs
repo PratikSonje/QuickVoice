@@ -64,6 +64,19 @@ test("auth registration and password reset flows have complete UX handling", () 
   assert.ok(existsSync(join(root, "src/app/(auth)/reset-password/page.tsx")));
 });
 
+test("google oauth redirects back to the canonical console origin", () => {
+  const links = read("src/components/oauth-buttons.tsx") + read("src/lib/links.ts");
+  const dollar = String.fromCharCode(36);
+
+  assert.match(links, /NEXT_PUBLIC_CONSOLE_URL/);
+  assert.match(links, /export const CONSOLE_URL/);
+  assert.match(links, /CONSOLE_URL\s*\?\?/);
+  assert.match(links, /callbackOrigin/);
+  assert.ok(links.includes("callbackURL: `" + dollar + "{callbackOrigin}/dashboard`"));
+  assert.ok(links.includes("newUserCallbackURL: `" + dollar + "{callbackOrigin}/orgs`"));
+  assert.doesNotMatch(links, /callbackURL:\s*["'`]\/dashboard["'`]/);
+});
+
 test("agent creation, limits, and deletion are wired", () => {
   assert.match(read("src/components/agents/NewAgentDialog.tsx"), /templateId:\s*selectedTemplate/);
   assert.doesNotMatch(read("src/components/agents/NewAgentDialog.tsx"), /templateId:\s*null/);

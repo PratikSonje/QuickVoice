@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "@/src/lib/auth-client";
+import { CONSOLE_URL } from "@/src/lib/links";
 import { Button } from "@/src/components/ui/button";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -16,14 +17,14 @@ export default function OAuthButtons() {
         onClick={async () => {
           setGoogleLoading(true);
 
-          const origin = window.location.origin;
+          const callbackOrigin = CONSOLE_URL ?? window.location.origin;
 
           try {
             await signIn.social({
               provider: "google",
-              callbackURL: `${origin}/dashboard`,
-              errorCallbackURL: `${origin}/login`,
-              newUserCallbackURL: `${origin}/orgs`,
+              callbackURL: `${callbackOrigin}/dashboard`,
+              errorCallbackURL: `${callbackOrigin}/login`,
+              newUserCallbackURL: `${callbackOrigin}/orgs`,
             });
           } catch {
             setGoogleLoading(false);

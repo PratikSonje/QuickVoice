@@ -4,6 +4,11 @@ export const SERVER_URL = trimTrailingSlashes(
   process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:5000",
 );
 
+export const CONSOLE_URL =
+  process.env.NEXT_PUBLIC_CONSOLE_URL === undefined
+    ? undefined
+    : trimTrailingSlashes(process.env.NEXT_PUBLIC_CONSOLE_URL);
+
 export const LANDING_URL =
   process.env.NEXT_PUBLIC_LANDING_URL === undefined
     ? "/"
