@@ -1,7 +1,74 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { importBatchCampaignRecipients } from "../../src/modules/outbound/outbound-batch.service.js";
+import {
+  createBatchCampaign,
+  dispatchBatchCampaign,
+  importBatchCampaignRecipients,
+} from "../../src/modules/outbound/outbound-batch.service.js";
+
+test("createBatchCampaign queues the import job with a BullMQ-safe custom id", async () => {
+  const calls: unknown[] = [];
+  const campaign = {
+    campaignId: "campaign_123",
+    organizationId: "org_123",
+    userId: "user_123",
+    name: "June renewals",
+    agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+    fromNumber: "+15551230000",
+    scheduledAt: null,
+    sourceFileKey: "outbound-batches/org_123/file.csv",
+    sourceFileName: "file.csv",
+    ringingTimeoutSeconds: 45,
+    timezone: "UTC",
+    status: "SCHEDULED",
+  };
+  const repo = {
+    getDialableNumber: async () => ({
+      number: "+15551230000",
+      provider: "TWILIO",
+      sid: "PN123",
+    }),
+    createBatchCampaign: async (input: unknown) => {
+      calls.push(["createCampaign", input]);
+      return campaign;
+    },
+  };
+  const queue = {
+    add: async (...args: unknown[]) => {
+      calls.push(["queue", ...args]);
+    },
+  };
+
+  const result = await createBatchCampaign(
+    {
+      organizationId: "org_123",
+      userId: "user_123",
+      name: "June renewals",
+      agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+      fromNumber: "+15551230000",
+      sourceFileKey: "outbound-batches/org_123/file.csv",
+      sourceFileName: "file.csv",
+      scheduledAt: null,
+      timezone: "UTC",
+      ringingTimeoutSeconds: 45,
+    },
+    { repository: repo, queue }
+  );
+
+  assert.equal(result, campaign);
+  const queued = calls.find((call) => (call as unknown[])[0] === "queue") as unknown[];
+  assert.deepEqual(queued, [
+    "queue",
+    "import",
+    { campaignId: "campaign_123" },
+    {
+      jobId: "outbound-batch-import-campaign_123",
+      removeOnComplete: 100,
+      removeOnFail: 200,
+    },
+  ]);
+});
 
 test("importBatchCampaignRecipients persists valid and invalid file rows and schedules dispatch", async () => {
   const calls: unknown[] = [];
@@ -99,9 +166,63 @@ test("importBatchCampaignRecipients persists valid and invalid file rows and sch
     { campaignId: "campaign_123" },
     {
       delay: 300000,
-      jobId: "outbound-batch-dispatch:campaign_123",
+      jobId: "outbound-batch-dispatch-campaign_123",
       removeOnComplete: 100,
       removeOnFail: 200,
     },
+  ]);
+});
+
+test("dispatchBatchCampaign queues dispatch-call jobs with BullMQ-safe custom ids", async () => {
+  const calls: unknown[] = [];
+  const repo = {
+    getCampaignForDispatch: async (campaignId: string) => {
+      calls.push(["loadCampaign", campaignId]);
+      return { campaignId };
+    },
+    listScheduledOutboundIdsForCampaign: async (campaignId: string) => {
+      calls.push(["listOutboundIds", campaignId]);
+      return ["outbound_123", "outbound_456"];
+    },
+    markCampaignActive: async (campaignId: string) => {
+      calls.push(["markActive", campaignId]);
+    },
+    markCampaignCompleted: async (campaignId: string) => {
+      calls.push(["markCompleted", campaignId]);
+    },
+  };
+  const queue = {
+    add: async (...args: unknown[]) => {
+      calls.push(["queue", ...args]);
+    },
+  };
+
+  await dispatchBatchCampaign(
+    { campaignId: "campaign_123" },
+    { repository: repo, queue }
+  );
+
+  const queueCalls = calls.filter((call) => (call as unknown[])[0] === "queue");
+  assert.deepEqual(queueCalls, [
+    [
+      "queue",
+      "dispatch-call",
+      { outboundId: "outbound_123" },
+      {
+        jobId: "outbound-call-dispatch-outbound_123",
+        removeOnComplete: 100,
+        removeOnFail: 200,
+      },
+    ],
+    [
+      "queue",
+      "dispatch-call",
+      { outboundId: "outbound_456" },
+      {
+        jobId: "outbound-call-dispatch-outbound_456",
+        removeOnComplete: 100,
+        removeOnFail: 200,
+      },
+    ],
   ]);
 });

@@ -116,7 +116,7 @@ export async function createBatchCampaign(
     "import",
     { campaignId: campaign.campaignId },
     {
-      jobId: `outbound-batch-import:${campaign.campaignId}`,
+      jobId: `outbound-batch-import-${campaign.campaignId}`,
       removeOnComplete: 100,
       removeOnFail: 200,
     }
@@ -215,7 +215,7 @@ export async function importBatchCampaignRecipients(
     { campaignId: campaign.campaignId },
     {
       delay: dispatchDelay(campaign.scheduledAt, now()),
-      jobId: `outbound-batch-dispatch:${campaign.campaignId}`,
+      jobId: `outbound-batch-dispatch-${campaign.campaignId}`,
       removeOnComplete: 100,
       removeOnFail: 200,
     }
@@ -246,7 +246,7 @@ export async function dispatchBatchCampaign(
         "dispatch-call",
         { outboundId },
         {
-          jobId: `outbound-call-dispatch:${outboundId}`,
+          jobId: `outbound-call-dispatch-${outboundId}`,
           removeOnComplete: 100,
           removeOnFail: 200,
         }
