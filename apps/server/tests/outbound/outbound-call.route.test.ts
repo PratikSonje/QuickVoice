@@ -7,6 +7,8 @@ import type { Server } from "node:http";
 let server: Server;
 let baseUrl: string;
 let serviceArgs: unknown[] = [];
+let batchArgs: unknown[] = [];
+let uploadUrlArgs: unknown[] = [];
 
 before(async () => {
   process.env.STRIPE_SECRET_KEY ||= "sk_test_placeholder";
@@ -35,6 +37,21 @@ before(async () => {
         return {
           outbound: { outboundId: "2b1f6d53-42f5-4cc7-9689-7b6f51a0c113", status: "IN_PROGRESS" },
           livekitParticipant: { participantId: "sip-participant-123" },
+        };
+      },
+      createBatchCampaign: async (args) => {
+        batchArgs.push(args);
+        return {
+          campaignId: "campaign_123",
+          status: "SCHEDULED",
+          name: args.name,
+        };
+      },
+      createBatchUploadUrl: async (args) => {
+        uploadUrlArgs.push(args);
+        return {
+          uploadUrl: "https://s3.example.test/upload",
+          s3Key: "outbound-batches/org_123/recipients.csv",
         };
       },
     })
@@ -79,5 +96,57 @@ test("POST /quick validates and dispatches a quick outbound call", async () => {
     phoneNumber: "+15550001111",
     fromNumber: "+15551230000",
     username: "Ada",
+  });
+});
+
+test("GET /batch-upload-url returns a presigned outbound batch upload target", async () => {
+  uploadUrlArgs = [];
+  const response = await fetch(
+    `${baseUrl}/api/v1/outbound-calls/batch-upload-url?fileName=recipients.csv&contentType=text/csv`
+  );
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.success, true);
+  assert.equal(body.data.uploadUrl, "https://s3.example.test/upload");
+  assert.deepEqual(uploadUrlArgs[0], {
+    organizationId: "org_123",
+    fileName: "recipients.csv",
+    contentType: "text/csv",
+  });
+});
+
+test("POST /batches validates and creates a scheduled batch campaign", async () => {
+  batchArgs = [];
+  const response = await fetch(`${baseUrl}/api/v1/outbound-calls/batches`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: "June renewals",
+      agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+      fromNumber: "+15551230000",
+      sourceFileKey: "outbound-batches/org_123/recipients.csv",
+      sourceFileName: "recipients.csv",
+      scheduledAt: "2026-06-21T10:05:00.000Z",
+      timezone: "UTC",
+      ringingTimeoutSeconds: 45,
+    }),
+  });
+
+  assert.equal(response.status, 201);
+  const body = await response.json();
+  assert.equal(body.success, true);
+  assert.equal(body.data.campaignId, "campaign_123");
+  assert.deepEqual(batchArgs[0], {
+    organizationId: "org_123",
+    userId: "user_123",
+    name: "June renewals",
+    agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+    fromNumber: "+15551230000",
+    sourceFileKey: "outbound-batches/org_123/recipients.csv",
+    sourceFileName: "recipients.csv",
+    scheduledAt: new Date("2026-06-21T10:05:00.000Z"),
+    timezone: "UTC",
+    ringingTimeoutSeconds: 45,
   });
 });

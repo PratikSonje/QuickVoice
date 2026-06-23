@@ -20,8 +20,24 @@ export type CampaignModel = runtime.Types.Result.DefaultSelection<Prisma.$Campai
 
 export type AggregateCampaign = {
   _count: CampaignCountAggregateOutputType | null
+  _avg: CampaignAvgAggregateOutputType | null
+  _sum: CampaignSumAggregateOutputType | null
   _min: CampaignMinAggregateOutputType | null
   _max: CampaignMaxAggregateOutputType | null
+}
+
+export type CampaignAvgAggregateOutputType = {
+  totalRecipients: number | null
+  validRecipients: number | null
+  invalidRecipients: number | null
+  ringingTimeoutSeconds: number | null
+}
+
+export type CampaignSumAggregateOutputType = {
+  totalRecipients: number | null
+  validRecipients: number | null
+  invalidRecipients: number | null
+  ringingTimeoutSeconds: number | null
 }
 
 export type CampaignMinAggregateOutputType = {
@@ -33,7 +49,16 @@ export type CampaignMinAggregateOutputType = {
   agentId: string | null
   fromNumber: string | null
   scheduledAt: Date | null
+  sourceFileKey: string | null
+  sourceFileName: string | null
+  totalRecipients: number | null
+  validRecipients: number | null
+  invalidRecipients: number | null
+  ringingTimeoutSeconds: number | null
+  timezone: string | null
   status: $Enums.CampaignStatus | null
+  startedAt: Date | null
+  completedAt: Date | null
   userId: string | null
 }
 
@@ -46,7 +71,16 @@ export type CampaignMaxAggregateOutputType = {
   agentId: string | null
   fromNumber: string | null
   scheduledAt: Date | null
+  sourceFileKey: string | null
+  sourceFileName: string | null
+  totalRecipients: number | null
+  validRecipients: number | null
+  invalidRecipients: number | null
+  ringingTimeoutSeconds: number | null
+  timezone: string | null
   status: $Enums.CampaignStatus | null
+  startedAt: Date | null
+  completedAt: Date | null
   userId: string | null
 }
 
@@ -59,11 +93,34 @@ export type CampaignCountAggregateOutputType = {
   agentId: number
   fromNumber: number
   scheduledAt: number
+  sourceFileKey: number
+  sourceFileName: number
+  totalRecipients: number
+  validRecipients: number
+  invalidRecipients: number
+  ringingTimeoutSeconds: number
+  timezone: number
   status: number
+  startedAt: number
+  completedAt: number
   userId: number
   _all: number
 }
 
+
+export type CampaignAvgAggregateInputType = {
+  totalRecipients?: true
+  validRecipients?: true
+  invalidRecipients?: true
+  ringingTimeoutSeconds?: true
+}
+
+export type CampaignSumAggregateInputType = {
+  totalRecipients?: true
+  validRecipients?: true
+  invalidRecipients?: true
+  ringingTimeoutSeconds?: true
+}
 
 export type CampaignMinAggregateInputType = {
   campaignId?: true
@@ -74,7 +131,16 @@ export type CampaignMinAggregateInputType = {
   agentId?: true
   fromNumber?: true
   scheduledAt?: true
+  sourceFileKey?: true
+  sourceFileName?: true
+  totalRecipients?: true
+  validRecipients?: true
+  invalidRecipients?: true
+  ringingTimeoutSeconds?: true
+  timezone?: true
   status?: true
+  startedAt?: true
+  completedAt?: true
   userId?: true
 }
 
@@ -87,7 +153,16 @@ export type CampaignMaxAggregateInputType = {
   agentId?: true
   fromNumber?: true
   scheduledAt?: true
+  sourceFileKey?: true
+  sourceFileName?: true
+  totalRecipients?: true
+  validRecipients?: true
+  invalidRecipients?: true
+  ringingTimeoutSeconds?: true
+  timezone?: true
   status?: true
+  startedAt?: true
+  completedAt?: true
   userId?: true
 }
 
@@ -100,7 +175,16 @@ export type CampaignCountAggregateInputType = {
   agentId?: true
   fromNumber?: true
   scheduledAt?: true
+  sourceFileKey?: true
+  sourceFileName?: true
+  totalRecipients?: true
+  validRecipients?: true
+  invalidRecipients?: true
+  ringingTimeoutSeconds?: true
+  timezone?: true
   status?: true
+  startedAt?: true
+  completedAt?: true
   userId?: true
   _all?: true
 }
@@ -143,6 +227,18 @@ export type CampaignAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: CampaignAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: CampaignSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: CampaignMinAggregateInputType
@@ -173,6 +269,8 @@ export type CampaignGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: CampaignCountAggregateInputType | true
+  _avg?: CampaignAvgAggregateInputType
+  _sum?: CampaignSumAggregateInputType
   _min?: CampaignMinAggregateInputType
   _max?: CampaignMaxAggregateInputType
 }
@@ -186,9 +284,20 @@ export type CampaignGroupByOutputType = {
   agentId: string | null
   fromNumber: string
   scheduledAt: Date | null
+  sourceFileKey: string | null
+  sourceFileName: string | null
+  totalRecipients: number
+  validRecipients: number
+  invalidRecipients: number
+  ringingTimeoutSeconds: number
+  timezone: string
   status: $Enums.CampaignStatus
+  startedAt: Date | null
+  completedAt: Date | null
   userId: string | null
   _count: CampaignCountAggregateOutputType | null
+  _avg: CampaignAvgAggregateOutputType | null
+  _sum: CampaignSumAggregateOutputType | null
   _min: CampaignMinAggregateOutputType | null
   _max: CampaignMaxAggregateOutputType | null
 }
@@ -220,7 +329,16 @@ export type CampaignWhereInput = {
   agentId?: Prisma.StringNullableFilter<"Campaign"> | string | null
   fromNumber?: Prisma.StringFilter<"Campaign"> | string
   scheduledAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  sourceFileKey?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  sourceFileName?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  totalRecipients?: Prisma.IntFilter<"Campaign"> | number
+  validRecipients?: Prisma.IntFilter<"Campaign"> | number
+  invalidRecipients?: Prisma.IntFilter<"Campaign"> | number
+  ringingTimeoutSeconds?: Prisma.IntFilter<"Campaign"> | number
+  timezone?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  startedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
   userId?: Prisma.StringNullableFilter<"Campaign"> | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
@@ -237,7 +355,16 @@ export type CampaignOrderByWithRelationInput = {
   agentId?: Prisma.SortOrderInput | Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceFileKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceFileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   agent?: Prisma.AgentOrderByWithRelationInput
@@ -257,7 +384,16 @@ export type CampaignWhereUniqueInput = Prisma.AtLeast<{
   agentId?: Prisma.StringNullableFilter<"Campaign"> | string | null
   fromNumber?: Prisma.StringFilter<"Campaign"> | string
   scheduledAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  sourceFileKey?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  sourceFileName?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  totalRecipients?: Prisma.IntFilter<"Campaign"> | number
+  validRecipients?: Prisma.IntFilter<"Campaign"> | number
+  invalidRecipients?: Prisma.IntFilter<"Campaign"> | number
+  ringingTimeoutSeconds?: Prisma.IntFilter<"Campaign"> | number
+  timezone?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  startedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
   userId?: Prisma.StringNullableFilter<"Campaign"> | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
@@ -274,11 +410,22 @@ export type CampaignOrderByWithAggregationInput = {
   agentId?: Prisma.SortOrderInput | Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceFileKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceFileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CampaignCountOrderByAggregateInput
+  _avg?: Prisma.CampaignAvgOrderByAggregateInput
   _max?: Prisma.CampaignMaxOrderByAggregateInput
   _min?: Prisma.CampaignMinOrderByAggregateInput
+  _sum?: Prisma.CampaignSumOrderByAggregateInput
 }
 
 export type CampaignScalarWhereWithAggregatesInput = {
@@ -293,7 +440,16 @@ export type CampaignScalarWhereWithAggregatesInput = {
   agentId?: Prisma.StringNullableWithAggregatesFilter<"Campaign"> | string | null
   fromNumber?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   scheduledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
+  sourceFileKey?: Prisma.StringNullableWithAggregatesFilter<"Campaign"> | string | null
+  sourceFileName?: Prisma.StringNullableWithAggregatesFilter<"Campaign"> | string | null
+  totalRecipients?: Prisma.IntWithAggregatesFilter<"Campaign"> | number
+  validRecipients?: Prisma.IntWithAggregatesFilter<"Campaign"> | number
+  invalidRecipients?: Prisma.IntWithAggregatesFilter<"Campaign"> | number
+  ringingTimeoutSeconds?: Prisma.IntWithAggregatesFilter<"Campaign"> | number
+  timezone?: Prisma.StringWithAggregatesFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusWithAggregatesFilter<"Campaign"> | $Enums.CampaignStatus
+  startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
   userId?: Prisma.StringNullableWithAggregatesFilter<"Campaign"> | string | null
 }
 
@@ -304,7 +460,16 @@ export type CampaignCreateInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutCampaignsInput
   agent?: Prisma.AgentCreateNestedOneWithoutCampaignsInput
   user?: Prisma.UserCreateNestedOneWithoutCampaignsInput
@@ -320,7 +485,16 @@ export type CampaignUncheckedCreateInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutCampaignInput
 }
@@ -332,7 +506,16 @@ export type CampaignUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCampaignsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutCampaignsNestedInput
   user?: Prisma.UserUpdateOneWithoutCampaignsNestedInput
@@ -348,7 +531,16 @@ export type CampaignUncheckedUpdateInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutCampaignNestedInput
 }
@@ -362,7 +554,16 @@ export type CampaignCreateManyInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
 }
 
@@ -373,7 +574,16 @@ export type CampaignUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CampaignUncheckedUpdateManyInput = {
@@ -385,7 +595,16 @@ export type CampaignUncheckedUpdateManyInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -413,8 +632,24 @@ export type CampaignCountOrderByAggregateInput = {
   agentId?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  sourceFileKey?: Prisma.SortOrder
+  sourceFileName?: Prisma.SortOrder
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+}
+
+export type CampaignAvgOrderByAggregateInput = {
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
 }
 
 export type CampaignMaxOrderByAggregateInput = {
@@ -426,7 +661,16 @@ export type CampaignMaxOrderByAggregateInput = {
   agentId?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  sourceFileKey?: Prisma.SortOrder
+  sourceFileName?: Prisma.SortOrder
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -439,8 +683,24 @@ export type CampaignMinOrderByAggregateInput = {
   agentId?: Prisma.SortOrder
   fromNumber?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
+  sourceFileKey?: Prisma.SortOrder
+  sourceFileName?: Prisma.SortOrder
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
+  timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+}
+
+export type CampaignSumOrderByAggregateInput = {
+  totalRecipients?: Prisma.SortOrder
+  validRecipients?: Prisma.SortOrder
+  invalidRecipients?: Prisma.SortOrder
+  ringingTimeoutSeconds?: Prisma.SortOrder
 }
 
 export type CampaignCreateNestedManyWithoutUserInput = {
@@ -596,7 +856,16 @@ export type CampaignCreateWithoutUserInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutCampaignsInput
   agent?: Prisma.AgentCreateNestedOneWithoutCampaignsInput
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutCampaignInput
@@ -611,7 +880,16 @@ export type CampaignUncheckedCreateWithoutUserInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutCampaignInput
 }
 
@@ -653,7 +931,16 @@ export type CampaignScalarWhereInput = {
   agentId?: Prisma.StringNullableFilter<"Campaign"> | string | null
   fromNumber?: Prisma.StringFilter<"Campaign"> | string
   scheduledAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  sourceFileKey?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  sourceFileName?: Prisma.StringNullableFilter<"Campaign"> | string | null
+  totalRecipients?: Prisma.IntFilter<"Campaign"> | number
+  validRecipients?: Prisma.IntFilter<"Campaign"> | number
+  invalidRecipients?: Prisma.IntFilter<"Campaign"> | number
+  ringingTimeoutSeconds?: Prisma.IntFilter<"Campaign"> | number
+  timezone?: Prisma.StringFilter<"Campaign"> | string
   status?: Prisma.EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
+  startedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Campaign"> | Date | string | null
   userId?: Prisma.StringNullableFilter<"Campaign"> | string | null
 }
 
@@ -664,7 +951,16 @@ export type CampaignCreateWithoutOrganizationInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   agent?: Prisma.AgentCreateNestedOneWithoutCampaignsInput
   user?: Prisma.UserCreateNestedOneWithoutCampaignsInput
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutCampaignInput
@@ -678,7 +974,16 @@ export type CampaignUncheckedCreateWithoutOrganizationInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutCampaignInput
 }
@@ -716,7 +1021,16 @@ export type CampaignCreateWithoutAgentInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutCampaignsInput
   user?: Prisma.UserCreateNestedOneWithoutCampaignsInput
   outboundCalls?: Prisma.OutboundCallCreateNestedManyWithoutCampaignInput
@@ -730,7 +1044,16 @@ export type CampaignUncheckedCreateWithoutAgentInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
   outboundCalls?: Prisma.OutboundCallUncheckedCreateNestedManyWithoutCampaignInput
 }
@@ -768,7 +1091,16 @@ export type CampaignCreateWithoutOutboundCallsInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutCampaignsInput
   agent?: Prisma.AgentCreateNestedOneWithoutCampaignsInput
   user?: Prisma.UserCreateNestedOneWithoutCampaignsInput
@@ -783,7 +1115,16 @@ export type CampaignUncheckedCreateWithoutOutboundCallsInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
 }
 
@@ -810,7 +1151,16 @@ export type CampaignUpdateWithoutOutboundCallsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCampaignsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutCampaignsNestedInput
   user?: Prisma.UserUpdateOneWithoutCampaignsNestedInput
@@ -825,7 +1175,16 @@ export type CampaignUncheckedUpdateWithoutOutboundCallsInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -838,7 +1197,16 @@ export type CampaignCreateManyUserInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type CampaignUpdateWithoutUserInput = {
@@ -848,7 +1216,16 @@ export type CampaignUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCampaignsNestedInput
   agent?: Prisma.AgentUpdateOneWithoutCampaignsNestedInput
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutCampaignNestedInput
@@ -863,7 +1240,16 @@ export type CampaignUncheckedUpdateWithoutUserInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutCampaignNestedInput
 }
 
@@ -876,7 +1262,16 @@ export type CampaignUncheckedUpdateManyWithoutUserInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CampaignCreateManyOrganizationInput = {
@@ -887,7 +1282,16 @@ export type CampaignCreateManyOrganizationInput = {
   agentId?: string | null
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
 }
 
@@ -898,7 +1302,16 @@ export type CampaignUpdateWithoutOrganizationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   agent?: Prisma.AgentUpdateOneWithoutCampaignsNestedInput
   user?: Prisma.UserUpdateOneWithoutCampaignsNestedInput
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutCampaignNestedInput
@@ -912,7 +1325,16 @@ export type CampaignUncheckedUpdateWithoutOrganizationInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutCampaignNestedInput
 }
@@ -925,7 +1347,16 @@ export type CampaignUncheckedUpdateManyWithoutOrganizationInput = {
   agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -937,7 +1368,16 @@ export type CampaignCreateManyAgentInput = {
   updatedAt?: Date | string
   fromNumber: string
   scheduledAt?: Date | string | null
+  sourceFileKey?: string | null
+  sourceFileName?: string | null
+  totalRecipients?: number
+  validRecipients?: number
+  invalidRecipients?: number
+  ringingTimeoutSeconds?: number
+  timezone?: string
   status: $Enums.CampaignStatus
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
   userId?: string | null
 }
 
@@ -948,7 +1388,16 @@ export type CampaignUpdateWithoutAgentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutCampaignsNestedInput
   user?: Prisma.UserUpdateOneWithoutCampaignsNestedInput
   outboundCalls?: Prisma.OutboundCallUpdateManyWithoutCampaignNestedInput
@@ -962,7 +1411,16 @@ export type CampaignUncheckedUpdateWithoutAgentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   outboundCalls?: Prisma.OutboundCallUncheckedUpdateManyWithoutCampaignNestedInput
 }
@@ -975,7 +1433,16 @@ export type CampaignUncheckedUpdateManyWithoutAgentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fromNumber?: Prisma.StringFieldUpdateOperationsInput | string
   scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceFileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceFileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  validRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  invalidRecipients?: Prisma.IntFieldUpdateOperationsInput | number
+  ringingTimeoutSeconds?: Prisma.IntFieldUpdateOperationsInput | number
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1019,7 +1486,16 @@ export type CampaignSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   agentId?: boolean
   fromNumber?: boolean
   scheduledAt?: boolean
+  sourceFileKey?: boolean
+  sourceFileName?: boolean
+  totalRecipients?: boolean
+  validRecipients?: boolean
+  invalidRecipients?: boolean
+  ringingTimeoutSeconds?: boolean
+  timezone?: boolean
   status?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   userId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.Campaign$agentArgs<ExtArgs>
@@ -1037,7 +1513,16 @@ export type CampaignSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   agentId?: boolean
   fromNumber?: boolean
   scheduledAt?: boolean
+  sourceFileKey?: boolean
+  sourceFileName?: boolean
+  totalRecipients?: boolean
+  validRecipients?: boolean
+  invalidRecipients?: boolean
+  ringingTimeoutSeconds?: boolean
+  timezone?: boolean
   status?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   userId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.Campaign$agentArgs<ExtArgs>
@@ -1053,7 +1538,16 @@ export type CampaignSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   agentId?: boolean
   fromNumber?: boolean
   scheduledAt?: boolean
+  sourceFileKey?: boolean
+  sourceFileName?: boolean
+  totalRecipients?: boolean
+  validRecipients?: boolean
+  invalidRecipients?: boolean
+  ringingTimeoutSeconds?: boolean
+  timezone?: boolean
   status?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   userId?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.Campaign$agentArgs<ExtArgs>
@@ -1069,11 +1563,20 @@ export type CampaignSelectScalar = {
   agentId?: boolean
   fromNumber?: boolean
   scheduledAt?: boolean
+  sourceFileKey?: boolean
+  sourceFileName?: boolean
+  totalRecipients?: boolean
+  validRecipients?: boolean
+  invalidRecipients?: boolean
+  ringingTimeoutSeconds?: boolean
+  timezone?: boolean
   status?: boolean
+  startedAt?: boolean
+  completedAt?: boolean
   userId?: boolean
 }
 
-export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"campaignId" | "organizationId" | "name" | "createdAt" | "updatedAt" | "agentId" | "fromNumber" | "scheduledAt" | "status" | "userId", ExtArgs["result"]["campaign"]>
+export type CampaignOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"campaignId" | "organizationId" | "name" | "createdAt" | "updatedAt" | "agentId" | "fromNumber" | "scheduledAt" | "sourceFileKey" | "sourceFileName" | "totalRecipients" | "validRecipients" | "invalidRecipients" | "ringingTimeoutSeconds" | "timezone" | "status" | "startedAt" | "completedAt" | "userId", ExtArgs["result"]["campaign"]>
 export type CampaignInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   agent?: boolean | Prisma.Campaign$agentArgs<ExtArgs>
@@ -1109,7 +1612,16 @@ export type $CampaignPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     agentId: string | null
     fromNumber: string
     scheduledAt: Date | null
+    sourceFileKey: string | null
+    sourceFileName: string | null
+    totalRecipients: number
+    validRecipients: number
+    invalidRecipients: number
+    ringingTimeoutSeconds: number
+    timezone: string
     status: $Enums.CampaignStatus
+    startedAt: Date | null
+    completedAt: Date | null
     userId: string | null
   }, ExtArgs["result"]["campaign"]>
   composites: {}
@@ -1546,7 +2058,16 @@ export interface CampaignFieldRefs {
   readonly agentId: Prisma.FieldRef<"Campaign", 'String'>
   readonly fromNumber: Prisma.FieldRef<"Campaign", 'String'>
   readonly scheduledAt: Prisma.FieldRef<"Campaign", 'DateTime'>
+  readonly sourceFileKey: Prisma.FieldRef<"Campaign", 'String'>
+  readonly sourceFileName: Prisma.FieldRef<"Campaign", 'String'>
+  readonly totalRecipients: Prisma.FieldRef<"Campaign", 'Int'>
+  readonly validRecipients: Prisma.FieldRef<"Campaign", 'Int'>
+  readonly invalidRecipients: Prisma.FieldRef<"Campaign", 'Int'>
+  readonly ringingTimeoutSeconds: Prisma.FieldRef<"Campaign", 'Int'>
+  readonly timezone: Prisma.FieldRef<"Campaign", 'String'>
   readonly status: Prisma.FieldRef<"Campaign", 'CampaignStatus'>
+  readonly startedAt: Prisma.FieldRef<"Campaign", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"Campaign", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Campaign", 'String'>
 }
     

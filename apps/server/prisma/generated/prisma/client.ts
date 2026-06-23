@@ -161,3 +161,8 @@ export type McpToolExecutionLog = Prisma.McpToolExecutionLogModel
  * 
  */
 export type Secret = Prisma.SecretModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
