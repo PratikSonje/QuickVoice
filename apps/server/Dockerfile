@@ -55,6 +55,7 @@ RUN rm -rf \
     /usr/local/bin/yarnpkg \
     /usr/local/lib/node_modules/corepack \
     /usr/local/lib/node_modules/npm
+RUN chown -R server:nodejs /app/node_modules
 
 WORKDIR /app/apps/server
 COPY --from=build --chown=server:nodejs /app/apps/server/dist ./dist

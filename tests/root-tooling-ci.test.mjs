@@ -109,6 +109,14 @@ test("server runtime image installs only production server dependencies", async 
   );
 });
 
+test("server runtime image lets the non-root user run Prisma migrations", async () => {
+  const dockerfile = await text("apps/server/Dockerfile");
+
+  assert.match(dockerfile, /chown -R server:nodejs \/app\/node_modules/);
+  assert.match(dockerfile, /USER server/);
+  assert.match(dockerfile, /prisma migrate deploy/);
+});
+
 test("Dependabot covers npm, GitHub Actions, Dockerfiles, and AI Python requirements", async () => {
   const dependabot = await text(".github/dependabot.yml");
 
