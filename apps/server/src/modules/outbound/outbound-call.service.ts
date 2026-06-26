@@ -189,38 +189,39 @@ export async function dispatchScheduledOutboundCall(
   if (!outbound) {
     throw new BadRequestError("Outbound call not found or is not scheduled");
   }
-  if (!outbound.agentId) {
-    throw new BadRequestError("Outbound call is not linked to an agent");
-  }
-
-  await enforcePlanQuota(repository, outbound.organizationId);
-
-  const dialableNumber = await repository.getDialableNumber({
-    organizationId: outbound.organizationId,
-    agentId: outbound.agentId,
-    fromNumber: outbound.fromNumber,
-  });
-
-  if (!dialableNumber) {
-    throw new BadRequestError(
-      "From number must belong to this organization and be linked to the selected agent"
-    );
-  }
-
-  const provider = dialableNumber.provider;
-  const sid = dialableNumber.sid;
-  const trunkId = outboundTrunks[provider];
-  if (!trunkId) {
-    throw new BadRequestError(`LiveKit outbound trunk is not configured for ${provider}`);
-  }
-
-  const optionalData = asRecord(outbound.optionalData);
-  const language = stringValue(optionalData.language);
-  const voiceId = stringValue(optionalData.voiceId) ?? stringValue(optionalData.voice_id);
-  const dynamicVariables = asRecord(optionalData.dynamicVariables ?? optionalData.dynamic_variables);
-  const ringingTimeoutSeconds = numberValue(optionalData.ringingTimeoutSeconds);
 
   try {
+    if (!outbound.agentId) {
+      throw new BadRequestError("Outbound call is not linked to an agent");
+    }
+
+    await enforcePlanQuota(repository, outbound.organizationId);
+
+    const dialableNumber = await repository.getDialableNumber({
+      organizationId: outbound.organizationId,
+      agentId: outbound.agentId,
+      fromNumber: outbound.fromNumber,
+    });
+
+    if (!dialableNumber) {
+      throw new BadRequestError(
+        "From number must belong to this organization and be linked to the selected agent"
+      );
+    }
+
+    const provider = dialableNumber.provider;
+    const sid = dialableNumber.sid;
+    const trunkId = outboundTrunks[provider];
+    if (!trunkId) {
+      throw new BadRequestError(`LiveKit outbound trunk is not configured for ${provider}`);
+    }
+
+    const optionalData = asRecord(outbound.optionalData);
+    const language = stringValue(optionalData.language);
+    const voiceId = stringValue(optionalData.voiceId) ?? stringValue(optionalData.voice_id);
+    const dynamicVariables = asRecord(optionalData.dynamicVariables ?? optionalData.dynamic_variables);
+    const ringingTimeoutSeconds = numberValue(optionalData.ringingTimeoutSeconds);
+
     const roomName = `outbound_${outbound.outboundId}`;
     const metadata = {
       agent_id: outbound.agentId,
@@ -277,8 +278,8 @@ export async function dispatchScheduledOutboundCall(
   }
 }
 
-async function enforcePlanQuota(
-  repository: QuickOutboundCallRepository,
+export async function enforcePlanQuota(
+  repository: Pick<QuickOutboundCallRepository, "getMonthlyUsage">,
   organizationId: string
 ) {
   const usage = await repository.getMonthlyUsage?.(organizationId);

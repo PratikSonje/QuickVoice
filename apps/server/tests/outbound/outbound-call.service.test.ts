@@ -400,3 +400,70 @@ test("dispatchScheduledOutboundCall dispatches an existing campaign row with bat
 
   assert.equal(calls.some((call) => (call as unknown[])[0] === "failed"), false);
 });
+
+test("dispatchScheduledOutboundCall marks an existing campaign row failed when quota is exhausted", async () => {
+  const calls: unknown[] = [];
+  const repo = {
+    getMonthlyUsage: async () => ({
+      plan: "free",
+      includedMinutes: 15,
+      usedSeconds: 15 * 60,
+    }),
+    getOutboundCallForDispatch: async (outboundId: string) => {
+      calls.push(["load", outboundId]);
+      return {
+        outboundId,
+        organizationId: "org_123",
+        userId: "user_123",
+        agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+        campaignId: "campaign_123",
+        phoneNumber: "+15550001111",
+        fromNumber: "+15551230000",
+        firstMessage: "Hi.",
+        systemPrompt: "Prompt.",
+        optionalData: {
+          rowNumber: 2,
+          sourceFileName: "recipients.csv",
+        },
+      };
+    },
+    getDialableNumber: async () => {
+      calls.push(["dialable"]);
+      return {
+        number: "+15551230000",
+        sid: "carrier-sid-123",
+        provider: "TWILIO",
+      };
+    },
+    createQuickCall: async () => {
+      throw new Error("should not create a second outbound call");
+    },
+    markInProgress: async () => {
+      throw new Error("should not mark progress");
+    },
+    markFailed: async (outboundId: string, reason: string) => {
+      calls.push(["failed", outboundId, reason]);
+      return { outboundId, status: "FAILED" };
+    },
+  };
+
+  await assert.rejects(
+    dispatchScheduledOutboundCall("2b1f6d53-42f5-4cc7-9689-7b6f51a0c113", {
+      repository: repo,
+      sipClient: { createSipParticipant: async () => ({}) },
+      dispatchClient: { createDispatch: async () => ({}) },
+      outboundTrunks: { TWILIO: "twilio-trunk", TELNYX: "telnyx-trunk" },
+      agentName: "QuickVoice",
+    }),
+    /Plan minutes exhausted/
+  );
+
+  assert.deepEqual(calls, [
+    ["load", "2b1f6d53-42f5-4cc7-9689-7b6f51a0c113"],
+    [
+      "failed",
+      "2b1f6d53-42f5-4cc7-9689-7b6f51a0c113",
+      "Plan minutes exhausted for the current billing period",
+    ],
+  ]);
+});

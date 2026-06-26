@@ -24,6 +24,11 @@ test("createBatchCampaign queues the import job with a BullMQ-safe custom id", a
     status: "SCHEDULED",
   };
   const repo = {
+    getMonthlyUsage: async () => ({
+      plan: "starter",
+      includedMinutes: 100,
+      usedSeconds: 0,
+    }),
     getDialableNumber: async () => ({
       number: "+15551230000",
       provider: "TWILIO",
@@ -225,4 +230,52 @@ test("dispatchBatchCampaign queues dispatch-call jobs with BullMQ-safe custom id
       },
     ],
   ]);
+});
+
+test("createBatchCampaign rejects immediately when plan minutes are exhausted", async () => {
+  const calls: unknown[] = [];
+  const repo = {
+    getMonthlyUsage: async () => ({
+      plan: "free",
+      includedMinutes: 15,
+      usedSeconds: 15 * 60,
+    }),
+    getDialableNumber: async () => {
+      calls.push("dialable");
+      return {
+        number: "+15551230000",
+        provider: "TWILIO",
+        sid: "PN123",
+      };
+    },
+    createBatchCampaign: async () => {
+      throw new Error("should not create batch campaign");
+    },
+  };
+  const queue = {
+    add: async () => {
+      throw new Error("should not queue import");
+    },
+  };
+
+  await assert.rejects(
+    createBatchCampaign(
+      {
+        organizationId: "org_123",
+        userId: "user_123",
+        name: "June renewals",
+        agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+        fromNumber: "+15551230000",
+        sourceFileKey: "outbound-batches/org_123/file.csv",
+        sourceFileName: "file.csv",
+        scheduledAt: null,
+        timezone: "UTC",
+        ringingTimeoutSeconds: 45,
+      },
+      { repository: repo, queue }
+    ),
+    /Plan minutes exhausted/
+  );
+
+  assert.deepEqual(calls, []);
 });

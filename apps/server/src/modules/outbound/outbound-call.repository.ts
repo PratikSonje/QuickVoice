@@ -106,11 +106,16 @@ export async function markInProgress(
 }
 
 export async function markFailed(outboundId: string, reason: string) {
+  const existing = await prisma.outboundCall.findUnique({
+    where: { outboundId },
+    select: { optionalData: true },
+  });
   return prisma.outboundCall.update({
     where: { outboundId },
     data: {
       status: CallStatus.FAILED,
       optionalData: {
+        ...jsonObject(existing?.optionalData),
         failureReason: reason,
       } as Prisma.InputJsonObject,
     },

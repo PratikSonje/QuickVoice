@@ -6,7 +6,10 @@ import { BadRequestError } from "../../common/errors/badRequest.js";
 import { getOutboundBatchQueue } from "../../queues/outbound-batch.queue.js";
 import * as outboundCallRepository from "./outbound-call.repository.js";
 import { parseBatchRecipients } from "./outbound-batch-parser.js";
-import { dispatchScheduledOutboundCall } from "./outbound-call.service.js";
+import {
+  dispatchScheduledOutboundCall,
+  enforcePlanQuota,
+} from "./outbound-call.service.js";
 import type {
   BatchUploadUrlQuery,
   CreateBatchCampaignArgs,
@@ -14,6 +17,7 @@ import type {
 } from "./outbound-call.schema.js";
 
 type BatchRepository = {
+  getMonthlyUsage: typeof outboundCallRepository.getMonthlyUsage;
   getDialableNumber: typeof outboundCallRepository.getDialableNumber;
   createBatchCampaign: typeof outboundCallRepository.createBatchCampaign;
   listBatchCampaigns: typeof outboundCallRepository.listBatchCampaigns;
@@ -57,7 +61,10 @@ type DispatchCampaignDeps = {
 };
 
 type CreateBatchCampaignDeps = {
-  repository?: Pick<BatchRepository, "getDialableNumber" | "createBatchCampaign">;
+  repository?: Pick<
+    BatchRepository,
+    "getMonthlyUsage" | "getDialableNumber" | "createBatchCampaign"
+  >;
   queue?: BatchQueueLike;
   now?: () => Date;
 };
@@ -93,6 +100,8 @@ export async function createBatchCampaign(
 ) {
   const repository = deps.repository ?? outboundCallRepository;
   const queue = deps.queue ?? getOutboundBatchQueue();
+
+  await enforcePlanQuota(repository, args.organizationId);
 
   const dialableNumber = await repository.getDialableNumber({
     organizationId: args.organizationId,
