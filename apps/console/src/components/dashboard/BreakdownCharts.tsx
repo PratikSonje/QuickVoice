@@ -262,9 +262,12 @@ export function BreakdownCharts({
           />
         )}
       </div>
-      <div className="border bg-card p-5" aria-labelledby={directionTitleId}>
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
+      <div
+        className="min-w-0 overflow-hidden border bg-card p-5"
+        aria-labelledby={directionTitleId}
+      >
+        <div className="mb-5 flex min-w-0 items-start justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Routing
             </p>
@@ -279,16 +282,16 @@ export function BreakdownCharts({
               routed calls.
             </p>
           </div>
-          <div className="border bg-background px-3 py-2 text-right">
+          <div className="shrink-0 border bg-background px-3 py-2 text-right">
             <p className="text-sm font-semibold text-foreground">{inboundPct}%</p>
             <p className="text-xs text-muted-foreground">inbound</p>
           </div>
         </div>
         {directionData.length ? (
-          <div className="grid gap-4 md:grid-cols-[1fr_200px]">
+          <div className="grid min-w-0 gap-4 overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(0,200px)]">
             <ChartContainer
               config={directionConfig}
-              className="h-64 w-full"
+              className="h-64 min-w-0 w-full max-w-full overflow-hidden"
               role="group"
               aria-label="Inbound and outbound direction mix chart"
             >
@@ -315,19 +318,29 @@ export function BreakdownCharts({
                 </Pie>
               </PieChart>
             </ChartContainer>
-            <div className="flex flex-col justify-center gap-3">
+            <div className="grid min-w-0 w-full max-w-full gap-2 overflow-hidden">
               {directionChartData.map((item) => (
-                <div key={item.direction} className="border px-3 py-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="capitalize text-muted-foreground">
+                <div
+                  key={item.direction}
+                  className="min-w-0 w-full max-w-full overflow-hidden border px-3 py-2 text-sm"
+                >
+                  <div className="flex min-w-0 items-center justify-between gap-2">
+                    <span className="min-w-0 truncate capitalize text-muted-foreground">
                       {item.direction}
                     </span>
-                    <span className="font-semibold text-foreground">{item.count}</span>
+                    <span className="shrink-0 font-semibold text-foreground">
+                      {item.count}
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {item.percentage}% of routed calls, {item.pattern}
+                  <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      {item.percentage}%
+                    </span>{" "}
+                    <span className="break-words">
+                      of routed calls, {item.pattern}
+                    </span>
                   </p>
-                  <div className="mt-2 h-1.5 bg-muted">
+                  <div className="mt-2 h-1.5 w-full overflow-hidden bg-muted">
                     <div
                       className="h-full"
                       style={{
