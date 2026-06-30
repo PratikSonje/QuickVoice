@@ -142,3 +142,17 @@ test("agent advanced danger zone uses the supported delete flow", () => {
   assert.doesNotMatch(source, /not yet supported/i);
   assert.doesNotMatch(source, /<AlertDialogAction disabled>Delete<\/AlertDialogAction>/);
 });
+
+test("sidebar exposes a direct theme toggle and transcript bubbles keep readable contrast", () => {
+  const sidebar = read("src/components/shell/AppSidebar.tsx");
+  const transcript = read("src/components/calls/Transcript.tsx");
+
+  assert.match(sidebar, /useTheme/);
+  assert.match(sidebar, /function ThemeToggle/);
+  assert.match(sidebar, /setTheme\(nextTheme\)/);
+  assert.match(sidebar, /aria-label=\{`Switch to \$\{nextTheme\} mode`\}/);
+  assert.match(sidebar, /<ThemeToggle \/>/);
+
+  assert.doesNotMatch(transcript, /bg-\[#0f2142\] text-foreground/);
+  assert.match(transcript, /bg-\[#0f2142\] text-white/);
+});

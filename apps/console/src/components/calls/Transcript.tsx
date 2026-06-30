@@ -41,7 +41,7 @@ export function Transcript({ callId }: { callId: string }) {
               className={cn(
                 "max-w-[78%] px-4 py-3",
                 isAgent
-                  ? "rounded-2xl rounded-tl-sm bg-[#0f2142] text-foreground"
+                  ? "rounded-2xl rounded-tl-sm bg-[#0f2142] text-white"
                   : "rounded-2xl rounded-tr-sm bg-blue-600 text-white"
               )}
             >

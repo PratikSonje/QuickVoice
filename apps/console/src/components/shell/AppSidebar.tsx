@@ -10,7 +10,10 @@ import {
   BookOpen,
   Settings2,
   Wrench,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import {
   Sidebar,
@@ -19,6 +22,9 @@ import {
   SidebarHeader,
   SidebarRail,
   SidebarSeparator,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/src/components/ui/sidebar";
 import { NavMain, type NavItem } from "@/src/components/shell/NavMain";
 import { OrgSwitcher } from "@/src/components/shell/OrgSwitcher";
@@ -50,6 +56,30 @@ const settingsNav: NavItem[] = [
   },
 ];
 
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const nextTheme = isDark ? "light" : "dark";
+  const Icon = isDark ? Sun : Moon;
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          type="button"
+          tooltip={`Switch to ${nextTheme} mode`}
+          aria-label={`Switch to ${nextTheme} mode`}
+          onClick={() => setTheme(nextTheme)}
+          className="h-11 !bg-transparent px-3 text-[15px] font-medium text-muted-foreground shadow-none transition-colors hover:!bg-sidebar-accent/60 hover:text-sidebar-foreground [&_svg]:size-[18px] [&_svg]:text-muted-foreground hover:[&_svg]:text-sidebar-foreground"
+        >
+          <Icon />
+          <span>Switch to {nextTheme} mode</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
 export function AppSidebar({
   activeOrgId,
   user,
@@ -69,6 +99,7 @@ export function AppSidebar({
         <NavMain label="Workspace" items={settingsNav} />
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border/60 p-3.5">
+        <ThemeToggle />
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
