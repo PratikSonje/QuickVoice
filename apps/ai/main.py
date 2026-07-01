@@ -69,6 +69,20 @@ def build_agent_instructions(config: dict) -> str:
     return instructions
 
 
+def build_room_options() -> room_io.RoomOptions:
+    return room_io.RoomOptions(
+        audio_input=room_io.AudioInputOptions(
+            noise_cancellation=lambda params: (
+                noise_cancellation.BVCTelephony()
+                if params.participant.kind
+                == rtc.ParticipantKind.PARTICIPANT_KIND_SIP
+                else noise_cancellation.BVC()
+            ),
+        ),
+        text_output=room_io.TextOutputOptions(sync_transcription=False),
+    )
+
+
 def provider_section(value: str | None):
     if not value or "/" not in value:
         return None
@@ -380,16 +394,7 @@ async def entrypoint(ctx: JobContext):
     await session.start(
         room=ctx.room,
         agent=agent,
-        room_options=room_io.RoomOptions(
-            audio_input=room_io.AudioInputOptions(
-                noise_cancellation=lambda params: (
-                    noise_cancellation.BVCTelephony()
-                    if params.participant.kind
-                    == rtc.ParticipantKind.PARTICIPANT_KIND_SIP
-                    else noise_cancellation.BVC()
-                ),
-            ),
-        ),
+        room_options=build_room_options(),
     )
     speak_first_message(session, config)
 

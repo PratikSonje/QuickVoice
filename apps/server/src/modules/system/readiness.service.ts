@@ -19,27 +19,44 @@ export async function getReadiness() {
       "Twilio credentials or trunk are not configured",
       "all"
     ),
-    telnyx: checkEnv(
-      ["TELNYX_API_KEY", "TELNYX_CONNECTION_ID"],
-      "Telnyx credentials or connection are not configured",
-      "all"
-    ),
     livekit: checkEnv(
       [
         "LIVEKIT_URL",
         "LIVEKIT_API_KEY",
         "LIVEKIT_API_SECRET",
         "LIVEKIT_SIP_INBOUND_TRUNK_ID",
-        "LIVEKIT_SIP_OUTBOUND_TRUNK_TWILIO_ID",
-        "LIVEKIT_SIP_OUTBOUND_TRUNK_TELNYX_ID",
       ],
-      "LiveKit URL, API credentials, or trunks are not configured",
+      "LiveKit URL, API credentials, or inbound trunk are not configured",
+      "all"
+    ),
+    livekitTwilio: checkEnv(
+      ["LIVEKIT_SIP_OUTBOUND_TRUNK_TWILIO_ID"],
+      "LiveKit Twilio outbound trunk is not configured",
+      "all"
+    ),
+    telnyx: checkEnv(
+      ["TELNYX_API_KEY", "TELNYX_CONNECTION_ID"],
+      "Telnyx credentials or connection are not configured",
+      "all"
+    ),
+    livekitTelnyx: checkEnv(
+      ["LIVEKIT_SIP_OUTBOUND_TRUNK_TELNYX_ID"],
+      "LiveKit Telnyx outbound trunk is not configured",
       "all"
     ),
     smithery: checkEnv(["SMITHERY_API_KEY"], "Smithery API key is not configured"),
   };
 
-  const ready = Object.values(checks).every((check) => check.status === "ok");
+  const requiredChecks = [
+    checks.db,
+    checks.redis,
+    checks.s3,
+    checks.stripe,
+    checks.twilio,
+    checks.livekit,
+    checks.livekitTwilio,
+  ];
+  const ready = requiredChecks.every((check) => check.status === "ok");
   return { ready, checks };
 }
 
