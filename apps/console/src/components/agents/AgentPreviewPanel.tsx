@@ -103,7 +103,8 @@ const statusCopy: Record<PreviewState, string> = {
   error: "Needs attention",
 };
 
-const LIVEKIT_CHAT_TOPIC = "lk.chat";
+const PREVIEW_TRANSCRIPT_TOPIC = "quickvoice.preview.transcript";
+const PREVIEW_TRANSCRIPT_TYPE = "preview_user_transcript";
 
 export function AgentPreviewPanel({
   agentId,
@@ -162,9 +163,13 @@ export function AgentPreviewPanel({
       if (!room || !trimmedText) return;
 
       try {
-        await room.localParticipant.sendText(trimmedText, {
-          topic: LIVEKIT_CHAT_TOPIC,
-        });
+        await room.localParticipant.sendText(
+          JSON.stringify({
+            type: PREVIEW_TRANSCRIPT_TYPE,
+            text: trimmedText,
+          }),
+          { topic: PREVIEW_TRANSCRIPT_TOPIC },
+        );
       } catch {
         addConversationMessage(
           "system",
