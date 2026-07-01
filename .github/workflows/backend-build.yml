@@ -31,14 +31,13 @@ env:
 
 jobs:
   changes:
-    name: Detect backend changes
-    runs-on: ubuntu-latest
+    name: Detect Backend Changes
+    runs-on: self-hosted
     permissions:
       contents: read
     outputs:
       server: ${{ steps.detect.outputs.server }}
       ai: ${{ steps.detect.outputs.ai }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -91,30 +90,12 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-  quality-gate:
-    name: Required CI Signal
-    uses: ./.github/workflows/ci.yml
-    permissions:
-      contents: read
-
-  build-and-deploy:
-    name: Build, Validate, Sign, Push, and Deploy Backend Image(s)
-    needs: [quality-gate, changes]
+  validate-config:
+    name: Validate Deployment Config
+    runs-on: self-hosted
+    needs: changes
     if: needs.changes.outputs.server == 'true' || needs.changes.outputs.ai == 'true'
-    runs-on: ubuntu-latest
-    environment:
-      name: production-backend
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Validate deployment configuration
         env:
           REQUIRED_AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
@@ -178,6 +159,25 @@ jobs:
             echo "- AI ECS container: ${AI_ECS_CONTAINER_NAME}"
           } >> "$GITHUB_STEP_SUMMARY"
 
+  build-server:
+    name: Build and Push Server Image
+    runs-on: self-hosted
+    needs: [changes, validate-config]
+    if: needs.changes.outputs.server == 'true'
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      image_uri: ${{ steps.image.outputs.image_uri }}
+      image_tag: ${{ steps.image.outputs.image_tag }}
+      digest: ${{ steps.server-build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -189,8 +189,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push server Docker image
-        id: server_build
-        if: needs.changes.outputs.server == 'true'
+        id: server-build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -200,28 +199,55 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}:sha-${{ github.sha }}
           sbom: true
           provenance: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max,ignore-error=true
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max,ignore-error=true
+
+      - name: Export server image metadata
+        id: image
+        env:
+          IMAGE_TAG: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}:sha-${{ github.sha }}
+          IMAGE_DIGEST: ${{ steps.server-build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_uri=${IMAGE_TAG%@*}@${IMAGE_DIGEST}" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test pushed server image manifest
-        if: needs.changes.outputs.server == 'true'
         env:
-          SERVER_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}@${{ steps.server_build.outputs.digest }}
+          SERVER_IMAGE_URI: ${{ steps.image.outputs.image_uri }}
         run: docker buildx imagetools inspect "$SERVER_IMAGE_URI"
 
-      - name: Scan server image for vulnerabilities
-        if: needs.changes.outputs.server == 'true'
-        uses: aquasecurity/trivy-action@v0.35.0
+  build-ai:
+    name: Build and Push AI Image
+    runs-on: self-hosted
+    needs: [changes, validate-config]
+    if: needs.changes.outputs.ai == 'true'
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      image_uri: ${{ steps.image.outputs.image_uri }}
+      image_tag: ${{ steps.image.outputs.image_tag }}
+      digest: ${{ steps.ai-build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}@${{ steps.server_build.outputs.digest }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          timeout: 20m0s
-          exit-code: "1"
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push AI Docker image
-        id: ai_build
-        if: needs.changes.outputs.ai == 'true'
+        id: ai-build
         uses: docker/build-push-action@v6
         with:
           context: apps/ai
@@ -234,45 +260,52 @@ jobs:
           cache-from: type=gha,scope=ai
           cache-to: type=gha,scope=ai,mode=max,ignore-error=true
 
-      - name: Smoke test pushed AI image manifest
-        if: needs.changes.outputs.ai == 'true'
+      - name: Export AI image metadata
+        id: image
         env:
-          AI_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}@${{ steps.ai_build.outputs.digest }}
+          IMAGE_TAG: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}:sha-${{ github.sha }}
+          IMAGE_DIGEST: ${{ steps.ai-build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_uri=${IMAGE_TAG%@*}@${IMAGE_DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test pushed AI image manifest
+        env:
+          AI_IMAGE_URI: ${{ steps.image.outputs.image_uri }}
         run: docker buildx imagetools inspect "$AI_IMAGE_URI"
 
-      - name: Scan AI image for vulnerabilities
-        if: needs.changes.outputs.ai == 'true'
-        uses: aquasecurity/trivy-action@v0.35.0
+  deploy:
+    name: Deploy Backend Images to ECS
+    runs-on: self-hosted
+    needs: [changes, validate-config, build-server, build-ai]
+    if: |
+      always()
+      && (needs.changes.outputs.server == 'true' || needs.changes.outputs.ai == 'true')
+      && (needs.validate-config.result == 'success')
+      && (needs.build-server.result == 'success' || needs.build-server.result == 'skipped')
+      && (needs.build-ai.result == 'success' || needs.build-ai.result == 'skipped')
+    environment:
+      name: production-backend
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      task_definition: ${{ steps.deploy.outputs.task_definition }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}@${{ steps.ai_build.outputs.digest }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          timeout: 20m0s
-          exit-code: "1"
-
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
-
-      - name: Sign server image
-        if: needs.changes.outputs.server == 'true'
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-          SERVER_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}@${{ steps.server_build.outputs.digest }}
-        run: cosign sign --yes "$SERVER_IMAGE_URI"
-
-      - name: Sign AI image
-        if: needs.changes.outputs.ai == 'true'
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-          AI_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}@${{ steps.ai_build.outputs.digest }}
-        run: cosign sign --yes "$AI_IMAGE_URI"
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy image(s) to ECS
+        id: deploy
         env:
           SERVER_CHANGED: ${{ needs.changes.outputs.server }}
           AI_CHANGED: ${{ needs.changes.outputs.ai }}
-          SERVER_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}@${{ steps.server_build.outputs.digest }}
-          AI_IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}@${{ steps.ai_build.outputs.digest }}
+          SERVER_IMAGE_URI: ${{ needs.build-server.outputs.image_uri }}
+          AI_IMAGE_URI: ${{ needs.build-ai.outputs.image_uri }}
         run: |
           set -euo pipefail
 
@@ -298,7 +331,7 @@ jobs:
 
           if [ "$SERVER_CHANGED" = "true" ]; then
             check_container "$SERVER_ECS_CONTAINER_NAME"
-            if [ -z "${SERVER_IMAGE_URI##*@}" ]; then
+            if [ -z "$SERVER_IMAGE_URI" ]; then
               echo "[fail] Missing server image digest"
               exit 1
             fi
@@ -306,7 +339,7 @@ jobs:
 
           if [ "$AI_CHANGED" = "true" ]; then
             check_container "$AI_ECS_CONTAINER_NAME"
-            if [ -z "${AI_IMAGE_URI##*@}" ]; then
+            if [ -z "$AI_IMAGE_URI" ]; then
               echo "[fail] Missing AI image digest"
               exit 1
             fi
@@ -350,6 +383,8 @@ jobs:
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE"
 
+          echo "task_definition=${new_task_definition_arn}" >> "$GITHUB_OUTPUT"
+
           {
             echo "## ECS deployment"
             echo "- Cluster: ${ECS_CLUSTER}"
@@ -366,18 +401,99 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Rollback metadata
+  scan-server:
+    name: Scan Server Image
+    runs-on: self-hosted
+    needs: [changes, build-server]
+    if: needs.changes.outputs.server == 'true' && needs.build-server.result == 'success'
+    continue-on-error: true
+    steps:
+      - name: Scan server image for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ needs.build-server.outputs.image_uri }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          timeout: 20m0s
+          exit-code: "1"
+
+  scan-ai:
+    name: Scan AI Image
+    runs-on: self-hosted
+    needs: [changes, build-ai]
+    if: needs.changes.outputs.ai == 'true' && needs.build-ai.result == 'success'
+    continue-on-error: true
+    steps:
+      - name: Scan AI image for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ needs.build-ai.outputs.image_uri }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          timeout: 20m0s
+          exit-code: "1"
+
+  sign-server:
+    name: Sign Server Image
+    runs-on: self-hosted
+    needs: [changes, build-server]
+    if: needs.changes.outputs.server == 'true' && needs.build-server.result == 'success'
+    continue-on-error: true
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign server image
         env:
-          SERVER_IMAGE_TAG: ${{ steps.login-ecr.outputs.registry }}/${{ env.SERVER_ECR_REPOSITORY }}:sha-${{ github.sha }}
-          AI_IMAGE_TAG: ${{ steps.login-ecr.outputs.registry }}/${{ env.AI_ECR_REPOSITORY }}:sha-${{ github.sha }}
-          SERVER_IMAGE_DIGEST: ${{ steps.server_build.outputs.digest }}
-          AI_IMAGE_DIGEST: ${{ steps.ai_build.outputs.digest }}
+          COSIGN_EXPERIMENTAL: "true"
+          SERVER_IMAGE_URI: ${{ needs.build-server.outputs.image_uri }}
+        run: cosign sign --yes "$SERVER_IMAGE_URI"
+
+  sign-ai:
+    name: Sign AI Image
+    runs-on: self-hosted
+    needs: [changes, build-ai]
+    if: needs.changes.outputs.ai == 'true' && needs.build-ai.result == 'success'
+    continue-on-error: true
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign AI image
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          AI_IMAGE_URI: ${{ needs.build-ai.outputs.image_uri }}
+        run: cosign sign --yes "$AI_IMAGE_URI"
+
+  rollback-metadata:
+    name: Rollback Metadata
+    runs-on: self-hosted
+    needs: [changes, build-server, build-ai, deploy]
+    if: |
+      always()
+      && needs.deploy.result == 'success'
+      && (needs.changes.outputs.server == 'true' || needs.changes.outputs.ai == 'true')
+    steps:
+      - name: Write rollback metadata
+        env:
           SERVER_CHANGED: ${{ needs.changes.outputs.server }}
           AI_CHANGED: ${{ needs.changes.outputs.ai }}
+          SERVER_IMAGE_TAG: ${{ needs.build-server.outputs.image_tag }}
+          AI_IMAGE_TAG: ${{ needs.build-ai.outputs.image_tag }}
+          SERVER_IMAGE_DIGEST: ${{ needs.build-server.outputs.digest }}
+          AI_IMAGE_DIGEST: ${{ needs.build-ai.outputs.digest }}
+          TASK_DEFINITION: ${{ needs.deploy.outputs.task_definition }}
         run: |
           {
             echo "## Rollback metadata"
             echo "- Source commit: ${GITHUB_SHA}"
+            echo "- ECS task definition: ${TASK_DEFINITION}"
             if [ "$SERVER_CHANGED" = "true" ]; then
               echo "- Server image tag: ${SERVER_IMAGE_TAG}"
               echo "- Server image digest: ${SERVER_IMAGE_DIGEST}"

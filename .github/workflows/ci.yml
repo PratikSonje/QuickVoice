@@ -11,10 +11,10 @@ permissions:
   contents: read
 
 jobs:
-  quality:
-    name: Build, Test, Typecheck, Lint, and Docker Validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
+  workspace-config:
+    name: Workspace Config
+    runs-on: self-hosted
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,6 +32,140 @@ jobs:
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify workspace tasks
+        run: pnpm check:tasks
+
+      - name: Verify shared configs
+        run: pnpm check:configs
+
+  root-tests:
+    name: Root Node Tests
+    runs-on: self-hosted
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run root tests
+        run: node --test tests/*.test.mjs
+
+  console:
+    name: Console Lint, Types, Build, Tests
+    runs-on: self-hosted
+    timeout-minutes: 40
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint console
+        run: pnpm --filter console lint
+
+      - name: Typecheck console
+        run: pnpm --filter console check-types
+
+      - name: Build console
+        run: pnpm --filter console build
+
+      - name: Run console tests
+        run: node --test apps/console/tests/*.test.mjs
+
+  web:
+    name: Web Lint, Types, Build
+    runs-on: self-hosted
+    timeout-minutes: 40
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint web
+        run: pnpm --filter web lint
+
+      - name: Typecheck web
+        run: pnpm --filter web check-types
+
+      - name: Build web
+        run: pnpm --filter web build
+
+  server:
+    name: Server Lint, Types, Build, Tests
+    runs-on: self-hosted
+    timeout-minutes: 40
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint server
+        run: pnpm --filter server lint
+
+      - name: Typecheck server
+        run: pnpm --filter server check-types
+
+      - name: Build server
+        run: pnpm --filter server build
+
+      - name: Run server tests
+        run: pnpm --filter server test
+
+  ai-python:
+    name: AI Python Tests
+    runs-on: self-hosted
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -46,20 +180,101 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pytest
 
+      - name: Run AI tests
+        working-directory: apps/ai
+        run: python -m pytest tests
+
+  docker-server:
+    name: Server Docker Validate
+    runs-on: self-hosted
+    timeout-minutes: 40
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Verify Docker validation script
-        run: test -x scripts/ci-docker-build.sh
+      - name: Build server image target
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/server/Dockerfile
+          target: build
+          push: false
+          load: true
+          tags: quickvoice-server:ci
+          cache-from: type=gha,scope=server-ci
+          cache-to: type=gha,scope=server-ci,mode=max,ignore-error=true
 
-      - name: Run local CI suite
-        run: pnpm ci:local
+  docker-ai:
+    name: AI Docker Validate
+    runs-on: self-hosted
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build AI image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/ai
+          file: apps/ai/Dockerfile
+          push: false
+          load: true
+          tags: quickvoice-ai:ci
+          build-args: |
+            PREINSTALL_CPU_TORCH=true
+            SKIP_MODEL_DOWNLOAD=true
+          cache-from: type=gha,scope=ai-ci
+          cache-to: type=gha,scope=ai-ci,mode=max,ignore-error=true
+
+  quality-summary:
+    name: Quality Summary
+    runs-on: self-hosted
+    timeout-minutes: 10
+    if: always()
+    needs:
+      - workspace-config
+      - root-tests
+      - console
+      - web
+      - server
+      - ai-python
+      - docker-server
+      - docker-ai
+    steps:
       - name: Write quality gate summary
-        if: always()
         run: |
           {
             echo "## Quality gate"
-            echo "- Command: pnpm ci:local"
-            echo "- Result: ${{ job.status }}"
+            echo "- Workspace config: ${{ needs.workspace-config.result }}"
+            echo "- Root tests: ${{ needs.root-tests.result }}"
+            echo "- Console: ${{ needs.console.result }}"
+            echo "- Web: ${{ needs.web.result }}"
+            echo "- Server: ${{ needs.server.result }}"
+            echo "- AI Python: ${{ needs.ai-python.result }}"
+            echo "- Server Docker: ${{ needs.docker-server.result }}"
+            echo "- AI Docker: ${{ needs.docker-ai.result }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if any quality job failed
+        run: |
+          set -euo pipefail
+          for result in \
+            "${{ needs.workspace-config.result }}" \
+            "${{ needs.root-tests.result }}" \
+            "${{ needs.console.result }}" \
+            "${{ needs.web.result }}" \
+            "${{ needs.server.result }}" \
+            "${{ needs.ai-python.result }}" \
+            "${{ needs.docker-server.result }}" \
+            "${{ needs.docker-ai.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "Quality job result was ${result}"
+              exit 1
+            fi
+          done
