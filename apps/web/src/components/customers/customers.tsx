@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Customer = {
   name: string;
   image: string;
@@ -44,16 +46,18 @@ function CustomerPill({
       }`}
     >
       <div
-        className={`flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl border ${
+        className={`relative flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl border ${
           isLower
             ? "border-primary/20 bg-white dark:bg-gray-950"
             : "border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950"
         }`}
       >
-        <img
+        <Image
           src={customer.image}
           alt={customer.name}
-          className="h-full w-full object-contain p-4"
+          fill
+          sizes="256px"
+          className="object-contain p-4"
         />
       </div>
       <p className="w-full truncate text-center text-base font-medium tracking-tight text-gray-950 dark:text-gray-50">
