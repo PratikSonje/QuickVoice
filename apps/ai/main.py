@@ -16,10 +16,11 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from handlers.calllog_handler import flush_call_log_queue
 from handlers.config_handler import get_config
 from handlers.finalization_handler import CallFinalizer
-from handlers.livekit_handler import get_transcripts, recording_path as build_recording_path, start_recording
+from handlers.livekit_handler import recording_path as build_recording_path, start_recording
 from handlers.mcp_handler import build_mcp_tool_instructions, call_mcp_tool, parse_arguments_json
 from handlers.privacy_handler import should_store_call_audio
 from handlers.rag_handler import RagRetrievalError, get_rag_context
+from handlers.transcript_collector import TranscriptCollector
 from handlers.worker_handler import (
     PREVIEW_TRANSCRIPT_TOPIC,
     apply_metadata_overrides,
@@ -377,6 +378,7 @@ async def entrypoint(ctx: JobContext):
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),
         preemptive_generation=config.get("preemptive_generation", True),
     )
+    transcript_collector = TranscriptCollector().attach(session)
     system_prompt = build_agent_instructions(config)
     agent = Assistant(
         system_prompt=system_prompt,
@@ -442,7 +444,7 @@ async def entrypoint(ctx: JobContext):
         call_context=call_context,
         started_at=call_start_time,
         recording_path=recording_path,
-        transcript_reader=lambda: get_transcripts(agent),
+        transcript_reader=transcript_collector.read,
     )
 
     async def unified_shutdown_hook():

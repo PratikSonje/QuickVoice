@@ -1,0 +1,52 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { CallStatus, TelephonyProvider } from "../../prisma/generated/prisma/client.js";
+import { buildCallLogIdentityFields } from "../../src/modules/calllogs/calllog.repository.js";
+import type { IngestCallLogArgs } from "../../src/modules/calllogs/calllog.schema.js";
+
+const baseInput: IngestCallLogArgs = {
+  organizationId: "org_123",
+  userId: "user_123",
+  agentId: "8d55565f-1111-4111-8111-f95fd03f0df2",
+  callId: "call_123",
+  startTime: "2026-07-03T12:00:00Z",
+  endTime: "2026-07-03T12:01:00Z",
+  direction: "outbound",
+  durationSeconds: 60,
+  status: CallStatus.COMPLETED,
+  metadata: {
+    summary: "Caller asked to call +15550001111 again.",
+    intent: "Follow up with +15551230000",
+    outboundId: null,
+  },
+  recordingSid: "",
+  transcripts: [],
+  toNumber: "+15550001111",
+  fromNumber: "+15551230000",
+  provider: TelephonyProvider.TWILIO,
+  extractedData: [],
+  evaluatedData: [],
+};
+
+test("call log identity fields keep structured phone numbers raw while redacting free-form metadata", () => {
+  const { callerId, metadata } = buildCallLogIdentityFields(baseInput, true);
+
+  assert.equal(callerId, "+15550001111");
+  assert.equal(metadata.fromNumber, "+15551230000");
+  assert.equal(metadata.toNumber, "+15550001111");
+  assert.equal(metadata.summary, "Caller asked to call [REDACTED_PHONE] again.");
+  assert.equal(metadata.intent, "Follow up with [REDACTED_PHONE]");
+});
+
+test("inbound call callerId uses the external caller number", () => {
+  const { callerId } = buildCallLogIdentityFields(
+    {
+      ...baseInput,
+      direction: "inbound",
+    },
+    true
+  );
+
+  assert.equal(callerId, "+15551230000");
+});

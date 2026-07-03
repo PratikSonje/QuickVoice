@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+from typing import Any
+
+
+class TranscriptCollector:
+    def __init__(self) -> None:
+        self._items: list[dict[str, Any]] = []
+        self._seen_ids: set[str] = set()
+        self._last_final_user_transcript: str | None = None
+
+    def attach(self, session: Any) -> "TranscriptCollector":
+        session.on("conversation_item_added", self.on_conversation_item_added)
+        session.on("user_input_transcribed", self.on_user_input_transcribed)
+        return self
+
+    def on_conversation_item_added(self, event: Any) -> None:
+        item = getattr(event, "item", None)
+        role = getattr(item, "role", None)
+        if role == "assistant":
+            role = "agent"
+        if role not in ("user", "agent"):
+            return
+
+        content = getattr(item, "text_content", None)
+        if callable(content):
+            content = content()
+        if content is None:
+            content = getattr(item, "content", "")
+        text = _content_to_text(content)
+        if not text:
+            return
+
+        message_id = str(getattr(item, "id", "") or f"msg-{len(self._items)}")
+        if message_id in self._seen_ids:
+            return
+        self._seen_ids.add(message_id)
+        self._items.append(
+            {
+                "id": message_id,
+                "role": role,
+                "content": text,
+                "time": getattr(item, "created_at", None) or getattr(event, "created_at", None),
+            }
+        )
+
+    def on_user_input_transcribed(self, event: Any) -> None:
+        if not bool(getattr(event, "is_final", False)):
+            return
+        text = str(getattr(event, "transcript", "") or "").strip()
+        if not text or text == self._last_final_user_transcript:
+            return
+        self._last_final_user_transcript = text
+
+        # Most final user turns also arrive through conversation_item_added.
+        # Keep this as a fallback for STT events that are not materialized into
+        # chat history before shutdown.
+        if any(item["role"] == "user" and item["content"] == text for item in self._items[-3:]):
+            return
+        self._items.append(
+            {
+                "id": f"user-transcript-{len(self._items)}",
+                "role": "user",
+                "content": text,
+                "time": getattr(event, "created_at", None),
+            }
+        )
+
+    def read(self) -> list[dict[str, Any]]:
+        return list(self._items)
+
+
+def _content_to_text(content: Any) -> str:
+    if isinstance(content, str):
+        return content.strip()
+    if isinstance(content, list):
+        return " ".join(str(part).strip() for part in content if isinstance(part, str)).strip()
+    return str(content or "").strip()

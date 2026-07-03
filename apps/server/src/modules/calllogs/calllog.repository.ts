@@ -13,13 +13,7 @@ import type {
 // the CallLog is still persisted (per product decision #4).
 export const saveCallLog = async (input: IngestCallLogArgs) => {
   const redactPii = process.env.CALL_LOG_PII_REDACTION !== "false";
-  // The external party's number goes into callerId. On inbound it's the
-  // caller; on outbound it's the callee. By default, PII is redacted before
-  // persistence. Set CALL_LOG_PII_REDACTION=false only in controlled installs
-  // that have a separate retention/legal basis for raw call data.
-  const rawCallerId =
-    input.direction === "inbound" ? input.fromNumber : input.toNumber;
-  const callerId = redactPii ? redactText(rawCallerId) : rawCallerId;
+  const { callerId, metadata } = buildCallLogIdentityFields(input, redactPii);
 
   return prisma.$transaction(async (tx) => {
     const callLog = await tx.callLog.create({
@@ -35,19 +29,7 @@ export const saveCallLog = async (input: IngestCallLogArgs) => {
         direction: input.direction,
         audioRecordingPath: input.recordingSid,
         callerId,
-        metadata: redactPii ? redactJson({
-          summary: input.metadata?.summary,
-          intent: input.metadata?.intent,
-          fromNumber: input.fromNumber,
-          toNumber: input.toNumber,
-          provider: input.provider,
-        } satisfies Prisma.InputJsonObject) : {
-          summary: input.metadata?.summary,
-          intent: input.metadata?.intent,
-          fromNumber: input.fromNumber,
-          toNumber: input.toNumber,
-          provider: input.provider,
-        } satisfies Prisma.InputJsonObject,
+        metadata,
         dataExtracted: redactPii ? redactJson(input.extractedData) : input.extractedData,
         dataEvaluation: redactPii ? redactJson(input.evaluatedData) : input.evaluatedData,
         
@@ -84,6 +66,25 @@ export const saveCallLog = async (input: IngestCallLogArgs) => {
     return callLog;
   });
 };
+
+export function buildCallLogIdentityFields(input: IngestCallLogArgs, redactPii: boolean) {
+  // The external party's number goes into callerId. On inbound it's the
+  // caller; on outbound it's the callee. Keep structured phone fields raw so
+  // call-log tables and details can show the actual number; redact only
+  // free-form text that may contain incidental PII.
+  const callerId = input.direction === "inbound" ? input.fromNumber : input.toNumber;
+  const summary = input.metadata?.summary ?? "";
+  const intent = input.metadata?.intent ?? "";
+  const metadata = {
+    summary: redactPii ? redactText(summary) : summary,
+    intent: redactPii ? redactText(intent) : intent,
+    fromNumber: input.fromNumber,
+    toNumber: input.toNumber,
+    provider: input.provider,
+  } satisfies Prisma.InputJsonObject;
+
+  return { callerId, metadata };
+}
 
 export const listByOrg = async (args: ListCallLogsArgs) => {
   const {
