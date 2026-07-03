@@ -29,7 +29,16 @@ def _pinecone():
 
 def _index():
     pc = _pinecone()
-    return pc.Index(os.environ.get("PINECONE_INDEX", "quickvoice-kb"))
+    return pc.Index(os.environ.get("PINECONE_INDEX", "quickvoice"))
+
+def _pinecone_namespace(agent_id: str) -> str:
+    return os.environ.get("PINECONE_NAMESPACE", "").strip() or agent_id
+
+def _agent_filter(agent_id: str, base_filter: dict | None = None) -> dict:
+    active_filter = copy.deepcopy(base_filter or {})
+    if os.environ.get("PINECONE_NAMESPACE", "").strip():
+        active_filter["agentId"] = {"$eq": agent_id}
+    return active_filter
 
 EMBEDDING_MODEL = os.environ.get("PINECONE_EMBEDDING_MODEL", "llama-text-embed-v2")
 EMBEDDING_TRUNCATE = os.environ.get("PINECONE_EMBEDDING_TRUNCATE", "END")
@@ -725,7 +734,7 @@ async def embed_chunks(chunks: list[str]) -> list[list[float]]:
     import asyncio
     pc = _pinecone()
 
-    BATCH = 100
+    BATCH = 96
     all_embeddings: list[list[float]] = []
 
     for i in range(0, len(chunks), BATCH):
@@ -751,12 +760,14 @@ def upsert_to_pinecone(
     doc_name: str,
 ) -> None:
     index = _index()
+    pinecone_namespace = _pinecone_namespace(namespace)
     _delete_kb_vectors(index=index, namespace=namespace, kb_id=kb_id)
     vectors = [
         {
             "id": f"{kb_id}#{i}",
             "values": emb,
             "metadata": {
+                "agentId": namespace,
                 "kbId": kb_id,
                 "name": doc_name,
                 "chunkIdx": i,
@@ -768,7 +779,7 @@ def upsert_to_pinecone(
     # Upsert in batches of 100
     batch_size = 100
     for start in range(0, len(vectors), batch_size):
-        index.upsert(vectors=vectors[start : start + batch_size], namespace=namespace)
+        index.upsert(vectors=vectors[start : start + batch_size], namespace=pinecone_namespace)
 
 
 def delete_kb_vectors(*, namespace: str, kb_id: str) -> None:
@@ -777,12 +788,16 @@ def delete_kb_vectors(*, namespace: str, kb_id: str) -> None:
 
 def _delete_kb_vectors(*, index, namespace: str, kb_id: str) -> None:
     try:
-        index.delete(filter={"kbId": {"$eq": kb_id}}, namespace=namespace)
+        pinecone_namespace = _pinecone_namespace(namespace)
+        index.delete(
+            filter=_agent_filter(namespace, {"kbId": {"$eq": kb_id}}),
+            namespace=pinecone_namespace,
+        )
     except Exception as exc:
         if _is_pinecone_namespace_not_found(exc):
             logger.info(
                 "[kb] pinecone namespace missing during delete; skipping {}",
-                redact_sensitive({"namespace": namespace, "kbId": kb_id}),
+                redact_sensitive({"namespace": _pinecone_namespace(namespace), "kbId": kb_id}),
             )
             return
         raise

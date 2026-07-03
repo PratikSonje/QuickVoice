@@ -427,6 +427,43 @@ class KbHandlerTests(unittest.TestCase):
         self.assertEqual(calls[0][0], "delete")
         self.assertEqual(calls[1][0], "upsert")
 
+    def test_upsert_uses_configured_namespace_with_agent_metadata(self):
+        calls = []
+
+        class FakeIndex:
+            def delete(self, **kwargs):
+                calls.append(("delete", kwargs))
+
+            def upsert(self, **kwargs):
+                calls.append(("upsert", kwargs))
+
+        original_index = kb_handler._index
+        original_namespace = os.environ.get("PINECONE_NAMESPACE")
+        try:
+            os.environ["PINECONE_NAMESPACE"] = "documents"
+            kb_handler._index = lambda: FakeIndex()
+            kb_handler.upsert_to_pinecone(
+                chunks=["new text"],
+                embeddings=[[0.1, 0.2]],
+                namespace="agent_123",
+                kb_id="kb_123",
+                doc_name="Doc",
+            )
+        finally:
+            kb_handler._index = original_index
+            if original_namespace is None:
+                os.environ.pop("PINECONE_NAMESPACE", None)
+            else:
+                os.environ["PINECONE_NAMESPACE"] = original_namespace
+
+        self.assertEqual(calls[0][1]["namespace"], "documents")
+        self.assertEqual(
+            calls[0][1]["filter"],
+            {"kbId": {"$eq": "kb_123"}, "agentId": {"$eq": "agent_123"}},
+        )
+        self.assertEqual(calls[1][1]["namespace"], "documents")
+        self.assertEqual(calls[1][1]["vectors"][0]["metadata"]["agentId"], "agent_123")
+
     def test_delete_kb_vectors_removes_only_selected_document_namespace(self):
         calls = []
 

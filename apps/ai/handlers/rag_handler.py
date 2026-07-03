@@ -25,7 +25,17 @@ def _pinecone():
 
 def _index():
     pc = _pinecone()
-    return pc.Index(os.environ.get("PINECONE_INDEX", "quickvoice-kb"))
+    return pc.Index(os.environ.get("PINECONE_INDEX", "quickvoice"))
+
+
+def _pinecone_namespace(agent_id: str) -> str:
+    return os.environ.get("PINECONE_NAMESPACE", "").strip() or agent_id
+
+
+def _agent_filter(agent_id: str) -> dict | None:
+    if not os.environ.get("PINECONE_NAMESPACE", "").strip():
+        return None
+    return {"agentId": {"$eq": agent_id}}
 
 
 def _embedding_values(response) -> list[list[float]]:
@@ -68,7 +78,8 @@ async def get_rag_context(agent_id: str, query: str, top_k: int = 5) -> str:
             index.query,
             vector=vector,
             top_k=top_k,
-            namespace=agent_id,
+            namespace=_pinecone_namespace(agent_id),
+            filter=_agent_filter(agent_id),
             include_metadata=True,
         )
         matches = resp.get("matches", [])

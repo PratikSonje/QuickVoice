@@ -101,6 +101,37 @@ class RagHandlerTests(unittest.TestCase):
         self.assertIn("score=0.87", context)
         self.assertIn("Refunds take five business days.", context)
 
+    def test_get_rag_context_filters_agent_inside_configured_namespace(self):
+        calls = []
+
+        async def fake_embed_query(query):
+            return [0.1, 0.2]
+
+        class EmptyIndex:
+            def query(self, **kwargs):
+                calls.append(kwargs)
+                return {"matches": []}
+
+        original_embed_query = rag_handler.embed_query
+        original_index = rag_handler._index
+        original_namespace = os.environ.get("PINECONE_NAMESPACE")
+        try:
+            os.environ["PINECONE_NAMESPACE"] = "documents"
+            rag_handler.embed_query = fake_embed_query
+            rag_handler._index = lambda: EmptyIndex()
+
+            context = asyncio.run(rag_handler.get_rag_context("agent_123", "refund"))
+        finally:
+            rag_handler.embed_query = original_embed_query
+            rag_handler._index = original_index
+            if original_namespace is None:
+                os.environ.pop("PINECONE_NAMESPACE", None)
+            else:
+                os.environ["PINECONE_NAMESPACE"] = original_namespace
+
+        self.assertEqual(context, "")
+        self.assertEqual(calls[0]["namespace"], "documents")
+        self.assertEqual(calls[0]["filter"], {"agentId": {"$eq": "agent_123"}})
 
 if __name__ == "__main__":
     unittest.main()
