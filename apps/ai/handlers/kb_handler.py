@@ -776,7 +776,27 @@ def delete_kb_vectors(*, namespace: str, kb_id: str) -> None:
 
 
 def _delete_kb_vectors(*, index, namespace: str, kb_id: str) -> None:
-    index.delete(filter={"kbId": {"$eq": kb_id}}, namespace=namespace)
+    try:
+        index.delete(filter={"kbId": {"$eq": kb_id}}, namespace=namespace)
+    except Exception as exc:
+        if _is_pinecone_namespace_not_found(exc):
+            logger.info(
+                "[kb] pinecone namespace missing during delete; skipping {}",
+                redact_sensitive({"namespace": namespace, "kbId": kb_id}),
+            )
+            return
+        raise
+
+
+def _is_pinecone_namespace_not_found(exc: Exception) -> bool:
+    status = getattr(exc, "status", None) or getattr(exc, "status_code", None)
+    message_parts = [str(exc)]
+    body = getattr(exc, "body", None)
+    if body:
+        message_parts.append(str(body))
+    message = " ".join(message_parts)
+    has_404 = status in {404, "404"} or "(404)" in message
+    return has_404 and "Namespace not found" in message
 
 
 # ── main entry ────────────────────────────────────────────────────────────────

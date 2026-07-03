@@ -396,6 +396,37 @@ class KbHandlerTests(unittest.TestCase):
         self.assertEqual(calls[0][1]["filter"], {"kbId": {"$eq": "kb_123"}})
         self.assertEqual(calls[1][0], "upsert")
 
+    def test_upsert_continues_when_existing_namespace_is_missing(self):
+        calls = []
+
+        class MissingNamespaceError(Exception):
+            status = 404
+            body = '{"code":5,"message":"Namespace not found","details":[]}'
+
+        class FakeIndex:
+            def delete(self, **kwargs):
+                calls.append(("delete", kwargs))
+                raise MissingNamespaceError("Namespace not found")
+
+            def upsert(self, **kwargs):
+                calls.append(("upsert", kwargs))
+
+        original_index = kb_handler._index
+        try:
+            kb_handler._index = lambda: FakeIndex()
+            kb_handler.upsert_to_pinecone(
+                chunks=["new text"],
+                embeddings=[[0.1, 0.2]],
+                namespace="agent_123",
+                kb_id="kb_123",
+                doc_name="Doc",
+            )
+        finally:
+            kb_handler._index = original_index
+
+        self.assertEqual(calls[0][0], "delete")
+        self.assertEqual(calls[1][0], "upsert")
+
     def test_delete_kb_vectors_removes_only_selected_document_namespace(self):
         calls = []
 
