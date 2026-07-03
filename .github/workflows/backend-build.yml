@@ -357,7 +357,17 @@ jobs:
                 (if $server_changed == "true" then .image = $server_image else . end)
                 | .environment = (((.environment // []) | map(select(.name != "LIVEKIT_AGENT_NAME"))) + [{"name":"LIVEKIT_AGENT_NAME","value":"quickvoice-voice-agent"}])
                 | .secrets = ((.secrets // []) | map(select(.name != "TELNYX_CONNECTION_ID")))
-              elif ($ai_changed == "true" and .name == $ai_container) then .image = $ai_image
+              elif .name == $ai_container then
+                (if $ai_changed == "true" then .image = $ai_image else . end)
+                | .environment = (((.environment // []) | map(select(
+                    .name != "PINECONE_INDEX"
+                    and .name != "PINECONE_EMBEDDING_MODEL"
+                    and .name != "PINECONE_NAMESPACE"
+                  ))) + [
+                    {"name":"PINECONE_INDEX","value":"quickvoice"},
+                    {"name":"PINECONE_EMBEDDING_MODEL","value":"llama-text-embed-v2"},
+                    {"name":"PINECONE_NAMESPACE","value":"documents"}
+                  ])
               else . end
             )
             | del(
