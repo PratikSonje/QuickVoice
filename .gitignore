@@ -2,9 +2,11 @@
 
 # Dependencies
 node_modules
+*.codex
 .venv
 .pnp
 .pnp.js
+.npm
 
 # Local env files
 .env

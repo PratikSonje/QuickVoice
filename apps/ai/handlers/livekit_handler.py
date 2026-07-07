@@ -65,9 +65,9 @@ async def start_recording(ctx: Any):
                         file_type=api.EncodedFileType.OGG,
                         filepath=recording_path(recording_id),
                         s3=api.S3Upload(
-                            access_key=storage["access_key"],
-                            secret=storage["secret"],
-                            session_token=storage.get("session_token"),
+                            # access_key=storage["access_key"],
+                            # secret=storage["secret"],
+                            # session_token=storage.get("session_token"),
                             bucket=storage["bucket"],
                             region=storage["region"],
                         ),
