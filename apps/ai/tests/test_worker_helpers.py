@@ -18,7 +18,9 @@ from handlers.worker_handler import (
 from livekit.agents import room_io
 
 from main import (
+    Assistant,
     attach_resolved_voice_config,
+    build_agent_instructions,
     build_room_options,
     build_session_provider_kwargs,
     provider_section,
@@ -26,6 +28,39 @@ from main import (
 
 
 class WorkerHandlerTests(unittest.TestCase):
+    def test_build_agent_instructions_mentions_livekit_dtmf_tool_when_ivr_navigation_enabled(self):
+        instructions = build_agent_instructions({"ivr_navigation_enabled": True})
+
+        self.assertIn("IVR navigation", instructions)
+        self.assertIn("send_dtmf_events", instructions)
+
+    def test_assistant_exposes_livekit_dtmf_tool_when_ivr_navigation_enabled(self):
+        agent = Assistant(
+            system_prompt="Use available tools.",
+            config={"ivr_navigation_enabled": True},
+            call_context={"direction": "outbound"},
+        )
+
+        self.assertIn("send_dtmf_events", [tool.id for tool in agent.tools])
+
+    def test_assistant_exposes_livekit_dtmf_tool_for_outbound_calls_by_default(self):
+        agent = Assistant(
+            system_prompt="Use available tools.",
+            config={},
+            call_context={"direction": "outbound"},
+        )
+
+        self.assertIn("send_dtmf_events", [tool.id for tool in agent.tools])
+
+    def test_assistant_keeps_livekit_dtmf_tool_off_when_ivr_navigation_disabled(self):
+        agent = Assistant(
+            system_prompt="Use available tools.",
+            config={"ivr_navigation_enabled": False},
+            call_context={"direction": "outbound"},
+        )
+
+        self.assertNotIn("send_dtmf_events", [tool.id for tool in agent.tools])
+
     def test_provider_section_parses_supported_provider_model_values(self):
         self.assertEqual(provider_section("deepgram/nova-3"), {"provider": "deepgram", "model": "nova-3"})
         self.assertEqual(provider_section("bedrock/us.amazon.nova-micro-v1:0"), {"provider": "bedrock", "model": "us.amazon.nova-micro-v1:0"})

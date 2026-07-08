@@ -11,6 +11,7 @@ from livekit.agents import (
     inference,
     room_io,
 )
+from livekit.agents.beta.tools import send_dtmf_events
 from livekit.plugins import noise_cancellation, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from handlers.call_metadata_collector import CallMetadataCollector, build_metadata_collection_instructions
@@ -63,12 +64,41 @@ RAG_TOOL_INSTRUCTIONS = (
     "before answering. Use retrieved context as the source of truth, and say "
     "when the knowledge base does not contain the answer."
 )
+IVR_TOOL_INSTRUCTIONS = (
+    "\n\nIVR navigation is available through send_dtmf_events. "
+    "When you hear an automated phone menu, wait for the relevant option, "
+    "then send only the needed DTMF events such as digits, star, or pound. "
+    "Do not send tones when you are unsure which menu option applies."
+)
+
+
+def _config_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def ivr_navigation_enabled(config: dict, call_context: dict | None = None) -> bool:
+    for key in ("ivr_navigation_enabled", "enable_ivr_navigation", "ivr_detection"):
+        if key in config:
+            return _config_bool(config.get(key))
+    return (call_context or {}).get("direction") == "outbound"
+
+
+def build_agent_tools(config: dict, call_context: dict | None = None) -> list:
+    if not ivr_navigation_enabled(config, call_context):
+        return []
+    return [send_dtmf_events]
 
 
 def build_agent_instructions(config: dict) -> str:
     instructions = config.get("system_prompt") or DEFAULT_SYSTEM_PROMPT
     if config.get("use_rag"):
         instructions += RAG_TOOL_INSTRUCTIONS
+    if ivr_navigation_enabled(config):
+        instructions += IVR_TOOL_INSTRUCTIONS
     metadata_instructions = build_metadata_collection_instructions(config)
     if metadata_instructions:
         instructions += f"\n\n{metadata_instructions}"
@@ -211,7 +241,10 @@ def run_combined_server() -> int:
 
 class Assistant(Agent):
     def __init__(self, system_prompt: str, config: dict, call_context: dict):
-        super().__init__(instructions=system_prompt)
+        super().__init__(
+            instructions=system_prompt,
+            tools=build_agent_tools(config, call_context),
+        )
         self._config = config
         self._call_context = call_context
         self._metadata_collector = CallMetadataCollector(config)
@@ -399,10 +432,12 @@ async def entrypoint(ctx: JobContext):
         ctx.shutdown(reason=f"provider adapter error: {error}")
         return
 
+    config["ivr_navigation_enabled"] = ivr_navigation_enabled(config, call_context)
     session = AgentSession(
         **provider_kwargs,
         vad=silero.VAD.load(),
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),
+        ivr_detection=config["ivr_navigation_enabled"],
         preemptive_generation=config.get("preemptive_generation", True),
     )
     transcript_collector = TranscriptCollector().attach(session)
