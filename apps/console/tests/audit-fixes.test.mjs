@@ -45,6 +45,8 @@ test("data loading failures render retryable error states instead of empty data"
 
 test("call metadata sheet displays reason and non-primary metadata keys", () => {
   const source = read("src/components/calls/CallMetadataSheet.tsx");
+  const detailPage = read("src/app/(app)/calls/[id]/page.tsx");
+  const extractedPanel = read("src/components/calls/ExtractedDataPanel.tsx");
 
   assert.match(source, /PRIMARY_METADATA_KEYS/);
   assert.match(source, /"reason"/);
@@ -52,6 +54,9 @@ test("call metadata sheet displays reason and non-primary metadata keys", () => 
   assert.match(source, /Additional Metadata/);
   assert.match(source, /formatMetadataLabel/);
   assert.match(source, /Object\.entries\(meta\)\.filter/);
+  assert.match(detailPage, /metadata=\{call\.metadata\}/);
+  assert.match(extractedPanel, /<h3 className="mb-3 text-sm font-semibold">Metadata<\/h3>/);
+  assert.match(extractedPanel, /No metadata captured for this call\./);
 });
 
 test("form validation and external setup flows block unsafe or blank input", () => {

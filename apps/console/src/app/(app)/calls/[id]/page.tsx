@@ -147,6 +147,7 @@ export default function CallDetailPage() {
  </div>
  </div>
  <ExtractedDataPanel
+ metadata={call.metadata}
  data={call.dataExtracted}
  evaluation={call.dataEvaluation}
  />

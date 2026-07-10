@@ -1,17 +1,42 @@
 "use client";
 
 export function ExtractedDataPanel({
+ metadata,
  data,
  evaluation,
 }: {
+ metadata: unknown;
  data: unknown;
  evaluation: unknown;
 }) {
+ const meta =
+  metadata && typeof metadata === "object" && !Array.isArray(metadata)
+   ? (metadata as Record<string, unknown>)
+   : {};
+ const metadataEntries = Object.entries(meta).filter(([, value]) => !isEmpty(value));
  const hasData = Array.isArray(data) && data.length > 0;
  const hasEval = Array.isArray(evaluation) && evaluation.length > 0;
+ const hasMetadata = metadataEntries.length > 0;
 
  return (
  <div className="space-y-4">
+ <div className="border bg-card p-5">
+ <h3 className="mb-3 text-sm font-semibold">Metadata</h3>
+ {hasMetadata ? (
+ <div className="space-y-3">
+ {metadataEntries.map(([key, value]) => (
+ <div key={key} className="space-y-1">
+ <p className="text-xs text-muted-foreground">{formatLabel(key)}</p>
+ <p className="break-words text-sm">{displayValue(value)}</p>
+ </div>
+ ))}
+ </div>
+ ) : (
+ <p className="text-xs text-muted-foreground">
+ No metadata captured for this call.
+ </p>
+ )}
+ </div>
  <div className="border bg-card p-5">
  <h3 className="mb-3 text-sm font-semibold">Extracted data</h3>
  {hasData ? (
@@ -38,4 +63,25 @@ export function ExtractedDataPanel({
  </div>
  </div>
  );
+}
+
+function isEmpty(value: unknown) {
+ return (
+  value === null ||
+  value === undefined ||
+  (typeof value === "string" && value.trim() === "")
+ );
+}
+
+function formatLabel(key: string) {
+ return key
+  .replace(/[_-]+/g, " ")
+  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+  .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function displayValue(value: unknown) {
+ if (typeof value === "boolean") return value ? "Yes" : "No";
+ if (typeof value === "object") return JSON.stringify(value);
+ return String(value);
 }
