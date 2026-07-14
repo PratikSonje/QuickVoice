@@ -25,6 +25,7 @@ from handlers.rag_handler import RagRetrievalError, get_rag_context
 from handlers.transcript_collector import TranscriptCollector
 from handlers.worker_handler import (
     PREVIEW_TRANSCRIPT_TOPIC,
+    apply_initiation_webhook_metadata,
     apply_metadata_overrides,
     build_call_context,
     consume_preview_user_transcript_stream,
@@ -379,7 +380,7 @@ async def entrypoint(ctx: JobContext):
     raw_metadata = ctx.job.metadata or ""
     if is_voice_session_metadata(raw_metadata):
         voice_metadata = parse_voice_session_metadata(raw_metadata)
-        metadata = voice_metadata.client_metadata
+        metadata = {**voice_metadata.client_metadata, "mode": voice_metadata.mode}
         preview_mode = voice_metadata.mode == "preview"
         call_context = build_call_context(ctx.room.name, metadata)
         if not call_context.get("agent_id") and metadata.get("agent_id"):
@@ -389,6 +390,7 @@ async def entrypoint(ctx: JobContext):
             agent_number=call_context.get("agent_number"),
             allow_default_config=True,
         )
+        metadata = await apply_initiation_webhook_metadata(config, metadata, call_context)
         config = apply_metadata_overrides(config, metadata)
         config["voice_config"] = voice_metadata.config
         config["agent_language"] = voice_metadata.config["language"]
@@ -411,6 +413,7 @@ async def entrypoint(ctx: JobContext):
             call_context.get("agent_id"),
             agent_number=call_context.get("agent_number"),
         )
+        metadata = await apply_initiation_webhook_metadata(config, metadata, call_context)
         config = apply_metadata_overrides(config, metadata)
         config = attach_resolved_voice_config(config)
     logger.info("Config loaded for agent: {}", redact_sensitive(config.get("agent_id")))

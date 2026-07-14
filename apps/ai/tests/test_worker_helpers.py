@@ -8,6 +8,7 @@ sys.path.insert(0, ROOT)
 
 from handlers.worker_handler import (
     PREVIEW_TRANSCRIPT_TOPIC,
+    apply_initiation_webhook_metadata,
     apply_metadata_overrides,
     build_call_context,
     parse_metadata,
@@ -328,6 +329,76 @@ class WorkerHandlerTests(unittest.TestCase):
         self.assertEqual(result["first_message"], "Hi Mumbai customer.")
         self.assertEqual(result["system_prompt"], "Ask about renewal.")
         self.assertEqual(config["first_message"], "Hi {{city}} customer.")
+
+    def test_apply_initiation_webhook_metadata_merges_before_call_values(self):
+        async def fake_fetch(webhook, metadata, call_context):
+            return {
+                "dynamic_variables": {
+                    "city": "Webhook City",
+                    "plan": "Webhook Plan",
+                }
+            }
+
+        result = asyncio.run(
+            apply_initiation_webhook_metadata(
+                {
+                    "initiation_webhook": {
+                        "webhook_url": "https://example.com/init",
+                        "method": "POST",
+                        "dynamic_variables": {
+                            "city": "Static City",
+                            "tier": "Static Tier",
+                        },
+                    }
+                },
+                {
+                    "direction": "outbound",
+                    "dynamic_variables": {
+                        "city": "Call City",
+                    },
+                },
+                {"call_id": "call_123"},
+                fetch_json=fake_fetch,
+            )
+        )
+
+        self.assertEqual(
+            result["dynamic_variables"],
+            {
+                "city": "Call City",
+                "tier": "Static Tier",
+                "plan": "Webhook Plan",
+            },
+        )
+
+    def test_apply_metadata_overrides_uses_placeholders_as_dynamic_variable_fallbacks(self):
+        config = {
+            "first_message": "Hi {{ city }} {{name}}.",
+            "system_prompt": "Plan {{plan}} for {{missing}}.",
+            "variables": {
+                "firstMessage": ["city", "name"],
+                "systemPrompt": ["plan", "missing"],
+                "placeholders": {
+                    "city": "Dallas",
+                    "plan": "Starter",
+                },
+            },
+        }
+
+        result = apply_metadata_overrides(
+            config,
+            {
+                "direction": "outbound",
+                "dynamic_variables": {
+                    "city": "Austin",
+                    "name": "Ada",
+                },
+            },
+        )
+
+        self.assertEqual(result["first_message"], "Hi Austin Ada.")
+        self.assertEqual(result["system_prompt"], "Plan Starter for {{missing}}.")
+
 
 
 if __name__ == "__main__":
