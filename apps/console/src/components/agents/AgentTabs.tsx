@@ -53,7 +53,7 @@ export function AgentTabs({ agentId }: { agentId: string }) {
   return (
     <Tabs value={current} onValueChange={onChange} className="w-full min-w-0">
       <div className="border bg-card">
-        <TabsList className="h-auto w-full justify-start overflow-x-auto border-b bg-transparent p-0">
+        <TabsList className="h-auto w-full justify-start overflow-x-auto overflow-y-hidden border-b bg-transparent p-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TABS.map((tab) => (
             <TabsTrigger
               key={tab.id}
