@@ -108,6 +108,7 @@ test("createQuickOutboundCall persists the quick call and dispatches a LiveKit S
   const metadata = JSON.parse(sip[4].participantMetadata);
   assert.deepEqual(metadata, {
     agent_id: "8d55565f-1111-4111-8111-f95fd03f0df2",
+    organization_id: "org_123",
     outbound_id: "2b1f6d53-42f5-4cc7-9689-7b6f51a0c113",
     direction: "outbound",
     from_number: "+15551230000",
