@@ -123,10 +123,13 @@ function recordsEqual(a: Record<string, string>, b: Record<string, string>) {
 export function WebhooksTab({ agentId }: { agentId: string }) {
     const { data: config, isLoading } = useAgentConfig(agentId);
     const save = useSaveAgentConfig(agentId);
-    const [initiationVariableRows, setInitiationVariableRows] = useState<WebhookVariableRow[]>([]);
-    const [initiationHeaderRows, setInitiationHeaderRows] = useState<SecretFieldRow[]>([]);
-    const [initiationBodyRows, setInitiationBodyRows] = useState<SecretFieldRow[]>([]);
-    const [postHeaderRows, setPostHeaderRows] = useState<SecretFieldRow[]>([]);
+    const [webhookRowsState, setWebhookRowsState] = useState({
+        source: "",
+        initiationVariableRows: [] as WebhookVariableRow[],
+        initiationHeaderRows: [] as SecretFieldRow[],
+        initiationBodyRows: [] as SecretFieldRow[],
+        postHeaderRows: [] as SecretFieldRow[],
+    });
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -149,6 +152,58 @@ export function WebhooksTab({ agentId }: { agentId: string }) {
         () => uniqueDynamicVariableNames(agentVariables),
         [agentVariables]
     );
+    const savedWebhookRows = useMemo(() => {
+        const init = config?.initiation_webhook;
+        const post = config?.post_call_webhook;
+        return {
+            initiationVariableRows: rowsForVariables(
+                detectedVariableNames,
+                init?.dynamic_variables
+            ),
+            initiationHeaderRows: rowsForSecretFields(init?.headers),
+            initiationBodyRows: rowsForSecretFields(init?.body),
+            postHeaderRows: rowsForSecretFields(post?.headers),
+        };
+    }, [
+        config?.initiation_webhook,
+        config?.post_call_webhook,
+        detectedVariableNames,
+    ]);
+    const savedWebhookRowsSource = useMemo(
+        () => JSON.stringify(savedWebhookRows),
+        [savedWebhookRows]
+    );
+
+    if (webhookRowsState.source !== savedWebhookRowsSource) {
+        setWebhookRowsState({
+            source: savedWebhookRowsSource,
+            ...savedWebhookRows,
+        });
+    }
+
+    const {
+        initiationVariableRows,
+        initiationHeaderRows,
+        initiationBodyRows,
+        postHeaderRows,
+    } =
+        webhookRowsState.source === savedWebhookRowsSource
+            ? webhookRowsState
+            : { source: savedWebhookRowsSource, ...savedWebhookRows };
+    const setInitiationVariableRows = (
+        rows: WebhookVariableRow[] | ((currentRows: WebhookVariableRow[]) => WebhookVariableRow[])
+    ) =>
+        setWebhookRowsState((state) => ({
+            ...state,
+            initiationVariableRows:
+                typeof rows === "function" ? rows(state.initiationVariableRows) : rows,
+        }));
+    const setInitiationHeaderRows = (rows: SecretFieldRow[]) =>
+        setWebhookRowsState((state) => ({ ...state, initiationHeaderRows: rows }));
+    const setInitiationBodyRows = (rows: SecretFieldRow[]) =>
+        setWebhookRowsState((state) => ({ ...state, initiationBodyRows: rows }));
+    const setPostHeaderRows = (rows: SecretFieldRow[]) =>
+        setWebhookRowsState((state) => ({ ...state, postHeaderRows: rows }));
 
     useEffect(() => {
         if (!config) return;
@@ -163,13 +218,7 @@ export function WebhooksTab({ agentId }: { agentId: string }) {
             post_transcript: post?.transcript ?? true,
             post_audio: post?.audio_url ?? false,
         });
-        setInitiationVariableRows(
-            rowsForVariables(detectedVariableNames, init?.dynamic_variables)
-        );
-        setInitiationHeaderRows(rowsForSecretFields(init?.headers));
-        setInitiationBodyRows(rowsForSecretFields(init?.body));
-        setPostHeaderRows(rowsForSecretFields(post?.headers));
-    }, [config, detectedVariableNames, form]);
+    }, [config, form]);
 
     const savedInitiationVariables = useMemo(
         () => recordFromRows(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ClipboardCheck, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -72,24 +72,52 @@ const EMPTY_EVALUATION = {
 export function AnalysisTab({ agentId }: { agentId: string }) {
   const { data: config, isLoading } = useAgentConfig(agentId);
   const save = useSaveAgentConfig(agentId);
-  const [dataNeeded, setDataNeeded] = useState<DataItem[]>([]);
-  const [evaluations, setEvaluations] = useState<EvaluationItem[]>([]);
   const [newDataItem, setNewDataItem] = useState(EMPTY_DATA_ITEM);
   const [newEvaluation, setNewEvaluation] = useState(EMPTY_EVALUATION);
-
-  useEffect(() => {
-    if (!config) return;
-    setDataNeeded(normalizeDataNeeded(config.data_needed));
-    setEvaluations(normalizeEvaluations(config.data_evaluation));
-  }, [config]);
-
-  const savedSnapshot = useMemo(
-    () => snapshot(
-      normalizeDataNeeded(config?.data_needed),
-      normalizeEvaluations(config?.data_evaluation)
-    ),
-    [config?.data_evaluation, config?.data_needed]
+  const savedDataNeeded = useMemo(
+    () => normalizeDataNeeded(config?.data_needed),
+    [config?.data_needed]
   );
+  const savedEvaluations = useMemo(
+    () => normalizeEvaluations(config?.data_evaluation),
+    [config?.data_evaluation]
+  );
+  const savedSnapshot = useMemo(
+    () => snapshot(savedDataNeeded, savedEvaluations),
+    [savedDataNeeded, savedEvaluations]
+  );
+  const [analysisState, setAnalysisState] = useState(() => ({
+    source: savedSnapshot,
+    dataNeeded: savedDataNeeded,
+    evaluations: savedEvaluations,
+  }));
+
+  if (analysisState.source !== savedSnapshot) {
+    setAnalysisState({
+      source: savedSnapshot,
+      dataNeeded: savedDataNeeded,
+      evaluations: savedEvaluations,
+    });
+  }
+
+  const { dataNeeded, evaluations } =
+    analysisState.source === savedSnapshot
+      ? analysisState
+      : {
+          source: savedSnapshot,
+          dataNeeded: savedDataNeeded,
+          evaluations: savedEvaluations,
+        };
+  const setDataNeeded = (updater: (items: DataItem[]) => DataItem[]) =>
+    setAnalysisState((state) => ({
+      ...state,
+      dataNeeded: updater(state.dataNeeded),
+    }));
+  const setEvaluations = (updater: (items: EvaluationItem[]) => EvaluationItem[]) =>
+    setAnalysisState((state) => ({
+      ...state,
+      evaluations: updater(state.evaluations),
+    }));
   const currentSnapshot = useMemo(
     () => snapshot(dataNeeded, evaluations),
     [dataNeeded, evaluations]

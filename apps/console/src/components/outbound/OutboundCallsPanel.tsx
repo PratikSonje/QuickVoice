@@ -270,8 +270,10 @@ export function OutboundCallsPanel() {
   const { data, isLoading, isError, isFetching, refetch } = useOutboundCalls(params);
   const calls = data?.items ?? [];
 
-  const agentName = (agentId: string | null) =>
-    agents.find((agent) => agent.agentId === agentId)?.name ?? "-";
+  const agentNames = useMemo(
+    () => new Map(agents.map((agent) => [agent.agentId, agent.name])),
+    [agents]
+  );
 
   const filteredCalls = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -283,13 +285,13 @@ export function OutboundCallsPanel() {
         call.fromNumber,
         call.status,
         call.mode,
-        agentName(call.agentId),
+        agentNames.get(call.agentId ?? "") ?? "-",
       ]
         .join(" ")
         .toLowerCase()
         .includes(query)
     );
-  }, [calls, search, agents]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [agentNames, calls, search]);
 
   async function confirmCancel() {
     if (!cancelTarget) return;
@@ -409,7 +411,7 @@ export function OutboundCallsPanel() {
                       {statusLabel(call.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell>{agentName(call.agentId)}</TableCell>
+                  <TableCell>{agentNames.get(call.agentId ?? "") ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {fmtDate(call.scheduledAt)}
                   </TableCell>

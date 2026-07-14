@@ -53,7 +53,10 @@ export function BehaviorTab({ agentId }: { agentId: string }) {
     const save = useSaveAgentConfig(agentId);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogIntent, setDialogIntent] = useState<DialogIntent>("edit");
-    const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({});
+    const [placeholderState, setPlaceholderState] = useState({
+        source: "",
+        values: {} as Record<string, string>,
+    });
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -74,6 +77,25 @@ export function BehaviorTab({ agentId }: { agentId: string }) {
         () => normalizeAgentVariables(config?.variables),
         [config?.variables]
     );
+    const savedPlaceholderValues = savedVariables.placeholders ?? {};
+    const savedPlaceholderSource = useMemo(
+        () => JSON.stringify(savedPlaceholderValues),
+        [savedPlaceholderValues]
+    );
+
+    if (placeholderState.source !== savedPlaceholderSource) {
+        setPlaceholderState({
+            source: savedPlaceholderSource,
+            values: savedPlaceholderValues,
+        });
+    }
+
+    const placeholderValues =
+        placeholderState.source === savedPlaceholderSource
+            ? placeholderState.values
+            : savedPlaceholderValues;
+    const setPlaceholderValues = (values: Record<string, string>) =>
+        setPlaceholderState((state) => ({ ...state, values }));
     const detectedVariables = useMemo(
         () =>
             buildAgentVariables(
@@ -98,12 +120,10 @@ export function BehaviorTab({ agentId }: { agentId: string }) {
 
     useEffect(() => {
         if (!config) return;
-        const variables = normalizeAgentVariables(config.variables);
         form.reset({
             systemPrompt: config.systemPrompt,
             firstMessage: config.firstMessage,
         });
-        setPlaceholderValues(variables.placeholders ?? {});
     }, [config, form]);
 
     function openVariableDialog(intent: DialogIntent) {

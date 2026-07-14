@@ -292,8 +292,10 @@ export function CampaignsPanel() {
   const [selectedCampaign, setSelectedCampaign] = useState<BatchCampaign | null>(null);
   const [cancelTarget, setCancelTarget] = useState<BatchCampaign | null>(null);
 
-  const agentName = (agentId: string | null) =>
-    agents.find((agent) => agent.agentId === agentId)?.name ?? "-";
+  const agentNames = useMemo(
+    () => new Map(agents.map((agent) => [agent.agentId, agent.name])),
+    [agents]
+  );
 
   const filteredCampaigns = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -305,13 +307,13 @@ export function CampaignsPanel() {
         campaign.name,
         campaign.fromNumber,
         campaign.sourceFileName ?? "",
-        agentName(campaign.agentId),
+        agentNames.get(campaign.agentId ?? "") ?? "-",
       ]
         .join(" ")
         .toLowerCase()
         .includes(query);
     });
-  }, [campaigns, search, status, agents]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [agentNames, campaigns, search, status]);
 
   async function confirmCancel() {
     if (!cancelTarget) return;
@@ -409,7 +411,7 @@ export function CampaignsPanel() {
                     <div className="min-w-64 space-y-1">
                       <p className="font-medium">{campaign.name}</p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {agentName(campaign.agentId)} · {campaign.sourceFileName ?? "No source file"}
+                        {agentNames.get(campaign.agentId ?? "") ?? "-"} · {campaign.sourceFileName ?? "No source file"}
                       </p>
                     </div>
                   </TableCell>

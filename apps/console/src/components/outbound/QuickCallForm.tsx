@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { CheckCircle2, Loader2, PhoneOutgoing, RefreshCw } from "lucide-react";
 
 import { EmptyState } from "@/src/components/common/EmptyState";
@@ -65,7 +65,10 @@ export function QuickCallForm() {
   const [username, setUsername] = useState("");
   const [firstMessage, setFirstMessage] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
-  const [dynamicVariableValues, setDynamicVariableValues] = useState<Record<string, string>>({});
+  const [dynamicVariableState, setDynamicVariableState] = useState({
+    source: "",
+    values: {} as Record<string, string>,
+  });
   const [formError, setFormError] = useState<string | null>(null);
   const [startedCall, setStartedCall] = useState<StartedCall | null>(null);
 
@@ -90,11 +93,25 @@ export function QuickCallForm() {
     () => uniqueDynamicVariableNames(selectedAgentVariables),
     [selectedAgentVariables]
   );
-  useEffect(() => {
-    setDynamicVariableValues(
-      Object.fromEntries(dynamicVariableNames.map((name) => [name, ""]))
-    );
-  }, [agentId, dynamicVariableNames]);
+  const dynamicVariableSource = `${agentId}:${dynamicVariableNames.join("\0")}`;
+  const emptyDynamicVariableValues = useMemo(
+    () => Object.fromEntries(dynamicVariableNames.map((name) => [name, ""])),
+    [dynamicVariableNames]
+  );
+
+  if (dynamicVariableState.source !== dynamicVariableSource) {
+    setDynamicVariableState({
+      source: dynamicVariableSource,
+      values: emptyDynamicVariableValues,
+    });
+  }
+
+  const dynamicVariableValues =
+    dynamicVariableState.source === dynamicVariableSource
+      ? dynamicVariableState.values
+      : emptyDynamicVariableValues;
+  const setDynamicVariableValues = (values: Record<string, string>) =>
+    setDynamicVariableState((state) => ({ ...state, values }));
 
   const isLoading = agentsLoading || numbersLoading;
   const canSubmit =
