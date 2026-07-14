@@ -13,6 +13,8 @@ export function useSecrets() {
   return useQuery({
     queryKey: queryKeys.secrets.list(),
     queryFn: () => secretsApi.list(),
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 }
 

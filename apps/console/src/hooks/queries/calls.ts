@@ -17,11 +17,13 @@ import { queryKeys } from "@/src/lib/query-keys";
 
 const PAGE_SIZE = 20;
 
-export function useLiveCalls() {
+export function useLiveCalls(enabled = true) {
   return useQuery({
     queryKey: queryKeys.calls.live(),
     queryFn: () => callsApi.live(),
-    refetchInterval: 5000,
+    enabled,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Clock, Loader2, PhoneCall, PhoneOff, Radio, Users, X } from "lucide-react";
+import { Clock, Loader2, PhoneCall, PhoneOff, Radio, RefreshCw, Users, X } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -36,7 +36,7 @@ function directionLabel(direction: LiveCallRoom["direction"]) {
 export function LiveCallsDock() {
   const [open, setOpen] = useState(false);
   const [endTarget, setEndTarget] = useState<LiveCallRoom | null>(null);
-  const { data: calls = [], isFetching, isError } = useLiveCalls();
+  const { data: calls = [], isFetching, isError, refetch } = useLiveCalls(open);
   const endLiveCall = useEndLiveCall();
 
   const sortedCalls = useMemo(
@@ -72,16 +72,29 @@ export function LiveCallsDock() {
                   Active LiveKit rooms for this organization.
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-8"
-                onClick={() => setOpen(false)}
-                aria-label="Close live calls"
-              >
-                <X className="size-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => refetch()}
+                  disabled={isFetching}
+                  aria-label="Refresh live calls"
+                >
+                  <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close live calls"
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="max-h-[420px] overflow-y-auto p-3">
@@ -94,7 +107,7 @@ export function LiveCallsDock() {
                   <PhoneCall className="mb-2 size-5 text-muted-foreground" />
                   <p className="text-sm font-medium">No active calls</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    New LiveKit rooms appear here automatically.
+                    Open or refresh this panel to check active LiveKit rooms.
                   </p>
                 </div>
               ) : (
