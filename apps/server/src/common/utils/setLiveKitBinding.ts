@@ -13,11 +13,11 @@ import { isSeedPhoneNumber } from "./phoneNumberGuards.js";
 type LiveKitSipClient = {
   updateSipInboundTrunkFields: (
     trunkId: string,
-    fields: { numbers: unknown }
+    fields: { numbers: ListUpdate }
   ) => Promise<unknown>;
 };
 
-type ListUpdateFactory = (input: { add?: string[]; remove?: string[] }) => unknown;
+type ListUpdateFactory = (input: { add?: string[]; remove?: string[] }) => ListUpdate;
 
 export type LiveKitBindingDeps = {
   inboundTrunkId?: string;
