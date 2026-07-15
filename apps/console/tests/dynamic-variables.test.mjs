@@ -97,3 +97,21 @@ test("AI runtime merges initiation webhook variables before rendering prompts", 
   assert.match(aiMain, /metadata = await apply_initiation_webhook_metadata\(config, metadata, call_context\)/);
   assert.match(aiMain, /config = apply_metadata_overrides\(config, metadata\)/);
 });
+
+
+test("advanced runtime settings expose IVR navigation", async () => {
+  const advancedTab = await text("apps/console/src/components/agents/tabs/AdvancedTab.tsx");
+  const configDefaults = await text("apps/console/src/lib/agents/config-defaults.ts");
+  const agentResource = await text("apps/console/src/lib/api/resources/agents.ts");
+  const agentTypes = await text("apps/console/src/lib/api/types.ts");
+  const agentSchema = await text("apps/server/src/modules/agent/agent.schema.ts");
+
+  assert.match(advancedTab, /ivr_navigation_enabled/);
+  assert.match(advancedTab, /IVR navigation/);
+  assert.match(advancedTab, /DTMF tones/);
+  assert.match(configDefaults, /ivr_navigation_enabled:\s*true/);
+  assert.match(configDefaults, /ivr_navigation_enabled:\s*current\.ivr_navigation_enabled \?\? true/);
+  assert.match(agentResource, /ivr_navigation_enabled:\s*boolean/);
+  assert.match(agentTypes, /ivr_navigation_enabled:\s*boolean/);
+  assert.match(agentSchema, /ivr_navigation_enabled:\s*z\.boolean\(\)\.default\(true\)/);
+});

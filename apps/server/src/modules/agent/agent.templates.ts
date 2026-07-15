@@ -18,6 +18,7 @@ const baseConfig = {
     placeholders: {},
   },
   preemptive_generation: false,
+  ivr_navigation_enabled: true,
   timezone: "UTC",
 } satisfies Omit<
   ConfigureAgentInput,

@@ -51,6 +51,7 @@ export interface ConfigureAgentInput {
     placeholders?: Record<string, string>;
   };
   preemptive_generation: boolean;
+  ivr_navigation_enabled: boolean;
   timezone: string;
 }
 

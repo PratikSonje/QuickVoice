@@ -132,6 +132,7 @@ export const swaggerSpec = {
           "initiation_webhook",
           "post_call_webhook",
           "preemptive_generation",
+          "ivr_navigation_enabled",
           "timezone",
         ],
         properties: {
@@ -166,6 +167,7 @@ export const swaggerSpec = {
           },
           variables: { $ref: "#/components/schemas/AgentVariables" },
           preemptive_generation: { type: "boolean", example: true },
+          ivr_navigation_enabled: { type: "boolean", example: true },
           timezone: { type: "string", example: "Asia/Calcutta" },
         },
         example: {
@@ -187,6 +189,7 @@ export const swaggerSpec = {
             placeholders: {},
           },
           preemptive_generation: true,
+          ivr_navigation_enabled: true,
           timezone: "Asia/Calcutta",
         },
       },

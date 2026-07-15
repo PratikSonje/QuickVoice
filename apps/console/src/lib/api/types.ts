@@ -75,6 +75,7 @@ export interface AgentConfiguration {
   post_call_webhook: WebhookConfig | null;
   variables: Record<string, unknown> | null;
   preemptive_generation: boolean;
+  ivr_navigation_enabled: boolean;
   timezone: string;
 }
 

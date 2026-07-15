@@ -394,6 +394,7 @@ model AgentConfiguration {
   post_call_webhook                 Json?
   variables                         Json?
   preemptive_generation             Boolean  @default(false)
+  ivr_navigation_enabled            Boolean  @default(true)
   timezone                          String   @default("UTC")
 }
 
