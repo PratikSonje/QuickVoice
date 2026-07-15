@@ -26,7 +26,9 @@ from main import (
     attach_resolved_voice_config,
     build_agent_instructions,
     build_room_options,
+    dtmf_user_input,
     build_session_provider_kwargs,
+    parse_dtmf_data_packet,
     provider_section,
 )
 
@@ -64,6 +66,36 @@ class WorkerHandlerTests(unittest.TestCase):
         )
 
         self.assertNotIn("send_dtmf_events", [tool.id for tool in agent.tools])
+
+    def test_parse_dtmf_data_packet_accepts_livekit_sip_digit_packets(self):
+        self.assertEqual(parse_dtmf_data_packet(b"1", topic="sip.dtmf"), "1")
+        self.assertEqual(
+            parse_dtmf_data_packet(b'{"type":"dtmf","digit":"#"}', topic="sip.event"),
+            "#",
+        )
+        self.assertEqual(
+            parse_dtmf_data_packet(b'{"event":"sip_dtmf","digits":"12"}', topic=None),
+            "12",
+        )
+
+    def test_parse_dtmf_data_packet_rejects_non_dtmf_packets(self):
+        self.assertIsNone(parse_dtmf_data_packet(b"1", topic="chat"))
+        self.assertIsNone(
+            parse_dtmf_data_packet(
+                b'{"type":"preview_user_transcript","text":"1"}',
+                topic="quickvoice.preview.transcript",
+            )
+        )
+        self.assertIsNone(
+            parse_dtmf_data_packet(b'{"type":"dtmf","digit":"hello"}', topic="sip.dtmf")
+        )
+
+    def test_dtmf_user_input_tells_agent_to_route_immediately(self):
+        text = dtmf_user_input("1")
+
+        self.assertIn("Caller pressed 1", text)
+        self.assertIn("route immediately", text)
+        self.assertIn("Do not ask them to press again", text)
 
     def test_provider_section_parses_supported_provider_model_values(self):
         self.assertEqual(provider_section("deepgram/nova-3"), {"provider": "deepgram", "model": "nova-3"})

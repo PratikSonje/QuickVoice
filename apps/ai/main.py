@@ -45,6 +45,7 @@ import json
 from datetime import datetime, timezone
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import sys
@@ -72,6 +73,8 @@ IVR_TOOL_INSTRUCTIONS = (
     "then send only the needed DTMF events such as digits, star, or pound. "
     "Do not send tones when you are unsure which menu option applies."
 )
+DTMF_DIGIT_RE = re.compile(r"^[0-9*#A-Da-d]+$")
+DTMF_JSON_KEYS = ("digit", "digits", "dtmf", "tone", "tones", "value")
 
 
 def _config_bool(value) -> bool:
@@ -107,6 +110,56 @@ def build_agent_instructions(config: dict) -> str:
     instructions += build_http_tool_instructions(config.get("tools") or [])
     instructions += build_mcp_tool_instructions(config.get("mcp_connections") or [])
     return instructions
+
+
+def parse_dtmf_data_packet(data: bytes | str | None, topic: str | None = None) -> str | None:
+    if data is None:
+        return None
+
+    topic_text = (topic or "").lower()
+    text = data.decode("utf-8", errors="ignore") if isinstance(data, bytes) else str(data)
+    text = text.strip()
+    if not text:
+        return None
+
+    try:
+        parsed = json.loads(text)
+    except Exception:
+        parsed = None
+
+    if isinstance(parsed, dict):
+        packet_type = str(parsed.get("type") or parsed.get("event") or "").lower()
+        if "dtmf" not in topic_text and "dtmf" not in packet_type:
+            return None
+        for key in DTMF_JSON_KEYS:
+            digits = normalize_dtmf_digits(parsed.get(key))
+            if digits:
+                return digits
+        return None
+
+    if "dtmf" not in topic_text:
+        return None
+    return normalize_dtmf_digits(parsed if parsed is not None else text)
+
+
+def normalize_dtmf_digits(value) -> str | None:
+    if isinstance(value, int):
+        value = str(value)
+    if not isinstance(value, str):
+        return None
+
+    digits = value.strip().replace(" ", "").replace(",", "")
+    if not digits or not DTMF_DIGIT_RE.fullmatch(digits):
+        return None
+    return digits.upper()
+
+
+def dtmf_user_input(digits: str) -> str:
+    return (
+        f"Caller pressed {digits} on their phone keypad. "
+        "Treat this as the caller's menu selection and route immediately. "
+        "Do not ask them to press again unless the selection is invalid."
+    )
 
 
 def build_room_options() -> room_io.RoomOptions:
@@ -484,9 +537,24 @@ async def entrypoint(ctx: JobContext):
     @ctx.room.on("data_received")
     def on_data_received(data_packet):
         participant = getattr(data_packet, "participant", None)
+        topic = getattr(data_packet, "topic", None)
+        payload = getattr(data_packet, "data", b"")
+        dtmf_digits = parse_dtmf_data_packet(payload, topic=topic)
+        if dtmf_digits:
+            logger.info(
+                "[DTMF] received caller keypad input from {}: {}",
+                redact_sensitive(getattr(participant, "identity", "")),
+                redact_sensitive(dtmf_digits),
+            )
+            session.generate_reply(
+                user_input=dtmf_user_input(dtmf_digits),
+                allow_interruptions=True,
+            )
+            return
+
         text = parse_preview_user_transcript_packet(
-            getattr(data_packet, "data", b""),
-            topic=getattr(data_packet, "topic", None),
+            payload,
+            topic=topic,
             participant_identity=getattr(participant, "identity", None),
             preview_mode=preview_mode,
         )
