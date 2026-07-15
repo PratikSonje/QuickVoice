@@ -45,7 +45,6 @@ import json
 from datetime import datetime, timezone
 import os
 from pathlib import Path
-import re
 import signal
 import subprocess
 import sys
@@ -69,12 +68,19 @@ RAG_TOOL_INSTRUCTIONS = (
 )
 IVR_TOOL_INSTRUCTIONS = (
     "\n\nIVR navigation is available through send_dtmf_events. "
-    "When you hear an automated phone menu, wait for the relevant option, "
-    "then send only the needed DTMF events such as digits, star, or pound. "
-    "Do not send tones when you are unsure which menu option applies."
+    "This is for outbound calls where you, the AI agent, call a phone system "
+    "and the remote side plays an automated menu. Listen to the full menu "
+    "or enough of it to know the mapping, for example appointments equals 1, "
+    "orders equals 2, returns equals 3. If the human says their goal before "
+    "the menu finishes, remember it while you listen for the matching option. "
+    "When the human tells you their goal, such as I want appointments, match "
+    "that goal to the menu option and call "
+    "send_dtmf_events with only the matching digit, star, or pound. Do not ask "
+    "the human to press the key. Do not wait for the human to press digits. "
+    "If the menu option is clear, send the tone immediately. If the mapping is "
+    "not clear yet, keep listening until it is clear. Never send tones when you "
+    "are unsure which menu option applies."
 )
-DTMF_DIGIT_RE = re.compile(r"^[0-9*#A-Da-d]+$")
-DTMF_JSON_KEYS = ("digit", "digits", "dtmf", "tone", "tones", "value")
 
 
 def _config_bool(value) -> bool:
@@ -111,55 +117,6 @@ def build_agent_instructions(config: dict) -> str:
     instructions += build_mcp_tool_instructions(config.get("mcp_connections") or [])
     return instructions
 
-
-def parse_dtmf_data_packet(data: bytes | str | None, topic: str | None = None) -> str | None:
-    if data is None:
-        return None
-
-    topic_text = (topic or "").lower()
-    text = data.decode("utf-8", errors="ignore") if isinstance(data, bytes) else str(data)
-    text = text.strip()
-    if not text:
-        return None
-
-    try:
-        parsed = json.loads(text)
-    except Exception:
-        parsed = None
-
-    if isinstance(parsed, dict):
-        packet_type = str(parsed.get("type") or parsed.get("event") or "").lower()
-        if "dtmf" not in topic_text and "dtmf" not in packet_type:
-            return None
-        for key in DTMF_JSON_KEYS:
-            digits = normalize_dtmf_digits(parsed.get(key))
-            if digits:
-                return digits
-        return None
-
-    if "dtmf" not in topic_text:
-        return None
-    return normalize_dtmf_digits(parsed if parsed is not None else text)
-
-
-def normalize_dtmf_digits(value) -> str | None:
-    if isinstance(value, int):
-        value = str(value)
-    if not isinstance(value, str):
-        return None
-
-    digits = value.strip().replace(" ", "").replace(",", "")
-    if not digits or not DTMF_DIGIT_RE.fullmatch(digits):
-        return None
-    return digits.upper()
-
-
-def dtmf_user_input(digits: str) -> str:
-    return (
-        f"Caller pressed {digits} on their phone keypad. "
-        "Treat this as the caller's menu selection and route immediately. "
-        "Do not ask them to press again unless the selection is invalid."
-    )
 
 
 def build_room_options() -> room_io.RoomOptions:
@@ -537,24 +494,9 @@ async def entrypoint(ctx: JobContext):
     @ctx.room.on("data_received")
     def on_data_received(data_packet):
         participant = getattr(data_packet, "participant", None)
-        topic = getattr(data_packet, "topic", None)
-        payload = getattr(data_packet, "data", b"")
-        dtmf_digits = parse_dtmf_data_packet(payload, topic=topic)
-        if dtmf_digits:
-            logger.info(
-                "[DTMF] received caller keypad input from {}: {}",
-                redact_sensitive(getattr(participant, "identity", "")),
-                redact_sensitive(dtmf_digits),
-            )
-            session.generate_reply(
-                user_input=dtmf_user_input(dtmf_digits),
-                allow_interruptions=True,
-            )
-            return
-
         text = parse_preview_user_transcript_packet(
-            payload,
-            topic=topic,
+            getattr(data_packet, "data", b""),
+            topic=getattr(data_packet, "topic", None),
             participant_identity=getattr(participant, "identity", None),
             preview_mode=preview_mode,
         )
