@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   agentsApi,
   type ConfigureAgentInput,
+  type CreatePreviewSessionInput,
   type CreateAgentInput,
   type UpdateAgentInput,
 } from "@/src/lib/api/resources/agents";
@@ -46,7 +47,8 @@ export function useVoiceCatalog() {
 export function useCreateAgentPreviewSession(agentId: string) {
   return useMutation({
     mutationKey: queryKeys.agents.previewSession(agentId),
-    mutationFn: () => agentsApi.createPreviewSession(agentId),
+    mutationFn: (input?: CreatePreviewSessionInput) =>
+      agentsApi.createPreviewSession(agentId, input),
     onError: (err: Error) => {
       toast.error(err.message || "Could not start preview");
     },

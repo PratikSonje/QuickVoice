@@ -28,10 +28,14 @@ test("buildAgentPreviewSessionPayload maps saved config to an ephemeral preview 
     systemPrompt: "You are helping {{company}}.",
     variables: {
       placeholders: {
-        first_name: "Aman",
+        first_name: "Saved Aman",
         company: "QuickIntell",
         empty_value: "",
       },
+    },
+    dynamicVariables: {
+      first_name: "Preview Aman",
+      ignored_empty: "",
     },
   });
 
@@ -50,10 +54,13 @@ test("buildAgentPreviewSessionPayload maps saved config to an ephemeral preview 
   });
   assert.equal(payload.metadata.mode, "preview");
   assert.equal(payload.metadata.retention, "ephemeral");
-  assert.equal(payload.metadata.first_message, "Hello Aman from saved config.");
+  assert.equal(
+    payload.metadata.first_message,
+    "Hello Preview Aman from saved config.",
+  );
   assert.equal(payload.metadata.system_prompt, "You are helping QuickIntell.");
   assert.deepEqual(payload.metadata.dynamic_variables, {
-    first_name: "Aman",
+    first_name: "Preview Aman",
     company: "QuickIntell",
   });
 });

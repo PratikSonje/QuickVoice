@@ -55,6 +55,10 @@ export interface ConfigureAgentInput {
   timezone: string;
 }
 
+export interface CreatePreviewSessionInput {
+  dynamicVariables?: Record<string, string>;
+}
+
 export interface WebhookInit {
   webhook_url: string;
   method: "GET" | "POST";
@@ -102,9 +106,13 @@ export const agentsApi = {
     );
     return res.data.data;
   },
-  createPreviewSession: async (id: string): Promise<AgentPreviewSession> => {
+  createPreviewSession: async (
+    id: string,
+    input?: CreatePreviewSessionInput,
+  ): Promise<AgentPreviewSession> => {
     const res = await apiClient.post<ApiEnvelope<AgentPreviewSession>>(
       `/agents/${id}/preview-session`,
+      input ?? {},
     );
     return res.data.data;
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   createLocalAudioTrack,
   Room,
@@ -31,8 +31,17 @@ import {
   SheetTitle,
 } from "@/src/components/ui/sheet";
 import { Badge } from "@/src/components/ui/badge";
-import { useCreateAgentPreviewSession } from "@/src/hooks/queries/agents";
+import { DynamicVariableInputs } from "@/src/components/agents/DynamicVariableInputs";
+import {
+  useAgentConfig,
+  useCreateAgentPreviewSession,
+} from "@/src/hooks/queries/agents";
 import type { AgentPreviewSession } from "@/src/lib/api/types";
+import {
+  dynamicVariablePayload,
+  normalizeAgentVariables,
+  uniqueDynamicVariableNames,
+} from "@/src/lib/agents/dynamic-variables";
 import { cn } from "@/src/lib/utils";
 
 type PreviewState =
@@ -79,6 +88,7 @@ export function AgentPreviewPanel({
   onOpenChange,
 }: AgentPreviewPanelProps) {
   const createPreview = useCreateAgentPreviewSession(agentId);
+  const { data: config } = useAgentConfig(agentId);
   const roomRef = useRef<Room | null>(null);
   const localTrackRef = useRef<LocalAudioTrack | null>(null);
   const remoteAudioRef = useRef<HTMLDivElement | null>(null);
@@ -91,6 +101,18 @@ export function AgentPreviewPanel({
     ConversationMessage[]
   >([]);
   const [interimTranscript, setInterimTranscript] = useState("");
+  const [previewVariableValues, setPreviewVariableValues] = useState<
+    Record<string, string>
+  >({});
+
+  const agentVariables = useMemo(
+    () => normalizeAgentVariables(config?.variables),
+    [config?.variables],
+  );
+  const previewVariableNames = useMemo(
+    () => uniqueDynamicVariableNames(agentVariables),
+    [agentVariables],
+  );
 
   const addEvent = useCallback((label: string, detail: string) => {
     setEvents((current) =>
@@ -231,7 +253,12 @@ export function AgentPreviewPanel({
     addEvent("Microphone", "Waiting for browser permission.");
 
     try {
-      const session = await createPreview.mutateAsync();
+      const session = await createPreview.mutateAsync({
+        dynamicVariables: dynamicVariablePayload(
+          agentVariables,
+          previewVariableValues,
+        ),
+      });
       setPreview(session);
       setState("connecting");
       addEvent("Session", "Temporary LiveKit room created.");
@@ -418,6 +445,19 @@ export function AgentPreviewPanel({
                     ? `Temporary preview access expires around ${expiresAt}.`
                     : "Starts a temporary 3-hour LiveKit preview room."}
                 </p>
+              </div>
+
+              <div className="mt-4">
+                <DynamicVariableInputs
+                  variableNames={previewVariableNames}
+                  values={previewVariableValues}
+                  placeholders={agentVariables.placeholders}
+                  title="Preview variables"
+                  description="Values entered here are used for this preview session and override saved fallback values."
+                  disabled={isBusy}
+                  idPrefix="preview-variable"
+                  onValuesChange={setPreviewVariableValues}
+                />
               </div>
             </div>
           ) : (

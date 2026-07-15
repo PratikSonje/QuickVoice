@@ -19,7 +19,11 @@ test("agent preview API and hook are wired", () => {
   assert.match(types, /interface AgentPreviewSession/);
   assert.match(agentsResource, /createPreviewSession/);
   assert.ok(agentsResource.includes("`/agents/${id}/preview-session`"));
+  assert.match(agentsResource, /interface CreatePreviewSessionInput/);
+  assert.match(agentsResource, /dynamicVariables\?: Record<string, string>/);
+  assert.match(agentsResource, /apiClient\.post<ApiEnvelope<AgentPreviewSession>>\(\s*`\/agents\/\$\{id\}\/preview-session`,\s*input \?\? \{\}/s);
   assert.match(hooks, /useCreateAgentPreviewSession/);
+  assert.match(hooks, /mutationFn: \(input\?: CreatePreviewSessionInput\)/);
   assert.match(queryKeys, /previewSession/);
 });
 
@@ -32,6 +36,11 @@ test("agent preview panel uses LiveKit microphone flow and is available on the a
   assert.ok(panel.includes("new Room("));
   assert.ok(panel.includes("createLocalAudioTrack"));
   assert.ok(panel.includes("Agent preview"));
+  assert.ok(panel.includes("DynamicVariableInputs"));
+  assert.ok(panel.includes("Preview variables"));
+  assert.ok(panel.includes("useAgentConfig(agentId)"));
+  assert.ok(panel.includes("dynamicVariablePayload("));
+  assert.match(panel, /createPreview\.mutateAsync\(\{\s*dynamicVariables:/s);
   assert.ok(panel.includes("dark:"));
   assert.ok(panel.includes("bg-background"));
   assert.match(panel, /Mute|Unmute/);

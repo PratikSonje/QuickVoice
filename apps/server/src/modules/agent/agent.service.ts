@@ -43,6 +43,7 @@ type PreviewConfigSource = {
   firstMessage: string;
   systemPrompt: string;
   variables?: unknown;
+  dynamicVariables?: unknown;
 };
 
 export type AgentPreviewSessionPayload = {
@@ -133,6 +134,7 @@ export const getVoiceCatalog = async (): Promise<VoiceCatalog> => {
 export const createAgentPreviewSession = async (
   organizationId: string,
   agentId: string,
+  dynamicVariables?: unknown,
 ): Promise<AgentPreviewSession> => {
   const configuration = await getAgentConfig(organizationId, agentId);
   return requestAgentPreviewSession(
@@ -148,6 +150,7 @@ export const createAgentPreviewSession = async (
       firstMessage: configuration.firstMessage,
       systemPrompt: configuration.systemPrompt,
       variables: configuration.variables,
+      dynamicVariables,
     }),
   );
 };
@@ -156,7 +159,10 @@ export const buildAgentPreviewSessionPayload = (
   configuration: PreviewConfigSource,
 ): AgentPreviewSessionPayload => {
   const suffix = randomUUID().replace(/-/g, "").slice(0, 12);
-  const dynamicVariables = previewDynamicVariables(configuration.variables);
+  const dynamicVariables = {
+    ...previewDynamicVariables(configuration.variables),
+    ...previewDynamicVariableOverrides(configuration.dynamicVariables),
+  };
   const firstMessage = renderPreviewDynamicVariables(
     configuration.firstMessage,
     dynamicVariables,
@@ -201,10 +207,13 @@ function renderPreviewDynamicVariables(
   template: string,
   variables: Record<string, string>,
 ): string {
-  return template.replace(/\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g, (match, key) => {
-    const value = variables[key];
-    return value?.trim() ? value : match;
-  });
+  return template.replace(
+    /\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g,
+    (match, key) => {
+      const value = variables[key];
+      return value?.trim() ? value : match;
+    },
+  );
 }
 
 function previewDynamicVariables(value: unknown): Record<string, string> {
@@ -222,6 +231,21 @@ function previewDynamicVariables(value: unknown): Record<string, string> {
   for (const [key, entry] of Object.entries(
     placeholders as Record<string, unknown>,
   )) {
+    const name = key.trim();
+    if (!name || typeof entry !== "string") continue;
+    const variableValue = entry.trim();
+    if (variableValue) variables[name] = variableValue;
+  }
+  return variables;
+}
+
+function previewDynamicVariableOverrides(
+  value: unknown,
+): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+  const variables: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
     const name = key.trim();
     if (!name || typeof entry !== "string") continue;
     const variableValue = entry.trim();
