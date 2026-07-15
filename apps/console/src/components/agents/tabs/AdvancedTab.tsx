@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { BookOpen, Keyboard, Loader2, Radio, Save, Trash2, Zap } from "lucide-react";
@@ -83,7 +83,10 @@ export function AdvancedTab({ agentId }: { agentId: string }) {
     },
   });
 
-  const ivrEnabled = form.watch("ivr_navigation_enabled");
+  const ivrEnabled = useWatch({
+    control: form.control,
+    name: "ivr_navigation_enabled",
+  });
 
   useEffect(() => {
     if (!config) return;
