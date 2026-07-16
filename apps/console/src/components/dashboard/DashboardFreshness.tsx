@@ -60,11 +60,11 @@ export function DashboardFreshness({
     <section
       aria-busy={isFetching}
       aria-live="polite"
-      className="rounded-lg border bg-card/80 p-3 shadow-sm"
+      className="rounded-lg border bg-card p-3 shadow-sm ring-1 ring-border/60"
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="grid gap-3 text-sm sm:grid-cols-2">
-          <div className="rounded-md bg-muted/35 px-4 py-3">
+          <div className="rounded-md border bg-muted/35 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase text-muted-foreground">
               Reporting window
             </p>
@@ -76,7 +76,7 @@ export function DashboardFreshness({
                   )}`}
             </p>
           </div>
-          <div className="rounded-md bg-muted/35 px-4 py-3">
+          <div className="rounded-md border bg-muted/35 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase text-muted-foreground">
               Last updated
             </p>

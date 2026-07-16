@@ -46,7 +46,7 @@ export function RangeSwitcher({
         onValueChange={onChange}
         aria-label="Dashboard date range"
         aria-busy={busy}
-        className="w-full border bg-background p-1 sm:w-fit"
+        className="w-full rounded-md border bg-muted/40 p-1 shadow-xs sm:w-fit"
       >
         {RANGES.map((range) => (
           <ToggleGroupItem

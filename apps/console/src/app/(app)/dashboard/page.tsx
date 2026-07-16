@@ -121,7 +121,7 @@ function DashboardSignal({
   }[tone];
 
   return (
-    <div className="group min-w-0 border-t border-border/70 px-5 py-4 transition-colors hover:bg-muted/35 lg:border-l lg:border-t-0">
+    <div className="group min-w-0 border-t border-border/70 bg-card/80 px-5 py-4 transition-colors hover:bg-muted/45 lg:border-l lg:border-t-0">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground">
@@ -200,7 +200,7 @@ function DashboardInsightCard({
   icon: LucideIcon;
 }) {
   return (
-    <div className="rounded-lg border bg-background/80 p-4 shadow-xs">
+    <div className="rounded-lg border bg-card/95 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase text-muted-foreground">
@@ -268,13 +268,13 @@ function DashboardCommandCenter({
     : "/calls";
 
   return (
-    <section className="overflow-hidden rounded-lg border bg-card shadow-sm">
+    <section className="overflow-hidden rounded-lg border bg-card shadow-md shadow-primary/5 ring-1 ring-border/60">
       <div className="grid xl:grid-cols-[minmax(0,1fr)_390px]">
-        <div className="relative min-w-0 p-6 sm:p-7 lg:p-8">
+        <div className="relative min-w-0 bg-gradient-to-br from-card via-background to-muted/45 p-6 sm:p-7 lg:p-8">
           <div className="absolute inset-x-0 top-0 h-1 bg-primary" aria-hidden />
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 max-w-3xl">
-              <div className="inline-flex h-8 items-center gap-2 rounded-full border bg-background px-3 text-xs font-medium text-muted-foreground shadow-xs">
+              <div className="inline-flex h-8 items-center gap-2 rounded-full border bg-card px-3 text-xs font-medium text-muted-foreground shadow-xs">
                 <Activity className="size-3.5 text-primary" />
                 {RANGE_LABELS[range]} overview
               </div>
@@ -341,8 +341,8 @@ function DashboardCommandCenter({
           </div>
         </div>
 
-        <aside className="border-t bg-muted/20 p-6 xl:border-l xl:border-t-0 lg:p-7">
-          <div className="rounded-lg border bg-background p-5 shadow-xs">
+        <aside className="border-t bg-muted/35 p-6 xl:border-l xl:border-t-0 lg:p-7">
+          <div className="rounded-lg border bg-card p-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase text-muted-foreground">
@@ -411,7 +411,7 @@ function DashboardCommandCenter({
         </aside>
       </div>
 
-      <div className="grid border-t bg-background/80 lg:grid-cols-4">
+      <div className="grid border-t bg-card/95 lg:grid-cols-4">
         <DashboardSignal
           label="Calls"
           value={formatCompactNumber(calls)}
@@ -556,11 +556,12 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5 rounded-lg border bg-muted/25 p-4 shadow-[inset_0_1px_0_hsl(var(--background))] sm:p-5">
       <PageHeader
         title="Dashboard"
         description="A compact view of call volume, outcomes, routing, and agent performance."
         actions={<RangeSwitcher current={range} loading={isFetching} />}
+        className="rounded-lg border bg-card p-5 shadow-sm"
       />
       <DashboardFreshness
         summary={data}
@@ -601,7 +602,10 @@ export default function DashboardPage() {
           />
           <KpiCards summary={data} range={range} loading={isLoading} />
           <PerformanceGraphs summary={data} range={range} loading={isLoading} />
-          <section className="grid grid-cols-1 gap-4 xl:grid-cols-3" aria-label="Traffic and agent performance">
+          <section
+            className="grid grid-cols-1 gap-4 rounded-lg border bg-background/60 p-3 shadow-sm xl:grid-cols-3"
+            aria-label="Traffic and agent performance"
+          >
             <div className="xl:col-span-2">
               <VolumeChart summary={data} range={range} loading={isLoading} />
             </div>
