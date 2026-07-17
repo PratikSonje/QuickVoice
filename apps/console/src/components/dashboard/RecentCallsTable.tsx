@@ -42,12 +42,12 @@ function statusVariant(
 function statusClass(status: CallStatus) {
   switch (status) {
     case "COMPLETED":
-      return "border-primary/20 bg-primary/5 text-primary";
+      return "border-emerald-500/20 bg-emerald-500/10 text-emerald-500";
     case "FAILED":
     case "NOT_ANSWERED":
       return "border-border bg-muted/40 text-muted-foreground";
     case "IN_PROGRESS":
-      return "border-primary/20 bg-primary/5 text-primary";
+      return "border-sky-500/20 bg-sky-500/10 text-sky-500";
     default:
       return "border-border bg-muted/40 text-muted-foreground";
   }
@@ -121,7 +121,7 @@ function primaryNumber(call: CallLog, parties: ReturnType<typeof callParties>) {
 
 function directionClasses(direction: CallLog["direction"]) {
   if (direction === "inbound" || direction === "outbound") {
-    return "border-primary/20 bg-primary/5 text-primary";
+    return "border-blue-500/20 bg-blue-500/10 text-blue-500";
   }
   return "border-border bg-muted/40 text-muted-foreground";
 }
@@ -182,7 +182,7 @@ export function RecentCallsTable({
         </div>
         <Link
           href="/calls"
-          className={`inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline ${linkFocusClass}`}
+          className={`inline-flex items-center gap-1 text-xs font-medium text-blue-500 hover:underline ${linkFocusClass}`}
         >
           View call logs <ArrowRight className="size-3" />
         </Link>
@@ -340,7 +340,7 @@ export function RecentCallsTable({
                       key={call.callId}
                       className="border-b border-border/70 bg-card transition-colors hover:bg-muted/25"
                     >
-                      <TableCell className="h-13 pl-5 align-middle text-sm text-primary">
+                      <TableCell className="h-13 pl-5 align-middle text-sm text-blue-500">
                         <CallTimestamp call={call} />
                       </TableCell>
                       <TableCell className="align-middle">
@@ -349,7 +349,7 @@ export function RecentCallsTable({
                         </p>
                       </TableCell>
                       <TableCell className="max-w-[220px] align-middle">
-                        <p className="truncate text-sm text-primary">
+                        <p className="truncate text-sm text-blue-500">
                           {agentLabel}
                         </p>
                         <span className="sr-only">

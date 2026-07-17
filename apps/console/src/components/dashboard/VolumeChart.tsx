@@ -30,15 +30,15 @@ import type {
 const config = {
   calls: {
     label: "Calls",
-    color: "hsl(var(--primary))",
+    color: "#2563eb",
   },
   minutes: {
     label: "Minutes",
-    color: "hsl(var(--muted-foreground))",
+    color: "#06b6d4",
   },
   failed: {
     label: "Failed",
-    color: "hsl(var(--foreground))",
+    color: "#f97316",
   },
 } satisfies ChartConfig;
 
@@ -113,7 +113,7 @@ export function VolumeChart({
         </div>
         <div className="grid grid-cols-3 overflow-hidden rounded-xl border bg-background/80 text-center text-xs shadow-sm backdrop-blur sm:min-w-96">
           <div className="border-r border-border/70 px-3 py-2.5">
-            <p className="font-semibold text-primary tabular-nums">{calls}</p>
+            <p className="font-semibold text-blue-500 tabular-nums">{calls}</p>
             <p className="text-muted-foreground">calls</p>
           </div>
           <div className="border-r border-border/70 px-3 py-2.5">
@@ -121,7 +121,7 @@ export function VolumeChart({
             <p className="text-muted-foreground">minutes</p>
           </div>
           <div className="px-3 py-2.5">
-            <p className="font-semibold text-muted-foreground tabular-nums">{peak}</p>
+            <p className="font-semibold text-cyan-500 tabular-nums">{peak}</p>
             <p className="text-muted-foreground">peak</p>
           </div>
         </div>
@@ -169,12 +169,12 @@ export function VolumeChart({
                   <stop
                     offset="0%"
                     stopColor="var(--color-minutes)"
-                    stopOpacity={0.28}
+                    stopOpacity={0.36}
                   />
                   <stop
                     offset="100%"
                     stopColor="var(--color-minutes)"
-                    stopOpacity={0.04}
+                    stopOpacity={0.06}
                   />
                 </linearGradient>
               </defs>
@@ -244,7 +244,7 @@ export function VolumeChart({
                 dataKey="calls"
                 name={`Calls by ${bucketUnit}`}
                 fill="var(--color-calls)"
-                fillOpacity={0.92}
+                fillOpacity={0.95}
                 barSize={18}
                 radius={[6, 6, 2, 2]}
               />
@@ -267,21 +267,21 @@ export function VolumeChart({
             <li className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="h-4 w-2 rounded-sm border border-primary bg-primary/80"
+                className="h-4 w-2 rounded-sm border border-blue-500 bg-blue-500"
               />
               <span>Calls by {bucketUnit} - bar series</span>
             </li>
             <li className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="h-3 w-5 rounded-sm border border-muted-foreground bg-muted-foreground/20"
+                className="h-3 w-5 rounded-sm border border-cyan-500 bg-cyan-500/20"
               />
               <span>Minutes (right axis) - shaded area</span>
             </li>
             <li className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="h-px w-6 border-t-2 border-foreground"
+                className="h-px w-6 border-t-2 border-orange-500"
               />
               <span>Failed calls - line series</span>
             </li>

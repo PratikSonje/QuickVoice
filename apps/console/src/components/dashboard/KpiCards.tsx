@@ -135,7 +135,7 @@ function Trend({
       aria-label={accessibleCopy}
       className={
         good
-          ? "flex max-w-full items-start gap-1 text-primary"
+          ? "flex max-w-full items-start gap-1 text-emerald-500"
           : "flex max-w-full items-start gap-1 text-muted-foreground"
       }
     >
@@ -155,7 +155,7 @@ function InvestigationHint({
   return (
     <div className="flex flex-col gap-1">
       {children}
-      <span className="inline-flex items-center gap-1 text-primary">
+      <span className="inline-flex items-center gap-1 text-blue-500">
         {action} <ArrowRight className="size-3" />
       </span>
     </div>

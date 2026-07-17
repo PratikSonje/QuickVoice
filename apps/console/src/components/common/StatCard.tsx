@@ -6,10 +6,10 @@ type StatTone = "neutral" | "success" | "warning" | "danger" | "info";
 
 const toneStyles: Record<StatTone, string> = {
   neutral: "border-border bg-muted/35 text-muted-foreground",
-  success: "border-primary/20 bg-primary/5 text-primary",
-  warning: "border-primary/20 bg-primary/5 text-primary",
-  danger: "border-primary/20 bg-primary/5 text-primary",
-  info: "border-primary/20 bg-primary/5 text-primary",
+  success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
+  warning: "border-amber-500/20 bg-amber-500/10 text-amber-500",
+  danger: "border-rose-500/20 bg-rose-500/10 text-rose-500",
+  info: "border-blue-500/20 bg-blue-500/10 text-blue-500",
 };
 
 export function StatCard({
@@ -34,7 +34,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative flex h-full min-h-[148px] flex-col overflow-hidden rounded-lg border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md",
+        "relative flex h-full min-h-[148px] flex-col overflow-hidden rounded-lg border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/30 hover:shadow-md",
         className
       )}
     >
@@ -67,7 +67,7 @@ export function StatCard({
       </div>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary/10"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500/40 via-cyan-400/25 to-transparent"
       />
     </div>
   );
