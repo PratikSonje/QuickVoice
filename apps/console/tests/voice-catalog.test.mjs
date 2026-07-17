@@ -89,7 +89,7 @@ test("voice tab keeps configured model and voice values visible after refresh", 
   assert.match(source, /ensureSelectedVoiceOption/);
   assert.match(source, /llmModelsWithConfiguredValue/);
   assert.match(source, /voicesWithConfiguredValue/);
-  assert.match(source, /Configured LLM/);
+  assert.match(source, /Configured \${kind}/);
   assert.match(source, /Configured voice/);
   assert.doesNotMatch(source, /getDefaultVoiceForTtsModel/);
   assert.doesNotMatch(source, /getDefaultSttModelForLanguage/);
