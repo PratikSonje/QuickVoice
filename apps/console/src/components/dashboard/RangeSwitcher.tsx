@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { CalendarDays, Loader2 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
@@ -43,7 +43,7 @@ export function RangeSwitcher({
   const pathname = usePathname();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const defaults = useMemo(defaultCustomDates, []);
+  const [defaults] = useState(() => defaultCustomDates());
   const [from, setFrom] = useState(customFrom ?? defaults.from);
   const [to, setTo] = useState(customTo ?? defaults.to);
   const busy = loading || isPending;

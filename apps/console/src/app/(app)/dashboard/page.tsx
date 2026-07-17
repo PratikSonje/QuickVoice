@@ -289,6 +289,8 @@ function DashboardCommandCenter({
     ? dashboardCallsHref({
         range,
         status: totals?.failedCalls ? "FAILED" : "NOT_ANSWERED",
+        from: customFrom,
+        to: customTo,
       })
     : "/calls";
 
