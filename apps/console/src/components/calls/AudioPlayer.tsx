@@ -43,7 +43,7 @@ export function AudioPlayer({ src }: { src: string | null }) {
     return (
         <div className="rounded-2xl border bg-background p-5 shadow-sm">
             <div className="flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
                     <Music className="size-5" />
                 </div>
                 <div className="min-w-0 flex-1">

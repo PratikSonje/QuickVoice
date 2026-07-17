@@ -61,7 +61,7 @@ function DetailStat({
 }) {
   return (
     <div className="rounded-xl border bg-background/70 p-4 shadow-sm transition-colors hover:bg-muted/40">
-      <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
         <Icon className="size-4" />
       </div>
       <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -81,7 +81,7 @@ export function CallTranscriptSheet({ call, onClose }: Props) {
     <Sheet open={!!call} onOpenChange={(open) => { if (!open) onClose(); }}>
       <SheetContent
         side="right"
-        className="w-full gap-0 overflow-hidden p-0 sm:max-w-[820px] xl:max-w-[920px]"
+        className="gap-0 overflow-hidden p-0 data-[side=right]:w-full data-[side=right]:sm:w-[min(92vw,1040px)] data-[side=right]:sm:max-w-none data-[side=right]:xl:w-[1040px]"
       >
         <SheetHeader className="border-b bg-muted/30 px-6 py-5 sm:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -102,7 +102,7 @@ export function CallTranscriptSheet({ call, onClose }: Props) {
                     variant={call.status === "COMPLETED" ? "default" : "secondary"}
                     className={cn(
                       "gap-1.5 rounded-full px-3 py-1",
-                      call.status === "COMPLETED" && "bg-primary text-primary-foreground"
+                      call.status === "COMPLETED" && "bg-blue-600 text-white"
                     )}
                   >
                     <CheckCircle2 className="size-3.5" />
@@ -115,7 +115,7 @@ export function CallTranscriptSheet({ call, onClose }: Props) {
         </SheetHeader>
 
         <div className="flex min-h-0 flex-1 flex-col bg-background">
-          <div className="grid gap-3 border-b bg-background/95 p-4 sm:grid-cols-3 sm:p-6 lg:p-8">
+          <div className="grid gap-3 border-b bg-background/95 p-4 sm:grid-cols-3 sm:p-5 xl:p-6">
             <DetailStat
               icon={CalendarClock}
               label="Started"
@@ -133,8 +133,8 @@ export function CallTranscriptSheet({ call, onClose }: Props) {
             />
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
-            <aside className="border-b bg-muted/20 p-4 sm:p-6 lg:border-r lg:border-b-0 lg:p-8">
+          <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)]">
+            <aside className="border-b bg-muted/20 p-4 sm:p-6 lg:border-r lg:border-b-0 lg:p-6">
               <AudioPlayer src={call?.audioRecordingPath ?? null} />
               <div className="mt-5 rounded-xl border bg-background/70 p-4 text-sm text-muted-foreground">
                 <p className="font-medium text-foreground">Review tip</p>

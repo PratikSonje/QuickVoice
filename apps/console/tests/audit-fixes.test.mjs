@@ -171,7 +171,7 @@ test("sidebar exposes a direct theme toggle and transcript bubbles keep readable
 
   assert.doesNotMatch(transcript, /bg-\[#0f2142\] text-foreground/);
   assert.match(transcript, /bg-background text-foreground/);
-  assert.match(transcript, /bg-primary text-primary-foreground/);
+  assert.match(transcript, /bg-blue-600 text-white/);
 });
 
 
@@ -180,9 +180,10 @@ test("call transcript drawer uses a wide review layout", () => {
   const audio = read("src/components/calls/AudioPlayer.tsx");
   const transcript = read("src/components/calls/Transcript.tsx");
 
-  assert.match(sheet, /sm:max-w-\[820px\]/);
-  assert.match(sheet, /xl:max-w-\[920px\]/);
-  assert.match(sheet, /lg:grid-cols-\[320px_minmax\(0,1fr\)\]/);
+  assert.match(sheet, /data-\[side=right\]:sm:w-\[min\(92vw,1040px\)\]/);
+  assert.match(sheet, /data-\[side=right\]:sm:max-w-none/);
+  assert.match(sheet, /data-\[side=right\]:xl:w-\[1040px\]/);
+  assert.match(sheet, /lg:grid-cols-\[340px_minmax\(0,1fr\)\]/);
   assert.match(sheet, /Review tip/);
   assert.match(audio, /rounded-2xl border bg-background p-5/);
   assert.match(transcript, /sm:max-w-\[76%\]/);

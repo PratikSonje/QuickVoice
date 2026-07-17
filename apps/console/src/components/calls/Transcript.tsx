@@ -46,14 +46,14 @@ export function Transcript({ callId }: { callId: string }) {
                 "max-w-[88%] rounded-2xl border px-4 py-3 shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5 sm:max-w-[76%]",
                 isAgent
                   ? "rounded-tl-md bg-background text-foreground"
-                  : "rounded-tr-md border-primary/20 bg-primary text-primary-foreground"
+                  : "rounded-tr-md border-blue-600/20 bg-blue-600 text-white"
               )}
             >
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70">
                 {isAgent ? "Agent" : "Caller"}
               </p>
               <p className="text-sm leading-6">{r.messageText}</p>
-              <p className={cn("mt-2 text-right text-[10px]", isAgent ? "text-muted-foreground" : "text-primary-foreground/70")}>
+              <p className={cn("mt-2 text-right text-[10px]", isAgent ? "text-muted-foreground" : "text-white/70")}>
                 {new Date(r.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
               </p>
             </div>
