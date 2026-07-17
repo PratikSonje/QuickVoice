@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import Link from "next/link";
-import { Bar, BarChart, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 import { ArrowRight, PhoneCall } from "lucide-react";
 import {
   ChartContainer,
@@ -23,16 +23,28 @@ const statusConfig = {
   count: { label: "Calls", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
-const directionConfig = {
-  inbound: { label: "Inbound", color: "var(--chart-2)" },
-  outbound: { label: "Outbound", color: "var(--chart-4)" },
-  unknown: { label: "Unknown", color: "var(--muted-foreground)" },
-} satisfies ChartConfig;
-
-const directionColors = {
-  inbound: "var(--color-inbound)",
-  outbound: "var(--color-outbound)",
-  unknown: "var(--color-unknown)",
+const directionStyles = {
+  inbound: {
+    label: "Inbound",
+    color: "#0284C7",
+    accentClass: "bg-sky-500",
+    textClass: "text-sky-600 dark:text-sky-300",
+    surfaceClass: "border-sky-500/25 bg-sky-500/10",
+  },
+  outbound: {
+    label: "Outbound",
+    color: "#F59E0B",
+    accentClass: "bg-amber-500",
+    textClass: "text-amber-600 dark:text-amber-300",
+    surfaceClass: "border-amber-500/25 bg-amber-500/10",
+  },
+  unknown: {
+    label: "Unknown",
+    color: "#64748B",
+    accentClass: "bg-slate-500",
+    textClass: "text-slate-600 dark:text-slate-300",
+    surfaceClass: "border-slate-500/25 bg-slate-500/10",
+  },
 };
 
 const statusColors: Record<string, string> = {
@@ -102,9 +114,12 @@ export function BreakdownCharts({
     directionData.find((item) => item.direction === "inbound")?.count ?? 0;
   const outbound =
     directionData.find((item) => item.direction === "outbound")?.count ?? 0;
-  const directionTotal = inbound + outbound;
+  const directionTotal = directionData.reduce((sum, item) => sum + item.count, 0);
   const inboundPct = directionTotal
     ? Math.round((inbound / directionTotal) * 100)
+    : 0;
+  const outboundPct = directionTotal
+    ? Math.round((outbound / directionTotal) * 100)
     : 0;
   const statusChartData = statusData.map((item) => ({
     ...item,
@@ -114,9 +129,10 @@ export function BreakdownCharts({
   }));
   const directionChartData = directionData.map((item) => ({
     ...item,
-    label: item.direction,
+    label: directionStyles[item.direction].label,
     pattern: directionPattern[item.direction],
     percentage: percent(item.count, directionTotal),
+    style: directionStyles[item.direction],
   }));
 
   return (
@@ -267,10 +283,10 @@ export function BreakdownCharts({
         )}
       </div>
       <div
-        className="min-w-0 overflow-hidden rounded-lg border bg-card p-5 shadow-sm"
+        className="min-w-0 overflow-hidden rounded-xl border bg-card shadow-sm ring-1 ring-border/50"
         aria-labelledby={directionTitleId}
       >
-        <div className="mb-5 flex min-w-0 items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-4 border-b bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),hsl(var(--background)),hsl(var(--muted)/0.55))] p-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase text-muted-foreground">
               Routing
@@ -286,80 +302,127 @@ export function BreakdownCharts({
               routed calls.
             </p>
           </div>
-          <div className="shrink-0 rounded-lg border bg-background px-3 py-2 text-right shadow-xs">
-            <p className="text-sm font-semibold text-foreground">{inboundPct}%</p>
-            <p className="text-xs text-muted-foreground">inbound</p>
+          <div className="grid grid-cols-2 overflow-hidden rounded-xl border bg-background/80 text-center text-xs shadow-sm backdrop-blur sm:min-w-56">
+            <div className="border-r border-border/70 px-3 py-2.5">
+              <p className="font-semibold tabular-nums text-sky-600 dark:text-sky-300">
+                {inboundPct}%
+              </p>
+              <p className="text-muted-foreground">inbound</p>
+            </div>
+            <div className="px-3 py-2.5">
+              <p className="font-semibold tabular-nums text-amber-600 dark:text-amber-300">
+                {outboundPct}%
+              </p>
+              <p className="text-muted-foreground">outbound</p>
+            </div>
           </div>
         </div>
         {directionData.length ? (
-          <div className="grid min-w-0 gap-4 overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(0,200px)]">
-            <ChartContainer
-              config={directionConfig}
-              className="h-64 min-w-0 w-full max-w-full overflow-hidden"
-              role="group"
-              aria-label="Inbound and outbound direction mix chart"
-            >
-              <PieChart
-                accessibilityLayer
-                aria-label="Inbound and outbound direction mix chart"
-                aria-describedby={directionSummaryId}
-              >
-                <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                <Pie
-                  data={directionChartData}
-                  dataKey="count"
-                  nameKey="label"
-                  innerRadius={54}
-                  outerRadius={92}
-                  paddingAngle={2}
-                >
-                  {directionData.map((item) => (
-                    <Cell
-                      key={item.direction}
-                      fill={directionColors[item.direction]}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-            <div className="grid min-w-0 w-full max-w-full gap-2 overflow-hidden">
-              {directionChartData.map((item) => (
-                <div
-                  key={item.direction}
-                  className="min-w-0 w-full max-w-full overflow-hidden rounded-lg border bg-background px-3 py-2 text-sm shadow-xs"
-                >
-                  <div className="flex min-w-0 items-center justify-between gap-2">
-                    <span className="min-w-0 truncate capitalize text-muted-foreground">
-                      {item.direction}
-                    </span>
-                    <span className="shrink-0 font-semibold text-foreground">
-                      {item.count}
-                    </span>
+          <div
+            className="space-y-5 p-5"
+            role="group"
+            aria-label="Inbound and outbound direction mix chart"
+            aria-describedby={directionSummaryId}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-sky-500/25 bg-sky-500/10 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Inbound calls
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight text-sky-600 tabular-nums dark:text-sky-300">
+                      {inbound}
+                    </p>
                   </div>
-                  <p className="mt-1 text-xs leading-snug text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {item.percentage}%
-                    </span>{" "}
-                    <span className="break-words">
-                      of routed calls, {item.pattern}
-                    </span>
-                  </p>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full"
-                      style={{
-                        width: `${
-                          directionTotal
-                            ? Math.round((item.count / directionTotal) * 100)
-                            : 0
-                        }%`,
-                        background:
-                          directionColors[item.direction] ?? "var(--muted-foreground)",
-                      }}
-                    />
-                  </div>
+                  <span className="rounded-full bg-background/70 px-2.5 py-1 text-xs font-semibold text-sky-600 shadow-xs dark:text-sky-300">
+                    {inboundPct}%
+                  </span>
                 </div>
-              ))}
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-background/70">
+                  <div
+                    className="h-full rounded-full bg-sky-500"
+                    style={{ width: `${inboundPct}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Outbound calls
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight text-amber-600 tabular-nums dark:text-amber-300">
+                      {outbound}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-background/70 px-2.5 py-1 text-xs font-semibold text-amber-600 shadow-xs dark:text-amber-300">
+                    {outboundPct}%
+                  </span>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-background/70">
+                  <div
+                    className="h-full rounded-full bg-amber-500"
+                    style={{ width: `${outboundPct}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-background/60 p-4">
+              <div className="mb-3 flex items-center justify-between gap-3 text-xs">
+                <span className="font-medium text-muted-foreground">
+                  Routed call share
+                </span>
+                <span className="font-semibold text-foreground tabular-nums">
+                  {directionTotal} total
+                </span>
+              </div>
+              <div className="flex h-4 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                {directionChartData.map((item) => (
+                  <div
+                    key={item.direction}
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${item.percentage}%`,
+                      background: item.style.color,
+                    }}
+                    title={`${item.label}: ${item.percentage}%`}
+                  />
+                ))}
+              </div>
+              <div className="mt-4 grid gap-2">
+                {directionChartData.map((item) => (
+                  <div
+                    key={item.direction}
+                    className={`rounded-lg border p-3 ${item.style.surfaceClass}`}
+                  >
+                    <div className="flex min-w-0 items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          aria-hidden
+                          className={`size-2.5 shrink-0 rounded-full ${item.style.accentClass}`}
+                        />
+                        <span className="truncate text-sm font-medium text-foreground">
+                          {item.label}
+                        </span>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-sm font-semibold text-foreground tabular-nums">
+                          {item.count}
+                        </p>
+                        <p className={`text-xs font-medium ${item.style.textClass}`}>
+                          {item.percentage}%
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      Percentage of routed calls, {item.pattern}.
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="sr-only">
               <table aria-describedby={directionSummaryId}>
@@ -390,7 +453,7 @@ export function BreakdownCharts({
             icon={ArrowRight}
             title="No routing data yet"
             description="Connect a number or place a test call to see inbound and outbound routing mix."
-            className="h-64 bg-background/40"
+            className="m-5 h-64 bg-background/40"
             action={
               <div className="flex flex-col gap-2 sm:flex-row">
                 <Button asChild size="sm">
