@@ -108,10 +108,14 @@ export function PerformanceGraphs({
   summary,
   range,
   loading,
+  customFrom,
+  customTo,
 }: {
   summary?: DashboardSummary;
   range: DashboardRange;
   loading?: boolean;
+  customFrom?: string;
+  customTo?: string;
 }) {
   const successSummaryId = useId();
   const exceptionSummaryId = useId();
@@ -323,7 +327,7 @@ export function PerformanceGraphs({
             Failed + missed call buckets
           </span>
           <Link
-            href={dashboardCallsHref({ range, status: "FAILED" })}
+            href={dashboardCallsHref({ range, status: "FAILED", from: customFrom, to: customTo })}
             className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
           >
             Review failed <ArrowRight className="size-3" />

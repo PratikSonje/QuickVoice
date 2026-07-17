@@ -657,7 +657,23 @@ export const swaggerSpec = {
           {
             name: "range",
             in: "query",
-            schema: { type: "string", enum: ["24h", "7d", "30d"], default: "7d" },
+            schema: {
+              type: "string",
+              enum: ["24h", "7d", "30d", "custom"],
+              default: "7d",
+            },
+          },
+          {
+            name: "from",
+            in: "query",
+            description: "Required when range is custom. Inclusive start date.",
+            schema: { type: "string", format: "date" },
+          },
+          {
+            name: "to",
+            in: "query",
+            description: "Required when range is custom. Inclusive end date.",
+            schema: { type: "string", format: "date" },
           },
         ],
         responses: {

@@ -24,6 +24,7 @@ const PREVIOUS_PERIOD_LABELS: Record<DashboardSummary["range"], string> = {
   "24h": "previous 24 hours",
   "7d": "previous 7 days",
   "30d": "previous 30 days",
+  custom: "previous custom range",
 };
 
 const PERIOD_BOUNDARY_FORMAT = new Intl.DateTimeFormat("en-US", {
@@ -168,10 +169,14 @@ export function KpiCards({
   summary,
   range,
   loading,
+  customFrom,
+  customTo,
 }: {
   summary?: DashboardSummary;
   range: DashboardRange;
   loading?: boolean;
+  customFrom?: string;
+  customTo?: string;
 }) {
   const totals = summary?.totals;
   const deltas = summary?.deltas;
@@ -268,7 +273,7 @@ export function KpiCards({
           className="h-full"
         />
         <Link
-          href={dashboardCallsHref({ range, status: "FAILED" })}
+          href={dashboardCallsHref({ range, status: "FAILED", from: customFrom, to: customTo })}
           className={drilldownLinkClass}
           aria-label="Review failed calls in the selected dashboard range"
         >
@@ -295,7 +300,7 @@ export function KpiCards({
           />
         </Link>
         <Link
-          href={dashboardCallsHref({ range, status: "NOT_ANSWERED" })}
+          href={dashboardCallsHref({ range, status: "NOT_ANSWERED", from: customFrom, to: customTo })}
           className={drilldownLinkClass}
           aria-label="View missed calls in the selected dashboard range"
         >

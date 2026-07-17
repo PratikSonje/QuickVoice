@@ -1,5 +1,5 @@
 import type { CallListParams } from "@/src/lib/api/resources/calls";
-import type { DashboardRange } from "@/src/lib/api/resources/dashboard";
+import type { DashboardSummaryParams } from "@/src/lib/api/resources/dashboard";
 
 export const queryKeys = {
   agents: {
@@ -39,8 +39,8 @@ export const queryKeys = {
   },
   dashboard: {
     all: ["dashboard"] as const,
-    summary: (range: DashboardRange) =>
-      [...queryKeys.dashboard.all, "summary", range] as const,
+    summary: (params: DashboardSummaryParams) =>
+      [...queryKeys.dashboard.all, "summary", params] as const,
   },
   org: {
     all: ["org"] as const,

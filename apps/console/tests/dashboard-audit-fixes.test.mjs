@@ -7,24 +7,27 @@ import test from "node:test";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("dashboard exposes freshness, reporting window, and stale/offline state", () => {
+test("dashboard keeps top chrome minimal and supports custom ranges", () => {
   const page = read("src/app/(app)/dashboard/page.tsx");
-  const freshness = read("src/components/dashboard/DashboardFreshness.tsx");
+  const switcher = read("src/components/dashboard/RangeSwitcher.tsx");
+  const api = read("src/lib/api/resources/dashboard.ts");
 
-  assert.match(page, /DashboardFreshness/);
-  assert.match(page, /dataUpdatedAt/);
-  assert.match(page, /isStale/);
-  assert.match(page, /isFetching/);
+  assert.doesNotMatch(page, /<PageHeader/);
+  assert.doesNotMatch(page, /<DashboardFreshness/);
+  assert.match(page, /<RangeSwitcher/);
+  assert.match(page, /customFrom=\{customFrom\}/);
+  assert.match(page, /customTo=\{customTo\}/);
+  assert.match(page, /useDashboardSummary\(\{ range, from: customFrom, to: customTo \}\)/);
 
-  assert.match(freshness, /Reporting window/);
-  assert.match(freshness, /Last updated/);
-  assert.match(freshness, /Refresh dashboard/);
-  assert.match(freshness, /aria-busy=\{isFetching\}/);
-  assert.match(freshness, /navigator\.onLine/);
-  assert.match(freshness, /You are offline/);
-  assert.match(freshness, /Dashboard data is stale/);
-  assert.match(freshness, /summary\.period\.from/);
-  assert.match(freshness, /summary\.period\.to/);
+  assert.match(switcher, /value: "custom"/);
+  assert.match(switcher, /type="date"/);
+  assert.match(switcher, /Apply/);
+  assert.match(switcher, /next\.set\("from", from\)/);
+  assert.match(switcher, /next\.set\("to", to\)/);
+  assert.match(switcher, /Select an end date after the start date/);
+
+  assert.match(api, /"24h" \| "7d" \| "30d" \| "custom"/);
+  assert.match(api, /DashboardSummaryParams/);
 });
 
 test("dashboard command center surfaces operational priorities and quick actions", () => {
@@ -106,6 +109,8 @@ test("dashboard exception signals link to filtered calls views with range contex
   assert.match(helper, /params\.set\("range", range\)/);
   assert.match(helper, /params\.set\("status", status\)/);
   assert.match(helper, /params\.set\("agentId", agentId\)/);
+  assert.match(helper, /params\.set\("from", from\)/);
+  assert.match(helper, /params\.set\("to", to\)/);
   assert.match(helper, /return `\/calls\?\$\{params\.toString\(\)\}`/);
 
   assert.match(page, /<KpiCards[\s\S]*range=\{range\}/);
@@ -144,7 +149,8 @@ test("dashboard performance graphs add quality, risk, and efficiency analytics",
   assert.match(graphs, /aria-label="Success rate trend chart"/);
   assert.match(graphs, /aria-label="Exception pressure stacked bar chart"/);
   assert.match(graphs, /aria-label="Conversation efficiency line chart"/);
-  assert.match(graphs, /dashboardCallsHref\(\{ range, status: "FAILED" \}\)/);
+  assert.match(graphs, /from: customFrom/);
+  assert.match(graphs, /to: customTo/);
   assert.match(graphs, /Success rate trend data table/);
   assert.match(graphs, /Exception pressure data table/);
   assert.match(graphs, /Conversation efficiency data table/);
@@ -180,13 +186,14 @@ test("dashboard range switching is labelled, responsive, and exposes loading sta
   const page = read("src/app/(app)/dashboard/page.tsx");
   const source = read("src/components/dashboard/RangeSwitcher.tsx");
 
-  assert.match(page, /<RangeSwitcher current=\{range\} loading=\{isFetching\}/);
+  assert.match(page, /<RangeSwitcher[\s\S]*current=\{range\}/);
   assert.match(source, /aria-label="Dashboard date range"/);
   assert.match(source, /aria-busy=\{busy\}/);
   assert.match(source, /role="status"/);
   assert.match(source, /aria-live="polite"/);
   assert.match(source, /Updating dashboard range/);
-  assert.match(source, /w-full[^"]*sm:w-auto/);
+  assert.match(source, /value: "custom"/);
+  assert.match(source, /type="date"/);
   assert.match(source, /flex-1[^"]*sm:flex-none/);
 });
 

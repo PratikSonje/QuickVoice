@@ -23,7 +23,6 @@ import {
   OfflineState,
   PermissionState,
 } from "@/src/components/common/EmptyState";
-import { PageHeader } from "@/src/components/common/PageHeader";
 import { RetryButton } from "@/src/components/common/RetryButton";
 import { RangeSwitcher } from "@/src/components/dashboard/RangeSwitcher";
 import { KpiCards } from "@/src/components/dashboard/KpiCards";
@@ -32,7 +31,6 @@ import { PerformanceGraphs } from "@/src/components/dashboard/PerformanceGraphs"
 import { BreakdownCharts } from "@/src/components/dashboard/BreakdownCharts";
 import { RecentCallsTable } from "@/src/components/dashboard/RecentCallsTable";
 import { AgentActivityList } from "@/src/components/dashboard/AgentActivityList";
-import { DashboardFreshness } from "@/src/components/dashboard/DashboardFreshness";
 import { dashboardCallsHref } from "@/src/components/dashboard/call-filter-links";
 import { useDashboardSummary } from "@/src/hooks/queries/dashboard";
 import type {
@@ -50,8 +48,30 @@ const MISSING_SECTION_FORMAT = new Intl.ListFormat("en-US", {
 });
 
 function resolveRange(param: string | null): DashboardRange {
-  if (param === "24h" || param === "7d" || param === "30d") return param;
+  if (
+    param === "24h" ||
+    param === "7d" ||
+    param === "30d" ||
+    param === "custom"
+  ) {
+    return param;
+  }
   return "7d";
+}
+
+function formatDateInput(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function defaultCustomRange() {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - 6);
+  return { from: formatDateInput(from), to: formatDateInput(to) };
+}
+
+function resolveDateParam(value: string | null) {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
 }
 
 function useOnlineStatus() {
@@ -83,6 +103,7 @@ const RANGE_LABELS: Record<DashboardRange, string> = {
   "24h": "Last 24 hours",
   "7d": "Last 7 days",
   "30d": "Last 30 days",
+  custom: "Custom range",
 };
 
 function formatDashboardDuration(seconds: number) {
@@ -227,12 +248,16 @@ function DashboardCommandCenter({
   loading,
   successPct,
   exceptionCalls,
+  customFrom,
+  customTo,
 }: {
   summary?: DashboardSummary;
   range: DashboardRange;
   loading?: boolean;
   successPct: number;
   exceptionCalls: number;
+  customFrom?: string;
+  customTo?: string;
 }) {
   const totals = summary?.totals;
   const calls = totals?.calls ?? 0;
@@ -502,17 +527,24 @@ function DashboardPartialDataNotice({ sections }: { sections: string[] }) {
 export default function DashboardPage() {
   const params = useSearchParams();
   const range = resolveRange(params.get("range"));
+  const defaultCustom = defaultCustomRange();
+  const customFrom =
+    range === "custom"
+      ? resolveDateParam(params.get("from")) ?? defaultCustom.from
+      : undefined;
+  const customTo =
+    range === "custom"
+      ? resolveDateParam(params.get("to")) ?? defaultCustom.to
+      : undefined;
   const isOnline = useOnlineStatus();
   const {
     data,
-    dataUpdatedAt,
     error,
     isLoading,
     isError,
     isFetching,
-    isStale,
     refetch,
-  } = useDashboardSummary(range);
+  } = useDashboardSummary({ range, from: customFrom, to: customTo });
   const successPct = Math.round((data?.totals.successRate ?? 0) * 100);
   const exceptionCalls =
     (data?.totals.failedCalls ?? 0) + (data?.totals.missedCalls ?? 0);
@@ -557,20 +589,14 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-5 rounded-lg border bg-muted/25 p-4 shadow-[inset_0_1px_0_hsl(var(--background))] sm:p-5">
-      <PageHeader
-        title="Dashboard"
-        description="A compact view of call volume, outcomes, routing, and agent performance."
-        actions={<RangeSwitcher current={range} loading={isFetching} />}
-        className="rounded-lg border bg-card p-5 shadow-sm"
-      />
-      <DashboardFreshness
-        summary={data}
-        loading={isLoading}
-        dataUpdatedAt={dataUpdatedAt}
-        isFetching={isFetching}
-        isStale={isStale}
-        onRefresh={() => refetch()}
-      />
+      <div className="flex justify-end">
+        <RangeSwitcher
+          current={range}
+          customFrom={customFrom}
+          customTo={customTo}
+          loading={isFetching}
+        />
+      </div>
       {dashboardErrorState?.kind === "offline" ? (
         <OfflineState
           title={dashboardErrorState.title}
@@ -599,9 +625,23 @@ export default function DashboardPage() {
             loading={isLoading}
             successPct={successPct}
             exceptionCalls={exceptionCalls}
+            customFrom={customFrom}
+            customTo={customTo}
           />
-          <KpiCards summary={data} range={range} loading={isLoading} />
-          <PerformanceGraphs summary={data} range={range} loading={isLoading} />
+          <KpiCards
+            summary={data}
+            range={range}
+            loading={isLoading}
+            customFrom={customFrom}
+            customTo={customTo}
+          />
+          <PerformanceGraphs
+            summary={data}
+            range={range}
+            loading={isLoading}
+            customFrom={customFrom}
+            customTo={customTo}
+          />
           <section
             className="grid grid-cols-1 gap-4 rounded-lg border bg-background/60 p-3 shadow-sm xl:grid-cols-3"
             aria-label="Traffic and agent performance"
@@ -613,9 +653,17 @@ export default function DashboardPage() {
               summary={data}
               range={range}
               loading={isLoading}
+              customFrom={customFrom}
+              customTo={customTo}
             />
           </section>
-          <BreakdownCharts summary={data} range={range} loading={isLoading} />
+          <BreakdownCharts
+            summary={data}
+            range={range}
+            loading={isLoading}
+            customFrom={customFrom}
+            customTo={customTo}
+          />
           <RecentCallsTable summary={data} loading={isLoading} />
         </>
       )}

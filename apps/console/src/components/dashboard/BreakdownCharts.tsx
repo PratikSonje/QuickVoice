@@ -71,10 +71,14 @@ export function BreakdownCharts({
   summary,
   range,
   loading,
+  customFrom,
+  customTo,
 }: {
   summary?: DashboardSummary;
   range: DashboardRange;
   loading?: boolean;
+  customFrom?: string;
+  customTo?: string;
 }) {
   const statusTitleId = useId();
   const statusSummaryId = useId();
@@ -194,7 +198,7 @@ export function BreakdownCharts({
               {statusData.map((item) => (
                 <Link
                   key={item.status}
-                  href={dashboardCallsHref({ range, status: item.status })}
+                  href={dashboardCallsHref({ range, status: item.status, from: customFrom, to: customTo })}
                   className="group flex items-center justify-between gap-3 rounded-lg border bg-background px-3 py-2 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-muted/30 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={`Review ${labelStatus(item.status)} calls in the selected dashboard range`}
                 >

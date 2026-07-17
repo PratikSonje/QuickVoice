@@ -44,10 +44,14 @@ export function AgentActivityList({
   summary,
   range,
   loading,
+  customFrom,
+  customTo,
 }: {
   summary?: DashboardSummary;
   range: DashboardRange;
   loading?: boolean;
+  customFrom?: string;
+  customTo?: string;
 }) {
   const {
     data: agents,
@@ -140,7 +144,7 @@ export function AgentActivityList({
             return (
               <Link
                 key={agent.agentId ?? "unknown"}
-                href={dashboardCallsHref({ range, agentId: agent.agentId })}
+                href={dashboardCallsHref({ range, agentId: agent.agentId, from: customFrom, to: customTo })}
                 className="group block rounded-lg border bg-background p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-muted/30 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label={`View calls for ${agentName} in the selected dashboard range`}
               >
