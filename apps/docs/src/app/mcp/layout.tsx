@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { DocsShell } from "@/components/docs-shell";
 
 export const metadata: Metadata = {
   title: "MCP",
@@ -7,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function McpLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <DocsShell>{children}</DocsShell>;
+  return children;
 }
