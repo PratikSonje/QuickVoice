@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
@@ -52,7 +52,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
@@ -76,7 +76,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
@@ -109,7 +109,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
@@ -139,7 +139,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
@@ -192,20 +192,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build server image target
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/server/Dockerfile
-          target: build
-          push: false
-          load: true
-          tags: quickvoice-server:ci
-          cache-from: type=gha,scope=server-ci
-          cache-to: type=gha,scope=server-ci,mode=max,ignore-error=true
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if docker build \
+              --target build \
+              --tag quickvoice-server:ci \
+              --file apps/server/Dockerfile \
+              .; then
+              exit 0
+            fi
+            echo "Docker server build failed on attempt ${attempt}; retrying after transient registry/network failure..."
+            sleep $((attempt * 20))
+          done
+          exit 1
 
   docker-ai:
     name: AI Docker Validate
@@ -215,22 +217,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build AI image
-        uses: docker/build-push-action@v6
-        with:
-          context: apps/ai
-          file: apps/ai/Dockerfile
-          push: false
-          load: true
-          tags: quickvoice-ai:ci
-          build-args: |
-            PREINSTALL_CPU_TORCH=true
-            SKIP_MODEL_DOWNLOAD=true
-          cache-from: type=gha,scope=ai-ci
-          cache-to: type=gha,scope=ai-ci,mode=max,ignore-error=true
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if docker build \
+              --build-arg PREINSTALL_CPU_TORCH=true \
+              --build-arg SKIP_MODEL_DOWNLOAD=true \
+              --tag quickvoice-ai:ci \
+              --file apps/ai/Dockerfile \
+              apps/ai; then
+              exit 0
+            fi
+            echo "Docker AI build failed on attempt ${attempt}; retrying after transient registry/network failure..."
+            sleep $((attempt * 20))
+          done
+          exit 1
 
   quality-summary:
     name: Quality Summary
