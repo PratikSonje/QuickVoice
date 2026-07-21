@@ -33,8 +33,10 @@ test("required CI workflow gates pull requests with parallel quality shards", as
   assert.match(ci, /python -m pip install -r requirements\.txt/);
   assert.match(ci, /python -m pip install pytest/);
   assert.match(ci, /python -m pytest tests/);
-  assert.match(ci, /docker\/setup-buildx-action@v3/);
-  assert.match(ci, /docker\/build-push-action@v6/);
+  assert.match(ci, /node-version: "24"/);
+  assert.match(ci, /docker build \\/);
+  assert.match(ci, /for attempt in 1 2 3/);
+  assert.match(ci, /retrying after transient registry\/network failure/);
   assert.match(ci, /PREINSTALL_CPU_TORCH=true/);
   assert.match(ci, /SKIP_MODEL_DOWNLOAD=true/);
   assert.match(ci, /Write quality gate summary/);
@@ -89,8 +91,11 @@ test("deploy workflows are gated, immutable, scanned, signed, and environment pr
   assert.match(workflow, /GitHub repository variables/);
   assert.match(workflow, /github\.sha/);
   assert.doesNotMatch(workflow, /:latest/);
-  assert.match(workflow, /sbom: true/);
-  assert.match(workflow, /provenance: true/);
+  assert.match(workflow, /docker build \\/);
+  assert.match(workflow, /docker push/);
+  assert.match(workflow, /aws ecr describe-images/);
+  assert.match(workflow, /for attempt in 1 2 3/);
+  assert.match(workflow, /retrying after transient registry\/network failure/);
   assert.match(workflow, /Smoke test pushed server image manifest/);
   assert.match(workflow, /Smoke test pushed AI image manifest/);
   assert.match(workflow, /aquasecurity\/trivy-action@/);
