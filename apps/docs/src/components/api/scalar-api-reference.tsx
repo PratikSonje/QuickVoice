@@ -71,7 +71,7 @@ export function ScalarApiReference() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[var(--qv-bg)] text-[var(--qv-ink)]">
+    <main className="api-reference-surface min-h-screen bg-[var(--qv-bg)] text-[var(--qv-ink)]">
       <Script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference" strategy="afterInteractive" onReady={() => setScriptReady(true)} />
       <div className="border-b border-[var(--qv-border)] bg-[var(--qv-card)] px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-3 pr-24">
