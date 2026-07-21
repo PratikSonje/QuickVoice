@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DocsShell } from "@/components/docs-shell";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { mcpReferenceStats } from "@/generated/mcp-reference";
@@ -24,8 +25,8 @@ const entries = [
 
 export default function ChangelogPage() {
   return (
-    <main className="min-h-screen bg-white qv-grid-bg text-slate-950">
-      <section className="mx-auto max-w-4xl px-6 py-20">
+    <DocsShell>
+      <section className="mx-auto max-w-4xl">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--qv-blue)]">QuickVoice Changelog</p>
         <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-slate-950 md:text-7xl">Product docs changes.</h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--qv-muted)]">
@@ -59,6 +60,6 @@ export default function ChangelogPage() {
           </Link>
         </div>
       </section>
-    </main>
+    </DocsShell>
   );
 }

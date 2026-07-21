@@ -1,9 +1,11 @@
+import { DocsShell } from "@/components/docs-shell";
 import Link from "next/link";
 import { CodeBlock } from "@/components/code-block";
 
 export default function SelfHostingPage() {
   return (
-    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <DocsShell>
+      <article className="prose prose-qv mx-auto max-w-4xl">
       <h1>Deploying the MCP service on ECS</h1>
       <p>
         Run QuickVoice MCP as the dedicated <code>apps/mcp-server</code> Node HTTP service. The docs app should stay responsible for the
@@ -45,6 +47,7 @@ pnpm --filter mcp-server start`} />
       <CodeBlock code={`MCP_BASE_URL="https://mcp.quickvoice.co/mcp" \
 MCP_AUTH_TOKEN="YOUR_MCP_AUTH_TOKEN" \
 pnpm --filter mcp-server test:mcp`} />
-    </article>
+      </article>
+    </DocsShell>
   );
 }

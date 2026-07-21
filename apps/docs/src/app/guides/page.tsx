@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DocsShell } from "@/components/docs-shell";
 import Link from "next/link";
 import { ArrowRight, BookOpen, KeyRound, ServerCog, ShieldCheck, Wrench } from "lucide-react";
 
@@ -48,8 +49,8 @@ const guides = [
 
 export default function GuidesPage() {
   return (
-    <main className="min-h-screen bg-white qv-grid-bg text-slate-950">
-      <section className="mx-auto max-w-6xl px-6 py-20">
+    <DocsShell>
+      <section className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--qv-blue)]">QuickVoice Guides</p>
           <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-slate-950 md:text-7xl">Step-by-step implementation guides.</h1>
@@ -80,6 +81,6 @@ export default function GuidesPage() {
           })}
         </div>
       </section>
-    </main>
+    </DocsShell>
   );
 }

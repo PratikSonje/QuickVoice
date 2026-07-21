@@ -1,3 +1,4 @@
+import { DocsShell } from "@/components/docs-shell";
 import { CodeBlock } from "@/components/code-block";
 
 const choices = [
@@ -17,7 +18,8 @@ const choices = [
 
 export default function ArchitecturePage() {
   return (
-    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <DocsShell>
+      <article className="prose prose-qv mx-auto max-w-4xl">
       <p className="lead">Use this boundary when deploying and maintaining QuickVoice MCP.</p>
       <h1>MCP architecture</h1>
       <p>
@@ -60,6 +62,7 @@ api.quickvoice.co/api/v1 → apps/server`} />
         For QuickVoice production, use <code>apps/mcp-server</code> for MCP and <code>apps/docs</code> for documentation. This keeps the MCP
         runtime smaller, easier to scale, easier to secure, and easier to debug independently from public docs traffic.
       </p>
-    </article>
+      </article>
+    </DocsShell>
   );
 }
