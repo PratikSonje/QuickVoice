@@ -2,7 +2,7 @@ import { CodeBlock } from "@/components/code-block";
 
 export default function QuickstartPage() {
   return (
-    <article className="prose prose-qv max-w-4xl">
+    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <p className="lead">Use this flow to connect an MCP-capable client to the dedicated QuickVoice MCP service over Streamable HTTP.</p>
       <h1>Quickstart</h1>
       <h2>1. Start the dedicated MCP HTTP service</h2>

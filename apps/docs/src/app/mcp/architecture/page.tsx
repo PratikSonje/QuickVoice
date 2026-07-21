@@ -17,7 +17,7 @@ const choices = [
 
 export default function ArchitecturePage() {
   return (
-    <article className="prose prose-qv max-w-4xl">
+    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <p className="lead">Use this boundary when deploying and maintaining QuickVoice MCP.</p>
       <h1>MCP architecture</h1>
       <p>

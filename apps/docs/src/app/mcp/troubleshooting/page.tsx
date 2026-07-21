@@ -1,6 +1,6 @@
 export default function TroubleshootingPage() {
   return (
-    <article className="prose prose-qv max-w-4xl">
+    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <h1>Troubleshooting</h1>
       <h2>401 Unauthorized</h2>
       <p>Confirm the client sends <code>Authorization: Bearer MCP_AUTH_TOKEN</code>. Do not use a console browser cookie as the MCP token.</p>

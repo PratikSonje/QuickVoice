@@ -3,7 +3,7 @@ import { mcpTools } from "@/generated/mcp-reference";
 
 export default function ToolsPage() {
   return (
-    <section className="mx-auto max-w-6xl">
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--qv-border)] pb-6">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--qv-blue)]">Reference</p>

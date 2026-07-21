@@ -2,7 +2,7 @@ import { mcpReferenceStats } from "@/generated/mcp-reference";
 
 export default function ChangelogPage() {
   return (
-    <article className="prose prose-qv max-w-4xl">
+    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <h1>Changelog</h1>
       <h2>July 2026</h2>
       <ul>

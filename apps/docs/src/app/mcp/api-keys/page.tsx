@@ -1,6 +1,6 @@
 export default function ApiKeysPage() {
   return (
-    <article className="prose prose-qv max-w-4xl">
+    <article className="prose prose-qv mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <h1>API keys and authentication</h1>
       <p>The remote MCP endpoint must not be public. QuickVoice MCP uses a bearer token gate before forwarding requests to the existing QuickVoice API layer.</p>
       <h2>Required environment</h2>
