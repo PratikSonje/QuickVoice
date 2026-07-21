@@ -56,7 +56,7 @@ test("security audit fails on high advisories and uses explicit suppressions", a
     assert.match(suppression.id, /^GHSA-|^CVE-|^\d+$/);
     assert.ok(suppression.module);
     assert.ok(suppression.reason.includes("Temporary baseline suppression"));
-    assert.equal(suppression.expires, "2026-07-19");
+    assert.equal(suppression.expires, "2026-08-20");
     assert.ok(Array.isArray(suppression.contexts));
     assert.ok(suppression.contexts.length > 0);
     for (const context of suppression.contexts) {
