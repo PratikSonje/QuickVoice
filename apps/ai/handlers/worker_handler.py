@@ -409,10 +409,20 @@ def render_dynamic_variables(template: str, variables: dict[str, Any]) -> str:
     return DYNAMIC_VARIABLE_TOKEN_RE.sub(replace, template)
 
 
-def speak_first_message(session: Any, config: dict[str, Any]):
+def speak_first_message(session: Any, config: dict[str, Any], trace=None):
     first_message = (config.get("first_message") or "").strip()
     if not first_message:
         return None
+    if trace:
+        trace.span(
+            name="tts_first_message",
+            input=first_message,
+            output="Voice greeting sent to user",
+            metadata={
+                "tts_provider": config.get("tts_model", "deepgram/aura-2"),
+                "greeting_length": len(first_message),
+            }
+        )
     return session.say(first_message, allow_interruptions=True)
 
 

@@ -35,6 +35,7 @@ from handlers.worker_handler import (
     parse_metadata,
     speak_first_message,
 )
+from handlers.langfuse_handler import get_langfuse
 from handlers.voice_catalog import load_voice_catalog
 from handlers.voice_config_resolution import resolve_voice_config
 from handlers.voice_provider_adapters import ProviderAdapterError, build_voice_provider_adapters
@@ -160,7 +161,8 @@ def provider_section(value: str | None):
 
 
 def attach_resolved_voice_config(config: dict) -> dict:
-    if isinstance(config.get("voice_config"), dict):
+    from utils.auth import is_explicit_dev_mode
+    if is_explicit_dev_mode() or isinstance(config.get("voice_config"), dict):
         return config
 
     tts_section = provider_section(config.get("tts_model"))
@@ -267,6 +269,7 @@ class Assistant(Agent):
         config: dict,
         call_context: dict,
         transcript_collector: TranscriptCollector | None = None,
+        trace=None,
     ):
         super().__init__(
             instructions=system_prompt,
@@ -276,6 +279,7 @@ class Assistant(Agent):
         self._call_context = call_context
         self._metadata_collector = CallMetadataCollector(config)
         self._transcript_collector = transcript_collector
+        self.trace = trace
 
     def _rag_enabled(self) -> bool:
         return bool(self._config.get("use_rag"))
@@ -288,6 +292,24 @@ class Assistant(Agent):
         )
 
     async def on_user_turn_completed(self, turn_ctx, new_message) -> None:
+        query = new_message.text_content if hasattr(new_message, "text_content") else ""
+        if callable(query):
+            query = query()
+        query = str(query or "").strip()
+        
+        if self.trace and query:
+            stt_model = self._config.get("stt_model", "deepgram/nova-3")
+            self.trace.span(
+                name="stt_user_turn",
+                input="User spoke into microphone",
+                output=query,
+                metadata={
+                    "stt_provider": stt_model,
+                    "language": self._config.get("agent_language", "en-US"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+
         if not self._rag_enabled():
             return
 
@@ -296,10 +318,6 @@ class Assistant(Agent):
             logger.warning("[rag] skipped retrieval because agent_id is missing")
             return
 
-        query = new_message.text_content if hasattr(new_message, "text_content") else ""
-        if callable(query):
-            query = query()
-        query = str(query or "").strip()
         if not query:
             return
 
@@ -329,23 +347,69 @@ class Assistant(Agent):
                 f"{context}"
             ),
         )
-        logger.info(f"[rag] injected context for agent={agent_id}")
+        logger.info("[rag] injected context for agent={}", redact_sensitive(agent_id))
 
     async def transcription_node(self, text, model_settings):
-        chunks: list[str] = []
-        output = Agent.default.transcription_node(self, text, model_settings)
-        if output is None:
-            return
-        async for chunk in output:
-            chunk_text = _transcription_chunk_text(chunk)
-            if chunk_text:
-                chunks.append(chunk_text)
-            yield chunk
-        if self._transcript_collector is not None:
-            self._transcript_collector.on_agent_transcription_final(
-                "".join(chunks),
-                datetime.now(timezone.utc),
+        span = None
+        generation_start = datetime.now(timezone.utc)
+        if self.trace:
+            chat_input = "Unknown input"
+            try:
+                msgs = self.chat_ctx.messages if not callable(self.chat_ctx.messages) else self.chat_ctx.messages()
+                if msgs:
+                    user_msgs = [m for m in msgs if getattr(m, "role", None) == "user"]
+                    if user_msgs:
+                        last_msg = user_msgs[-1]
+                        chat_input = getattr(last_msg, "content", "Unknown input") or chat_input
+            except Exception:
+                pass
+
+            llm_model = str(getattr(model_settings, "model", "unknown") if model_settings else "unknown")
+            span = self.trace.generation(
+                name="llm_generation",
+                input=str(chat_input),
+                model=llm_model,
+                metadata={
+                    "llm_provider": self._config.get("llm_provider", "google"),
+                    "llm_model": self._config.get("llm_model", "google/gemini-2.5-flash"),
+                    "start_time": generation_start.isoformat(),
+                }
             )
+
+        chunks: list[str] = []
+        try:
+            output = Agent.default.transcription_node(self, text, model_settings)
+            if output is None:
+                if span: span.end(output="")
+                return
+            async for chunk in output:
+                chunk_text = _transcription_chunk_text(chunk)
+                if chunk_text:
+                    chunks.append(chunk_text)
+                yield chunk
+            
+            final_text = "".join(chunks)
+            if span:
+                generation_end = datetime.now(timezone.utc)
+                latency_ms = (generation_end - generation_start).total_seconds() * 1000
+                span.end(
+                    output=final_text,
+                    metadata={
+                        "latency_ms": round(latency_ms, 2),
+                        "output_chars": len(final_text),
+                        "end_time": generation_end.isoformat(),
+                    }
+                )
+            
+            if self._transcript_collector is not None:
+                self._transcript_collector.on_agent_transcription_final(
+                    final_text,
+                    datetime.now(timezone.utc),
+                )
+        except Exception as e:
+            if span: span.end(level="ERROR", status_message=str(e))
+            logger.error("Error in LLM generation: {}", e.__class__.__name__)
+            raise
 
     @function_tool
     async def record_call_extracted_data(self, field: str, value: str) -> str:
@@ -379,7 +443,7 @@ class Assistant(Agent):
             top_k: Maximum number of matching chunks to retrieve.
         """
         if not self._rag_enabled():
-            return "Knowledge base search is disabled for this agent."
+            return "No knowledge base is configured. Answer the user's question using your own general knowledge instead."
 
         agent_id = self._agent_id()
         if not agent_id:
@@ -489,6 +553,29 @@ async def entrypoint(ctx: JobContext):
     if not call_context.get("provider") and config.get("provider"):
         call_context["provider"] = config["provider"]
 
+    # Initialize Langfuse Trace
+    langfuse_client = get_langfuse()
+    trace = None
+    if langfuse_client:
+        session_id = call_context.get("call_id") or ctx.room.name
+        agent_id = call_context.get("agent_id") or "unknown_agent"
+        logger.info("Creating Langfuse trace for session {}", redact_sensitive(session_id))
+        trace = langfuse_client.trace(
+            name="voice_call",
+            id=session_id,
+            session_id=session_id,
+            user_id=call_context.get("user_number"),
+            tags=[f"agent_id:{agent_id}", f"direction:{call_context.get('direction', 'inbound')}"],
+            metadata={
+                "agent_id": agent_id,
+                "direction": call_context.get("direction", "inbound"),
+                "llm_model": config.get("llm_model", "google/gemini-2.5-flash"),
+                "stt_model": config.get("stt_model", "deepgram/nova-3"),
+                "tts_model": config.get("tts_model", "deepgram/aura-2"),
+                "language": config.get("agent_language", "en-US"),
+            }
+        )
+
     try:
         provider_kwargs = build_session_provider_kwargs(config)
     except ProviderAdapterError as error:
@@ -531,6 +618,7 @@ async def entrypoint(ctx: JobContext):
         config=config,
         call_context=call_context,
         transcript_collector=transcript_collector,
+        trace=trace,
     )
 
     @ctx.room.on("data_received")
@@ -579,7 +667,7 @@ async def entrypoint(ctx: JobContext):
     except Exception:
         await live_transcript_publisher.close(reason="session_start_failed")
         raise
-    speak_first_message(session, config)
+    speak_first_message(session, config, trace=trace)
 
     recording_id = None
     if should_store_call_audio(config):
